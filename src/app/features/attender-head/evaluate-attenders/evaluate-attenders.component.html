@@ -1,0 +1,26 @@
+<div class="container">
+  <h2>Evaluate Attenders</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Attender</th>
+        <th *ngFor="let kpi of kpis">{{ kpi.kpi_name }} ({{ kpi.weightage }}%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let attender of attenders">
+        <td>{{ attender.name }}</td>
+        <td *ngFor="let kpi of kpis">
+          <input
+            type="number"
+            class="form-control"
+            min="0"
+            max="10"
+            [(ngModel)]="evaluations[attender.id][kpi.id]"
+          />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <button class="btn btn-primary" (click)="submitEvaluations()">Submit</button>
+</div>

@@ -1,0 +1,83 @@
+<div class="container mt-4">
+  <h2>Transfer Master</h2>
+  <p>Manage the Staff Transfers in the system.</p>
+
+  <div class="mb-3">
+    <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearch()">
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>Add/Edit Staff Transfer</h4>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="saveBranch()">
+        <div class="mb-3">
+          <label for="oldBranch" class="form-label">User</label>
+          <select id="oldBranch" class="form-select" [(ngModel)]="selectedUser" name="selectedUser" (ngModelChange)="onUserSelect($event)"> 
+            <option [ngValue]="null" selected>Choose...</option>
+            <option *ngFor="let user of userData" [ngValue]="user">
+              {{ user.name }}
+            </option>
+          </select>
+
+        </div>
+        <div class="mb-3">
+          <label for="oldBranch" class="form-label">Old Branch</label>
+          <select id="oldBranch" class="form-select" [(ngModel)]="transfer.old_branch_id" name="oldbranch_id">
+            <option selected>Choose...</option>
+            <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.name }}</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="newBranch" class="form-label">New Branch</label>
+          <select id="newBranch" class="form-select" [(ngModel)]="transfer.new_branch_id" name="newbranch_id">
+            <option selected>Choose...</option>
+            <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.name }}</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>Transferred ID</th>
+        <th>Staff ID</th>
+        <th>Old Branch</th>
+        <th>New Branch</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let branch of paginatedTrasferedStaff">
+        <td>{{ branch.id }}</td>
+        <td>{{ branch.staff_id }}</td>
+        <td>{{ branch.old_branch_id }}</td>
+        <td>{{ branch.new_branch_id }}</td>
+        <td>
+          <button class="btn btn-primary btn-sm me-2" (click)="editBranch(branch)">Edit</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteBranch(branch.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <nav *ngIf="totalPages > 1">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" href="#" (click)="goToPage($event, currentPage - 1)">Previous</a>
+      </li>
+      <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index"
+        [class.active]="currentPage === i + 1">
+        <a class="page-link" href="#" (click)="goToPage($event, i + 1)">{{ i + 1 }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" href="#" (click)="goToPage($event, currentPage + 1)">Next</a>
+      </li>
+    </ul>
+  </nav>
+</div>

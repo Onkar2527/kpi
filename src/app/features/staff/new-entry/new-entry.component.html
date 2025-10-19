@@ -1,0 +1,29 @@
+<div class="container mt-4">
+  <h2>Add Entry</h2>
+  <p>Submit a new entry for verification.</p>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <form (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="kpi" class="form-label">Select Type</label>
+      <select id="kpi" class="form-select" [(ngModel)]="kpi" name="kpi">
+        <option selected>Choose...</option>
+        <option *ngFor="let kpi of kpiOptions" [value]="kpi">{{ kpi }}</option>
+      </select>
+    </div>
+    <div class="mb-3" *ngIf="kpi !== 'loan_amulya'">
+      <label for="accountNumber" class="form-label">Account Number</label>
+      <input type="text" class="form-control" id="accountNumber" [(ngModel)]="accountNo" name="accountNo">
+    </div>
+    <div class="mb-3">
+      <label for="value" class="form-label">{{ kpi === 'loan_amulya' ? 'Number of Accounts' : 'Value' }}</label>
+      <input type="number" class="form-control" id="value" [(ngModel)]="value" name="value">
+    </div>
+    <div class="mb-3">
+      <label for="date" class="form-label">Date</label>
+      <input type="date" class="form-control" id="date" [(ngModel)]="date" name="date" [min]="minDate" [max]="maxDate">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>

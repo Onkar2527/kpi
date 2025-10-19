@@ -1,0 +1,65 @@
+<!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top flex-md-nowrap p-0 shadow">
+  <div class="container-fluid">
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">KPI Management System</a>
+    <div class="collapse navbar-collapse justify-content-end">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <span class="navbar-text me-3">Welcome, {{ auth.user?.name }}</span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" (click)="logout()">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav> -->
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
+  <div class="container-fluid px-3 px-md-4">
+    <!-- Brand/Logo -->
+    <a class="navbar-brand d-flex align-items-center me-4" href="#">
+      <div class="brand-icon me-2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 19V13H15V19H19V9L12 3L5 9V19H9Z" fill="#4361ee"/>
+        </svg>
+      </div>
+      <span class="fw-bold text-dark">KPI Management System</span>
+    </a>
+    
+    <!-- Toggle button for mobile -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+            aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <!-- Navbar content -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <!-- Navigation menu (if needed in the future) -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- Can add menu items here later -->
+      </ul>
+      
+      <!-- User section -->
+      <div class="d-flex align-items-center ms-auto">
+        <!-- User avatar and name -->
+        <div class="d-flex align-items-center me-3">
+          <div class="user-avatar bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2">
+            <span class="text-primary fw-medium">{{ auth.user?.name?.charAt(0) || 'U' }}</span>
+          </div>
+          <span class="text-muted d-none d-md-block">Welcome, {{ auth.user?.name || 'User' }}</span>
+        </div>
+        
+        <!-- Logout button -->
+        <div class="nav-divider d-none d-md-block me-3"></div>
+        <a class="nav-link logout-btn p-2 rounded" href="#" (click)="logout()" title="Logout">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 7L15.59 8.41L18.17 11H8V13H18.17L15.59 15.58L17 17L22 12L17 7ZM4 5H12V3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H12V19H4V5Z" fill="currentColor"/>
+          </svg>
+          <span class="d-none d-lg-inline ms-1">Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>

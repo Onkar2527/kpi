@@ -1,0 +1,14 @@
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-body">
+      <h3 class="card-title mb-4">Welcome</h3>
+      <p class="card-text" *ngIf="auth.user as user">
+        Hello, <strong>{{ user.name }}</strong>!<br />
+        Role: <strong>{{ user.role }}</strong><br />
+        Branch: <strong>{{ user.branchId || 'N/A' }}</strong>
+      </p>
+      <p class="card-text" *ngIf="!auth.user">You are not logged in.</p>
+      <button class="btn btn-secondary" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</div>

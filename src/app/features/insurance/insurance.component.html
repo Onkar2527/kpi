@@ -1,0 +1,14 @@
+<div class="container mt-4">
+  <h2>Upload Insurance Targets</h2>
+  <p>Upload a CSV file with the insurance targets for the period.</p>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="mb-3">
+        <label for="targetFile" class="form-label">Target File</label>
+        <input class="form-control" type="file" id="targetFile" (change)="onFileSelect($event)">
+      </div>
+      <button class="btn btn-primary" (click)="upload()">Upload</button>
+    </div>
+  </div>
+</div>

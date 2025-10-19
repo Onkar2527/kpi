@@ -1,0 +1,184 @@
+<div class="container mt-4">
+  <h2>Weightage & Increment</h2>
+  <p>Computed KPI scores and salary increments based on performance.</p>
+
+  <div class="card" *ngIf="auth.user?.role === 'Clerk' && staffScores">
+    <div class="card-header">
+      <h4>My KPI Scores (out of 10)</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>KPI</th>
+            <th>Weightage</th>
+            <th>Target</th>
+            <th>Achieved</th>
+            <th>Out of 10</th>
+            <th>Weightage Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let kpi of ['deposit', 'loan_gen', 'loan_amulya', 'recovery', 'audit', 'insurance']">
+            <td>{{ kpi }}</td>
+            <td>{{ staffScores[kpi]?.weightage }}</td>
+            <td>{{ staffScores[kpi]?.target | number:'1.2-2' }}</td>
+            <td>{{ staffScores[kpi]?.achieved | number:'1.2-2' }}</td>
+            <td>{{ staffScores[kpi]?.score | number:'1.2-2' }}</td>
+            <td>{{ staffScores[kpi]?.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td colspan="4"></td>
+            <td><strong>{{ staffScores.total | number:'1.2-2' }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="auth.user?.role === 'BM' && bmScores">
+    <div class="card-header">
+      <h4>Branch Manager KPI Scores (out of 10)</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>KPI</th>
+            <th>Weightage</th>
+            <th>Target</th>
+            <th>Achieved</th>
+            <th>Out of 10</th>
+            <th>Weightage Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Deposit</td>
+            <td>{{ bmScores.deposit.weightage }}</td>
+            <td>{{ bmScores.deposit.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.deposit.achieved | number:'1.2-2' }}</td>
+            <td>{{ bmScores.deposit.score | number:'1.2-2' }}</td>
+            <td>{{ bmScores.deposit.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td>Loan Gen</td>
+            <td>{{ bmScores.loan_gen.weightage }}</td>
+            <td>{{ bmScores.loan_gen.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_gen.achieved | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_gen.score | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_gen.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td>Loan Amulya</td>
+            <td>{{ bmScores.loan_amulya.weightage }}</td>
+            <td>{{ bmScores.loan_amulya.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_amulya.achieved | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_amulya.score | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_amulya.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td>Recovery</td>
+            <td>{{ bmScores.recovery.weightage }}</td>
+            <td>{{ bmScores.recovery.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.recovery.achieved | number:'1.2-2' }}</td>
+            <td>{{ bmScores.recovery.score | number:'1.2-2' }}</td>
+            <td>{{ bmScores.recovery.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td>Audit</td>
+            <td>{{ bmScores.audit.weightage }}</td>
+            <td>{{ bmScores.audit.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.audit.achieved | number:'1.2-2' }}</td>
+            <td>{{ bmScores.audit.score | number:'1.2-2' }}</td>
+            <td>{{ bmScores.audit.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td>Insurance</td>
+            <td>{{ bmScores.insurance.weightage }}</td>
+            <td>{{ bmScores.insurance.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.insurance.achieved | number:'1.2-2' }}</td>
+            <td>{{ bmScores.insurance.score | number:'1.2-2' }}</td>
+            <td>{{ bmScores.insurance.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td colspan="4"></td>
+            <td><strong>{{ bmScores.total | number:'1.2-2' }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header">
+      <h4>Staff KPI Scores (out of 10)</h4>
+      <div class="d-flex flex-wrap">
+        <div *ngFor="let score of scores" class="chip" [class.selected]="score === selectedEmployee"
+          (click)="selectEmployee(score)">
+          {{ score.staffName }}
+        </div>
+      </div>
+    </div>
+    <div class="card-body" *ngIf="selectedEmployee">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>KPI</th>
+            <th>Weightage</th>
+            <th>Target</th>
+            <th>Achieved</th>
+            <th>Out of 10</th>
+            <th>Weightage Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let kpi of ['deposit', 'loan_gen', 'loan_amulya', 'recovery', 'audit', 'insurance']">
+            <td>{{ kpi }}</td>
+            <td>{{ selectedEmployee[kpi]?.weightage }}</td>
+            <td>{{ selectedEmployee[kpi]?.target | number:'1.2-2' }}</td>
+            <td>{{ selectedEmployee[kpi]?.achieved | number:'1.2-2' }}</td>
+            <td>{{ selectedEmployee[kpi]?.score | number:'1.2-2' }}</td>
+            <td>{{ selectedEmployee[kpi]?.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td colspan="4"></td>
+            <td><strong>{{ selectedEmployee.total | number:'1.2-2' }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mt-4" *ngIf="auth.user?.role === 'BM' && bmScores">
+    <div class="card-header">
+      <h4>Salary Details</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead class="table-info">
+          <tr>
+            <th>Designation</th>
+            <th>Salary</th>
+            <th>Increment Amt.</th>
+            <th>KPI Based</th>
+            <th>Tot. Salary</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>B.M</td>
+            <td>{{ salary | number:'1.2-2' }}</td>
+            <td>{{ incrementAmt | number:'1.2-2' }}</td>
+            <td>{{ calculateKpiBasedIncrement() | number:'1.2-2' }}</td>
+            <td>{{ calculateTotalSalary() | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

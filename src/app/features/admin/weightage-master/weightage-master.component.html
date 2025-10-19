@@ -1,0 +1,47 @@
+<div class="container mt-4">
+  <h2>Weightage Master</h2>
+  <p>Manage KPI weightages.</p>
+
+  <div class="row">
+    <div class="col-md-6">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>KPI</th>
+            <th>Weightage</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let weightage of weightages">
+            <td>{{ weightage.kpi }}</td>
+            <td>{{ weightage.weightage }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm" (click)="editWeightage(weightage)">Edit</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h4>Edit Weightage</h4>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="saveWeightage()">
+            <div class="mb-3">
+              <label for="kpi" class="form-label">KPI</label>
+              <input type="text" class="form-control" id="kpi" [(ngModel)]="newWeightage.kpi" name="kpi" readonly>
+            </div>
+            <div class="mb-3">
+              <label for="weightage" class="form-label">Weightage</label>
+              <input type="number" class="form-control" id="weightage" [(ngModel)]="newWeightage.weightage" name="weightage">
+            </div>
+            <button type="submit" class="btn btn-success">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

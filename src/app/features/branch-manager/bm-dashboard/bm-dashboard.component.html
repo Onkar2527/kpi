@@ -1,0 +1,56 @@
+<div class="container mt-4">
+  <h2>BM Dashboard</h2>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card bg-light mb-3">
+        <div class="card-header">Total Targets</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ dashboardCounts?.totalTargets || 0 }}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-light mb-3">
+        <div class="card-header">Total Achieved</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ dashboardCounts?.totalAchieved || 0 }}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-light mb-3">
+        <div class="card-header">Pending Verifications</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ dashboardCounts?.pendingVerifications || 0 }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card bg-light mb-3">
+        <div class="card-header">Total Deposite Achieved</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ dashboardCounts?.totalDeposit || 0 }}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-light mb-3">
+        <div class="card-header">Total Loan Gen Achieved</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ dashboardCounts?.totalLoanGen || 0 }}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-light mb-3">
+        <div class="card-header">Total Loan Amulya Achieved</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ dashboardCounts?.totalLoanAmulya || 0 }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

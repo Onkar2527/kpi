@@ -1,0 +1,57 @@
+<div class="container mt-4">
+  <h2>Department Master</h2>
+  <p>Manage the departments in the system.</p>
+
+  <div class="mb-3">
+    <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()">
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>Add/Edit Department</h4>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="saveDepartment()">
+        <div class="mb-3">
+          <label for="departmentName" class="form-label">Department Name</label>
+          <input type="text" class="form-control" id="departmentName" [(ngModel)]="department.name" name="name">
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>Department ID</th>
+        <th>Department Name</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let department of paginatedDepartments">
+        <td>{{ department.id }}</td>
+        <td>{{ department.name }}</td>
+        <td>
+          <button class="btn btn-primary btn-sm me-2" (click)="editDepartment(department)">Edit</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteDepartment(department.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <nav *ngIf="totalPages > 1">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" href="#" (click)="goToPage($event, currentPage - 1)">Previous</a>
+      </li>
+      <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index" [class.active]="currentPage === i + 1">
+        <a class="page-link" href="#" (click)="goToPage($event, i + 1)">{{ i + 1 }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" href="#" (click)="goToPage($event, currentPage + 1)">Next</a>
+      </li>
+    </ul>
+  </nav>
+</div>

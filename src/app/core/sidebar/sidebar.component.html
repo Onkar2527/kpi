@@ -1,0 +1,59 @@
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+  <div class="position-sticky pt-3">
+    <ul class="nav flex-column">
+      <li class="nav-item" *ngIf="auth.user?.role === 'BM'">
+        <a class="nav-link" routerLink="/branch-manager/dashboard" routerLinkActive="active">Dashboard</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'BM'">
+        <a class="nav-link" routerLink="/branch-manager/allocate-targets" routerLinkActive="active">Allocate Targets</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'BM'">
+        <a class="nav-link" routerLink="/branch-manager/verify-entries" routerLinkActive="active">Verify Entries</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'BM'">
+        <a class="nav-link" routerLink="/branch-manager/weightage-increment" routerLinkActive="active">Weightage & Increment</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'Clerk' || auth.user?.role === 'Attender'">
+        <a class="nav-link" routerLink="/staff/my-targets" routerLinkActive="active">My Targets</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'Clerk'">
+        <a class="nav-link" routerLink="/staff/new-entry" routerLinkActive="active">New Entry</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'Clerk'">
+        <a class="nav-link" routerLink="/staff/my-submissions" routerLinkActive="active">My Submissions</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'attender-head'">
+        <a class="nav-link" routerLink="/attender-head/evaluate" routerLinkActive="active">Evaluate Attenders</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a class="nav-link" routerLink="/ho/upload-targets" routerLinkActive="active">Upload Targets</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a class="nav-link" routerLink="/admin/branch-master" routerLinkActive="active">Branch Master</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a class="nav-link" routerLink="/admin/user-master" routerLinkActive="active">User Master</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a class="nav-link" routerLink="/admin/department-master" routerLinkActive="active">Department Master</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a class="nav-link" routerLink="/admin/weightage-master" routerLinkActive="active">Weightage Master</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a class="nav-link" routerLink="/admin/transfer-master" routerLinkActive="active">Transfer Master</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'INSURANCE'">
+        <a class="nav-link" routerLink="/insurance" routerLinkActive="active">Upload Insurance Targets</a>
+      </li>
+
+       <li class="nav-item" *ngIf="auth.user?.role === 'HOD'  || auth.user?.role === 'HO_STAFF'">
+        <a class="nav-link" routerLink="/hod_performance/weightage-HoStaff" routerLinkActive="active">Weightage & Increment</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" (click)="logout()" href="#">Logout</a>
+      </li>
+    </ul>
+  </div>
+</nav>

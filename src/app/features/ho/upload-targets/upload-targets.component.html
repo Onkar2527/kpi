@@ -1,0 +1,38 @@
+<div class="container mt-4">
+  <h2>Upload Targets</h2>
+  <form (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label class="form-label">Upload Type</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="uploadType" id="main" value="main" [(ngModel)]="uploadType">
+        <label class="form-check-label" for="main">
+          Deposit, Loan General, Loan Amulya
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="uploadType" id="branch-specific" value="branch-specific" [(ngModel)]="uploadType">
+        <label class="form-check-label" for="branch-specific">
+          Insurance, Recovery
+        </label>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="targetFile" class="form-label">Target File (CSV)</label>
+      <input class="form-control" type="file" id="targetFile" (change)="onFileChange($event)" name="targetFile" accept=".csv" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+   <div *ngIf="message" class="mt-3">
+    <div
+      class="alert"
+      [ngClass]="{
+        'alert-success': messageType === 'success',
+        'alert-danger': messageType === 'error'
+      }"
+      role="alert"
+    >
+      {{ message }}
+    </div>
+  </div>
+</div>

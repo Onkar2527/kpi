@@ -1,0 +1,85 @@
+<div class="container mt-4">
+  <h2>My Targets</h2>
+  <p>Your personal and branch-level targets for the current period.</p>
+
+  <div class="card">
+    <div class="card-header">
+      <h4>Personal Targets</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>KPI</th>
+            <th>Weightage</th>
+            <th>Target Amount</th>
+            <th>Achieved</th>
+            <th>Out of 10</th>
+            <th>Weightage Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let target of personalTargets">
+            <td>{{ target.kpi }}</td>
+            <td>{{ target.weightage }}</td>
+            <td>{{ target.amount }}</td>
+            <td>{{ target.achieved || 0 }}</td>
+            <td>{{ target.outOf10 | number:'1.2-2' }}</td>
+            <td>{{ target.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" class="text-end"><strong>Total</strong></td>
+            <td><strong>{{ personalTotalWeightageScore | number:'1.2-2' }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mt-4" *ngIf="auth.user?.role !== 'attender'">
+    <div class="card-header">
+      <h4>Branch-Level Targets</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>KPI</th>
+            <th>Weightage</th>
+            <th>Target Amount</th>
+            <th>Achieved</th>
+            <th>Out of 10</th>
+            <th>Weightage Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let target of branchTargets">
+            <td>{{ target.kpi }}</td>
+            <td>{{ target.weightage }}</td>
+            <td>{{ target.amount }}</td>
+            <td>{{ target.achieved || 0 }}</td>
+            <td>{{ target.outOf10 | number:'1.2-2' }}</td>
+            <td>{{ target.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" class="text-end"><strong>Total</strong></td>
+            <td><strong>{{ branchTotalWeightageScore | number:'1.2-2' }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header">
+      <h4>Grand Total</h4>
+    </div>
+    <div class="card-body">
+      <p><strong>Total Weightage Score:</strong> {{ grandTotalWeightageScore | number:'1.2-2' }}</p>
+    </div>
+  </div>
+</div>

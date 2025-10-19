@@ -1,0 +1,76 @@
+<div class="container mt-4">
+  <h2>My Submissions</h2>
+  <p>A record of your submitted KPI entries and their current status.</p>
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <div class="card text-center" (click)="onCardClick('deposit')">
+        <div class="card-body">
+          <h5 class="card-title">Deposit</h5>
+          <p class="card-text">{{ depositCount }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center" (click)="onCardClick('loan_gen')">
+        <div class="card-body">
+          <h5 class="card-title">Loan General</h5>
+          <p class="card-text">{{ loanGenCount }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center" (click)="onCardClick('loan_amulya')">
+        <div class="card-body">
+          <h5 class="card-title">Loan Amulya</h5>
+          <p class="card-text">{{ loanAmulyaCount }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()">
+  </div>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>KPI</th>
+        <th>Account Number</th>
+        <th>Value</th>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let sub of paginatedSubmissions">
+        <td>{{ sub.kpi }}</td>
+        <td>{{ sub.account_no }}</td>
+        <td>{{ sub.value }}</td>
+        <td>{{ sub.date | date:'yyyy-MM-dd' }}</td>
+        <td>
+          <span class="badge" [ngClass]="{
+            'bg-success': sub.status === 'Verified',
+            'bg-warning text-dark': sub.status === 'Pending',
+            'bg-danger': sub.status === 'Returned'
+          }">{{ sub.status }}</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <nav *ngIf="totalPages > 0">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="goToPage(currentPage - 1)">Previous</button>
+      </li>
+      <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index" [class.active]="currentPage === i + 1">
+        <button class="page-link" (click)="goToPage(i + 1)">{{ i + 1 }}</button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="goToPage(currentPage + 1)">Next</button>
+      </li>
+    </ul>
+  </nav>
+</div>

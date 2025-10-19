@@ -1,0 +1,36 @@
+<div class="container mt-4">
+  <h2>Allocate Targets</h2>
+  <p>Auto-distribute targets and publish staff allocations.</p>
+
+  <div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-primary me-2">Auto-distribute</button>
+    <button class="btn btn-success">Publish</button>
+  </div>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>Staff Name</th>
+        <th>Deposit</th>
+        <th>Loan</th>
+        <th>Amulya</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let alloc of allocations">
+        <td>{{ alloc.staffName }}</td>
+        <td><span>{{ alloc.deposit }}</span></td>
+        <td><span>{{ alloc.loan_gen }}</span></td>
+        <td><span>{{ alloc.loan_amulya }}</span></td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th>Total</th>
+        <td><input type="number" class="form-control" [value]="calculateTotal('deposit')" readonly></td>
+        <td><input type="number" class="form-control" [value]="calculateTotal('loan_gen')" readonly></td>
+        <td><input type="number" class="form-control" [value]="calculateTotal('loan_amulya')" readonly></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
