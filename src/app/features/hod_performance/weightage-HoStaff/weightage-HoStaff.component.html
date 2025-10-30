@@ -130,6 +130,95 @@
     </div>
   </div>
 
+
+
+
+  <!-- AGM KPI VIEW -->
+    <div class="card mt-4" *ngIf="auth.user?.role === 'AGM' && hodScores">
+    <div class="card-header bg-info text-white">
+      <h4>AGM KPI Scores</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>KPI</th>
+            <th>Weightage</th>
+            <th>Achieved</th>
+            <th>Out of 10</th>
+            <th>Weightage Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let kpi of kpiListAGM">
+            <td>{{ kpi }}</td>
+            <td>{{ hodScores[kpi]?.weightage }}</td>
+            <td>{{ hodScores[kpi]?.achieved | number:'1.2-2' }}</td>
+            <td>{{ hodScores[kpi]?.score | number:'1.2-2' }}</td>
+            <td>{{ hodScores[kpi]?.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td colspan="3"></td>
+            <td><strong>{{ hodScores.total | number:'1.2-2' }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STAFF KPI SECTION (EDITABLE BY HOD) -->
+  <div class="card mt-4" *ngIf="auth.user?.role === 'AGM' && scores">
+    <div class="card-header">
+      <h4>HoStaff KPI Scores (out of 10)</h4>
+      <div class="d-flex flex-wrap">
+        <div *ngFor="let score of scores" class="chip" [class.selected]="score === selectedEmployee"
+          (click)="selectEmployee(score)">
+          {{ score.staffName }}
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body" *ngIf="selectedEmployee">
+      <form (ngSubmit)="submitScores()">
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>KPI</th>
+              <th>Weightage</th>
+              <th>Achieved</th>
+              <th>Out of 10</th>
+              <th>Weightage Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let kpi of kpiListAGM">
+              <td>{{ kpi }}</td>
+              <td>{{ selectedEmployee[kpi]?.weightage }}</td>
+              <td>
+                <input type="number" class="form-control" [(ngModel)]="selectedEmployee[kpi].achieved"
+                  [ngModelOptions]="{standalone: true}" min="0" max="999999" />
+              </td>
+              <td>{{ selectedEmployee[kpi]?.score | number:'1.2-2' }}</td>
+              <td>{{ selectedEmployee[kpi]?.weightageScore | number:'1.2-2' }}</td>
+            </tr>
+
+
+            <tr>
+              <td><strong>Total</strong></td>
+              <td colspan="3"></td>
+              <td><strong>{{ selectedEmployee.total | number : '1.2-2' }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="auth.user?.role === 'HOD'" class="text-end mt-3">
+          <button class="btn btn-success" type="submit">{{selectedEmployee.achieved === 0 ? "Save" : "Update"}}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Salary Section -->
   <!-- <div class="card mt-4" *ngIf="auth.user?.role === 'HOD' && hodScores">
     <div class="card-header">

@@ -48,7 +48,7 @@
         <td>{{ sub.kpi }}</td>
         <td>{{ sub.account_no }}</td>
         <td>{{ sub.value }}</td>
-        <td>{{ sub.date | date:'yyyy-MM-dd' }}</td>
+        <td>{{ sub.date | date:'dd-MM-yyyy' }}</td>
         <td>
           <span class="badge" [ngClass]="{
             'bg-success': sub.status === 'Verified',

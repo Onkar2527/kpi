@@ -43,12 +43,17 @@
             <option value="GM">GM</option>
           </select>
         </div>
+        <div *ngIf="user.role === 'BM' || user.role === 'Clerk' || user.role === 'Attender'|| user.role === 'INSURANCE'||user.role === 'AGM'|| user.role ==='DGM'|| user.role ==='GM'">
         <div class="mb-3">
           <label for="branch" class="form-label">Branch</label>
           <select id="branch" class="form-select" [(ngModel)]="user.branch_id" name="branch_id">
             <option selected>Choose...</option>
             <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.name }}</option>
           </select>
+        </div>
+        </div>
+        <div *ngIf="user.role === 'HO_STAFF'">
+          
         </div>
         <div class="mb-3">
           <label for="department" class="form-label">Department</label>

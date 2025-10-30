@@ -76,12 +76,15 @@ export class MyTargetsComponent implements OnInit {
               }
             } else if (kpi.kpi_type === 'target_based' && kpi.kpi_name === 'Insurance Target') {
               const branchKpi = branchScores.find(t => t.kpi === 'insurance');
+              const branchKpiScore = (branchKpi.outOf10 * kpi.weightage) / 100;
               if (branchKpi) {
                 personalScores.push({
                   ...branchKpi,
                   kpi: kpi.kpi_name, // Use the proper name
                   weightage: kpi.weightage,
-                  weightageScore: (branchKpi.outOf10 * kpi.weightage) / 100
+                  
+                  weightageScore: branchKpiScore ===0 ? -2 : branchKpiScore
+
                 });
               }
             }
@@ -100,46 +103,66 @@ export class MyTargetsComponent implements OnInit {
     }
   }
 
-  calculateScores(targets: any[]): any[] {
-    if (!Array.isArray(targets)) {
-      return [];
-    }
-    return targets.map(target => {
-      let outOf10;
-      const ratio = target.achieved / target.amount;
-      switch (target.kpi) {
-        case 'deposit':
-        case 'loan_gen':
-        case 'loan_amulya':
-          if (ratio < 1) {
-            outOf10 = ratio * 10;
-          } else if (ratio < 1.25) {
-            outOf10 = 10;
-          } else {
-            outOf10 = 12.5;
-          }
-          break;
-        case 'recovery':
-        case 'audit':
-        case 'insurance':
-          if (ratio < 1) {
-            outOf10 = ratio * 10;
-          } else {
-            outOf10 = 12.5;
-          }
-          break;
-        default:
-          outOf10 = 0;
-      }
-      outOf10 = Math.max(0, Math.min(12.5, isNaN(outOf10) ? 0 : outOf10));
-      const weightageScore = (outOf10 * target.weightage) / 100;
-      return {
-        ...target,
-        outOf10: outOf10,
-        weightageScore: isNaN(weightageScore) ? 0 : weightageScore
-      };
-    });
+calculateScores(targets: any[]): any[] {
+  if (!Array.isArray(targets)) {
+    return [];
   }
+
+  return targets.map(target => {
+    let outOf10;
+    const ratio = target.achieved / target.amount;
+    const auditRatio = target.kpi === 'audit' ? target.achieved / target.amount : 0;
+    const recoveryRatio = target.kpi === 'recovery' ? target.achieved / target.amount : 0;
+
+    switch (target.kpi) {
+      case 'deposit':
+      case 'loan_gen':
+        if (ratio < 1) outOf10 = ratio * 10;
+        else if (ratio < 1.25) outOf10 = 10;
+        else if (auditRatio >= 0.75 && recoveryRatio >= 0.75) outOf10 = 12.5;
+        else outOf10 = 10;
+        break;
+
+      case 'loan_amulya':
+        if (ratio < 1) outOf10 = ratio * 10;
+        else if (ratio < 1.25) outOf10 = 10;
+        else outOf10 = 12.5;
+        break;
+
+      case 'insurance':
+        if (ratio === 0) outOf10 = 0;
+        else if (ratio < 1) outOf10 = ratio * 10;
+        else if (ratio < 1.25) outOf10 = 10;
+        else outOf10 = 12.5;
+        break;
+
+      case 'recovery':
+      case 'audit':
+        if (ratio < 1) outOf10 = ratio * 10;
+        else outOf10 = 12.5;
+        break;
+
+      default:
+        outOf10 = 0;
+    }
+
+    outOf10 = Math.max(0, Math.min(12.5, isNaN(outOf10) ? 0 : outOf10));
+console.log(target);
+    return {
+      ...target,
+      outOf10,
+      weightageScore:
+        target.kpi === 'insurance' && (target.weightage === 0 || target.achieved === 0)
+          ? -2
+          : isNaN((outOf10 * target.weightage) / 100)
+          ? 0
+          : (outOf10 * target.weightage) / 100
+    };
+    
+    
+  });
+}
+
 
   calculateTotals(): void {
     this.personalTotalWeightageScore = this.personalTargets?.reduce((acc: any, target: any) => acc + target.weightageScore, 0) || 0;

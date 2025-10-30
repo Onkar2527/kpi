@@ -7,23 +7,44 @@
   <form (ngSubmit)="onSubmit()">
     <div class="mb-3">
       <label for="kpi" class="form-label">Select Type</label>
-      <select id="kpi" class="form-select" [(ngModel)]="kpi" name="kpi">
+      <select id="kpi" class="form-select" [(ngModel)]="kpi" name="kpi" required>
         <option selected>Choose...</option>
         <option *ngFor="let kpi of kpiOptions" [value]="kpi">{{ kpi }}</option>
       </select>
     </div>
+    <div class="mb-3">
+      <label for="typeOfDeposit" class="form-label">Choose The Option</label>
+      <select id="typeOfDeposit" class="form-select" [(ngModel)]="typeOfDeposit" name="typeOfDeposit" required>
+        <option selected>Choose...</option>
+        <option *ngFor="let typeOfDeposit of typeOfDepositOptions" [value]="typeOfDeposit">{{ typeOfDeposit }}</option>
+      </select>
+    </div>
     <div class="mb-3" *ngIf="kpi !== 'loan_amulya'">
       <label for="accountNumber" class="form-label">Account Number</label>
-      <input type="text" class="form-control" id="accountNumber" [(ngModel)]="accountNo" name="accountNo">
+      <input type="text" class="form-control" id="accountNumber" [(ngModel)]="accountNo" name="accountNo" minlength="14" maxlength="14" required>
     </div>
     <div class="mb-3">
       <label for="value" class="form-label">{{ kpi === 'loan_amulya' ? 'Number of Accounts' : 'Value' }}</label>
-      <input type="number" class="form-control" id="value" [(ngModel)]="value" name="value">
+      <input type="number" class="form-control" id="value" [(ngModel)]="value" name="value" required>
     </div>
     <div class="mb-3">
+    <label for="type" class="form-label">Select Options</label>
+    <select id="type" class="form-select" [(ngModel)]="type" name="type" required>
+      <option selected>Choose...</option>
+      <option 
+        *ngFor="let type of (kpi === 'loan_gen' || kpi === 'loan_amulya' ? ['ADD'] : typeOptions)" 
+        [value]="type">
+        {{ type }}
+      </option>
+    </select>
+  </div>
+
+    <div class="mb-3">
       <label for="date" class="form-label">Date</label>
-      <input type="date" class="form-control" id="date" [(ngModel)]="date" name="date" [min]="minDate" [max]="maxDate">
+      <input type="date" class="form-control" id="date" [(ngModel)]="date" name="date"  [max]="maxDate" required>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary"
+     [disabled]="isSubmitted">
+  {{ isSubmitted ? 'Submitting...' : 'Submit' }}</button>
   </form>
 </div>

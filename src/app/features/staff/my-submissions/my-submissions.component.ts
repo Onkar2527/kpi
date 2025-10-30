@@ -41,6 +41,7 @@ export class MySubmissionsComponent implements OnInit {
       this.period = period;
       if (this.employeeId) {
         this.staffService.getMySubmissions(this.period, this.employeeId).subscribe((data: any) => {
+          data.sort((a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime());
           this.submissions = data;
           this.depositCount = data.filter((s: any) => s.kpi === 'deposit').length;
           this.loanGenCount = data.filter((s: any) => s.kpi === 'loan_gen').length;
@@ -59,6 +60,7 @@ export class MySubmissionsComponent implements OnInit {
 
   updatePaginatedSubmissions(): void {
     this.paginatedSubmissions = this.paginationService.getPaginatedData(this.filteredSubmissions, this.currentPage, this.pageSize);
+    
   }
 
   goToPage(page: number): void {

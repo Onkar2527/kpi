@@ -47,8 +47,7 @@ loadPendingEntries() {
   if (this.branchId) {
     this.branchManagerService.getEntries(this.period, this.branchId).subscribe(data => {
       
-      data.sort((a, b) => a.staffName.toLowerCase().localeCompare(b.staffName.toLowerCase()));
-
+    data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       this.entries = data;
       this.filteredEntries = data;
       this.pendingEntries = data.filter(e => e.status === 'Pending').length;
