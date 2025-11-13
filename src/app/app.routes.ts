@@ -43,9 +43,13 @@ export const routes: Routes = [
         path: 'insurance',
         loadComponent: () => import('./features/insurance/insurance.component').then(m => m.InsuranceComponent)
       },
+      // {
+      //   path: 'hod_performance',
+      //   loadChildren: () => import('./features/hod_performance/hod_performance.module').then(m => m.HOPerformanceModule)
+      // },
       {
-        path: 'hod_performance',
-        loadChildren: () => import('./features/hod_performance/hod_performance.module').then(m => m.HOPerformanceModule)
+        path: 'all-performnace',
+        loadChildren: () => import('./features/all-performnace/all-performance.module').then(m => m.AllPerformanceModule)
       }
     ]
   },

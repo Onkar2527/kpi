@@ -1,56 +1,31 @@
-<div class="container mt-4">
-  <h2>BM Dashboard</h2>
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card bg-light mb-3">
-        <div class="card-header">Total Targets</div>
-        <div class="card-body">
-          <h5 class="card-title">{{ dashboardCounts?.totalTargets || 0 }}</h5>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card bg-light mb-3">
-        <div class="card-header">Total Achieved</div>
-        <div class="card-body">
-          <h5 class="card-title">{{ dashboardCounts?.totalAchieved || 0 }}</h5>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card bg-light mb-3">
-        <div class="card-header">Pending Verifications</div>
-        <div class="card-body">
-          <h5 class="card-title">{{ dashboardCounts?.pendingVerifications || 0 }}</h5>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card bg-light mb-3">
-        <div class="card-header">Total Deposite Achieved</div>
-        <div class="card-body">
-          <h5 class="card-title">{{ dashboardCounts?.totalDeposit || 0 }}</h5>
-        </div>
-      </div>
+<div class="dashboard-container">
+  <div class="card branch-dashboard shadow-lg border-0">
+    <div class="card-header text-white text-center">
+      <h3 class="mb-0 fw-bold">🏦 Branch Dashboard</h3>
     </div>
-    <div class="col-md-4">
-      <div class="card bg-light mb-3">
-        <div class="card-header">Total Loan Gen Achieved</div>
-        <div class="card-body">
-          <h5 class="card-title">{{ dashboardCounts?.totalLoanGen || 0 }}</h5>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card bg-light mb-3">
-        <div class="card-header">Total Loan Amulya Achieved</div>
-        <div class="card-body">
-          <h5 class="card-title">{{ dashboardCounts?.totalLoanAmulya || 0 }}</h5>
-        </div>
-      </div>
+
+    <div class="card-body p-0">
+      <table class="table table-hover table-dashboard mb-0 text-center align-middle">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Previous Year Balance</th>
+            <th>New Target</th>
+            <th>Total Target</th>
+            <th>Total Target Achieved</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let kpi of ['balance_deposit', 'loan_gen']">
+            <td class="fw-semibold text-indigo">{{ kpi | titlecase }}</td>
+            <td>{{ dashboradScores?.[kpi]?.PreviousBalance | number:'1.0-0' }}</td>
+            <td>{{ dashboradScores?.[kpi]?.totalPresentTarget | number:'1.0-0' }}</td>
+            <td>{{ dashboradScores?.[kpi]?.total | number:'1.0-0' }}</td>
+            <td>{{ dashboradScores?.[kpi]?.totalAchieved | number:'1.0-0' }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

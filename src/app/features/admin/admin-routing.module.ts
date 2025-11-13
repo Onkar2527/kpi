@@ -6,6 +6,10 @@ import { DepartmentMasterComponent } from './department-master/department-master
 import { WeightageMasterComponent } from './weightage-master/weightage-master.component';
 import { WeightageHoStaffComponent } from '../hod_performance/weightage-HoStaff/weightage-HoStaff.component';
 import { TransferMasterComponent } from './transfer-master/transfer-master.component';
+import { TrasferHistoryComponent } from './transfer-history/transfer-history.component';
+import { KpiMasterComponent } from './kpi-master/kpi-master.component';
+import { KpiMappingComponent } from './kpi-mapping/kpi-mapping.component';
+import { manageEntriesComponent } from './manage-entries/manage-entries.component';
 
 const routes: Routes = [
   {
@@ -32,7 +36,24 @@ const routes: Routes = [
    {
     path: 'transfer-master',
     component: TransferMasterComponent
+  },
+  {
+    path: 'trasfer-history',
+    component: TrasferHistoryComponent
+  },
+  {
+    path: 'kpi-master',
+    component: KpiMasterComponent
+  },
+  {
+    path: 'kpi-mapping',
+    component: KpiMappingComponent
+  },
+  {
+    path: 'entries-master',
+    component: manageEntriesComponent
   }
+
 ];
 
 @NgModule({

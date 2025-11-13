@@ -12,7 +12,7 @@ import { PeriodService } from '../../../core/period.service';
   styleUrls: ['./bm-dashboard.component.css']
 })
 export class BmDashboardComponent implements OnInit {
-  dashboardCounts: any;
+  dashboradScores: any;
   period!: string;
   branchId = this.auth.user?.branchId;
 
@@ -27,7 +27,8 @@ export class BmDashboardComponent implements OnInit {
       this.period = period;
       if (this.branchId) {
         this.branchManagerService.getDashboardCounts(this.period, this.branchId).subscribe(data => {
-          this.dashboardCounts = data;
+          this.dashboradScores = data;
+          
         });
       }
     });

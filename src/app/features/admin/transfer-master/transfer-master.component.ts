@@ -22,13 +22,51 @@ export class TransferMasterComponent implements OnInit {
   userData: any;
   filteredTrasferedStaff: any;
   paginatedTrasferedStaff: any;
-  transfer = {
+  transfer: {
+    [key: string]: any;
+    id: string;
+    staff_id: string;
+    old_branch_id: string;
+    new_branch_id: string;
+    kpi_total: string;
+    period: string;
+    old_designation: string;
+    new_designation: string;
+    deposit_target: string;
+    deposit_achieved: string;
+    loan_gen_target: string;
+    loan_gen_achieved: string;
+    loan_amulya_target: string;
+    loan_amulya_achieved: string;
+    audit_target: string;
+    audit_achieved: string;
+    recovery_target: string;
+    recovery_achieved: string;
+    insurance_target: string;
+    insurance_achieved: string;
+  } = {
     id: '',
     staff_id: '',
     old_branch_id: '',
     new_branch_id: '',
     kpi_total: '',
+    period: '',
+    old_designation: '',
+    new_designation: '',
+    deposit_target: '',
+    deposit_achieved: '',
+    loan_gen_target: '',
+    loan_gen_achieved: '',
+    loan_amulya_target: '',
+    loan_amulya_achieved: '',
+    audit_target: '',
+    audit_achieved: '',
+    recovery_target: '',
+    recovery_achieved: '',
+    insurance_target: '',
+    insurance_achieved: '',
   };
+
   searchTerm = '';
   currentPage = 1;
   pageSize = 10;
@@ -46,6 +84,9 @@ export class TransferMasterComponent implements OnInit {
   bmScores: any;
   hodScores: any;
   selectedUser: any;
+  searchText: string = '';
+  filteredUsers: any[] = [];
+
   constructor(
     private adminService: AdminService,
     private searchService: SearchService,
@@ -64,17 +105,47 @@ export class TransferMasterComponent implements OnInit {
     this.loadTrasferedStaff();
     this.loadUsers();
     this.loadBranches();
-    
   }
-onUserSelect(user: any) {
-  if (user) {
-    this.transfer.staff_id = user.id;      // store staff_id for API
-    this.selectedUserRole = user.role;     // store role to use in component
-  } else {
-    this.transfer.staff_id = '';
-    this.selectedUserRole = '';
+  loadUsers() {
+    this.adminService.getUsers().subscribe((data: any) => {
+      this.userData = data;
+      this.filteredUsers = [...this.userData];
+      this.onSearch();
+    });
   }
-}
+  filterUsers() {
+    const text = this.searchText.trim().toLowerCase();
+
+    if (!text) {
+      this.filteredUsers = [...this.userData];
+      this.selectedUser = null;
+      return;
+    }
+
+    const match = this.userData.find(
+      (user: any) => String(user.PF_NO).toLowerCase() === text
+    );
+
+    if (match) {
+      this.selectedUser = match;
+      this.filteredUsers = [match];
+      this.onUserSelect(match);
+    } else {
+      this.filteredUsers = [];
+      this.selectedUser = null;
+    }
+  }
+
+  onUserSelect(user: any) {
+    if (user) {
+      this.transfer.staff_id = user.id;
+      this.selectedUserRole = user.role;
+      this.transfer.old_branch_id = user.branch_id;
+    } else {
+      this.transfer.staff_id = '';
+      this.selectedUserRole = '';
+    }
+  }
 
   loadBranches() {
     this.adminService.getBranches().subscribe((data) => {
@@ -84,12 +155,6 @@ onUserSelect(user: any) {
   loadTrasferedStaff() {
     this.adminService.getTrasferedStaff().subscribe((data) => {
       this.TrasferedStaff = data;
-      this.onSearch();
-    });
-  }
-  loadUsers() {
-    this.adminService.getUsers().subscribe((data) => {
-      this.userData = data;
       this.onSearch();
     });
   }
@@ -120,150 +185,186 @@ onUserSelect(user: any) {
     this.updatePaginatedTrasferedStaff();
   }
 
-  // saveBranch() {
-  //   if (this.transfer.id) {
-  //     this.transfer.kpi_total = String(this.personalTotalWeightageScore);
-  //     this.adminService.updateTrasferedStaff(this.transfer.id, this.transfer).subscribe(() => {
-  //       this.branchstaff();
-  //       this.loadTrasferedStaff();
-  //     });
-  //   } else {
-  //     this.transfer.kpi_total = String(this.personalTotalWeightageScore);
-  //     this.adminService.addTrasferedStaff(this.transfer).subscribe(() => {
-  //       this.branchstaff();
-  //       this.loadTrasferedStaff();
-  //     });
-  //   }
-  //   this.transfer = {id: '', staff_id: '', old_branch_id: '', new_branch_id: '', kpi_total: '' };
-  // }
+  saveBranch() {
+    const kpis = [
+      'deposit',
+      'loan_gen',
+      'loan_amulya',
+      'recovery',
+      'audit',
+      'insurance',
+    ];
 
-saveBranch() {
-  // Call branchstaff AFTER you select or fill the staff fields
-  if (this.transfer.staff_id && this.transfer.old_branch_id) {
-    const newBranchId = this.transfer.new_branch_id;
-    const oldBranchId = this.transfer.old_branch_id;
-    const staff_id = this.transfer.staff_id;
-    if (this.selectedUserRole === 'Clerk') {
-      this.performanceService
-        .getStaffScores(this.period, this.transfer.staff_id)
-        .subscribe((data: any) => {
-          this.staffScores = data;
-          this.transfer.kpi_total = this.staffScores.total || 0;
+    // Call branchstaff AFTER you select or fill the staff fields
+    if (this.transfer.staff_id && this.transfer.old_branch_id) {
+      const newBranchId = this.transfer.new_branch_id;
+      const oldBranchId = this.transfer.old_branch_id;
+      const staff_id = this.transfer.staff_id;
+      if (this.selectedUserRole === 'Clerk') {
+        this.performanceService
+          .getStaffScores(
+            this.period,
+            this.transfer.staff_id,
+            this.transfer.old_branch_id
+          )
+          .subscribe((data: any) => {
+            this.staffScores = data;
+            console.log;
+            this.transfer.kpi_total = this.staffScores.total || 0;
+            this.transfer.old_designation = this.selectedUserRole || '';
+            this.transfer.period = this.period;
 
-         
-          this.saveOrUpdateTransfer();
-           this.autoDistribute(newBranchId);
-           this.deleteAllocationsAndTransfer(staff_id);
-        });
+            kpis.forEach((kpi) => {
+              const scoreData = this.staffScores?.[kpi];
+              if (scoreData) {
+                this.transfer[`${kpi}_target`] = scoreData.target || 0;
+                this.transfer[`${kpi}_achieved`] = scoreData.achieved || 0;
+              } else {
+                this.transfer[`${kpi}_target`] = 0;
+                this.transfer[`${kpi}_achieved`] = 0;
+              }
+            });
 
-    } else if (this.selectedUserRole === 'HO_STAFF') {
-      this.hoPerformanceService
-        .getStaffScores(this.period, this.transfer.staff_id, this.transfer.old_branch_id)
-        .subscribe(data => {
-          this.hostaffScores = data;
-          this.transfer.kpi_total = this.hostaffScores.total || 0;
+            this.saveOrUpdateTransfer();
+            this.deleteAllocationsAndTransfer(staff_id);
+            this.autoDistribute(newBranchId);
+          });
+      } else if (this.selectedUserRole === 'HO_STAFF') {
+        this.hoPerformanceService
+          .getStaffScores(
+            this.period,
+            this.transfer.staff_id,
+            this.transfer.old_branch_id
+          )
+          .subscribe(
+            (data) => {
+              this.hostaffScores = data;
+              this.transfer.kpi_total = this.hostaffScores.total || 0;
 
-          this.saveOrUpdateTransfer();
-          this.deleteHostaffAndTransfer(staff_id, oldBranchId);
-          
-        },
-        (error:any)=>{
-          alert(error.error.error)
-        }
-        );
+              this.saveOrUpdateTransfer();
+              this.deleteHostaffAndTransfer(staff_id, oldBranchId);
+            },
+            (error: any) => {
+              alert(error.error.error);
+            }
+          );
+      } else if (this.selectedUserRole === 'BM') {
+        this.performanceService
+          .getBmScores(this.period, this.transfer.old_branch_id)
+          .subscribe((data: any) => {
+            this.bmScores = data;
+            this.transfer.kpi_total = this.bmScores.total || 0;
+            this.transfer.old_designation = this.selectedUserRole || '';
+            this.transfer.period = this.period;
+            kpis.forEach((kpi) => {
+              const scoreData = this.bmScores?.[kpi];
+              if (scoreData) {
+                this.transfer[`${kpi}_target`] = scoreData.target || 0;
+                this.transfer[`${kpi}_achieved`] = scoreData.achieved || 0;
+              } else {
+                this.transfer[`${kpi}_target`] = 0;
+                this.transfer[`${kpi}_achieved`] = 0;
+              }
+            });
 
-    } else if (this.selectedUserRole === 'BM') {
-      this.performanceService
-        .getBmScores(this.period, this.transfer.old_branch_id)
-        .subscribe((data: any) => {
-          this.bmScores = data;
-          this.transfer.kpi_total = this.bmScores.total || 0;
+            this.saveOrUpdateTransfer();
+          });
+      } else if (this.selectedUserRole === 'HOD') {
+        this.hoPerformanceService
+          .getHoScores(
+            this.period,
+            this.transfer.staff_id,
+            this.transfer.old_branch_id
+          )
+          .subscribe((data) => {
+            this.hodScores = data;
+            this.transfer.kpi_total = this.hodScores.scores?.total || 0;
 
-          this.saveOrUpdateTransfer();
-        });
-
-    } else if (this.selectedUserRole === 'HOD') {
-      this.hoPerformanceService
-        .getHoScores(this.period, this.transfer.staff_id, this.transfer.old_branch_id)
-        .subscribe(data => {
-          this.hodScores = data;
-          this.transfer.kpi_total = this.hodScores.scores?.total || 0;
-
-          this.saveOrUpdateTransfer();
-        });
-
+            this.saveOrUpdateTransfer();
+          });
+      } else {
+        this.transfer.kpi_total = '0';
+        this.saveOrUpdateTransfer();
+      }
     } else {
-      this.transfer.kpi_total = '0';
-      this.saveOrUpdateTransfer();
+      alert('Please select staff and old branch before saving');
+    }
+  }
+
+  private saveOrUpdateTransfer() {
+    const newBranchId = this.transfer.new_branch_id;
+    const role = this.transfer.new_designation;
+    console.log(this.transfer);
+    const confirmed = confirm('Do you want to Transfer the Staff?');
+    if (!confirmed) return;
+    if (this.transfer.id) {
+      this.adminService
+        .transferUser(this.transfer.staff_id, newBranchId, role)
+        .subscribe(() => {});
+      this.adminService
+        .updateTrasferedStaff(this.transfer.id, this.transfer)
+        .subscribe(() => {
+          this.loadTrasferedStaff();
+          this.deleteAllocationsAndTransfer(this.transfer.staff_id);
+        });
+    } else {
+      this.adminService
+        .transferUser(this.transfer.staff_id, newBranchId, role)
+        .subscribe(() => {});
+      this.adminService.addTrasferedStaff(this.transfer).subscribe(() => {
+        alert('Staff transferred successfully');
+        this.loadTrasferedStaff();
+      });
     }
 
-  } else {
-    alert('Please select staff and old branch before saving');
+    // Reset
+    this.transfer = {
+      id: '',
+      staff_id: '',
+      old_branch_id: '',
+      new_branch_id: '',
+      kpi_total: '',
+      period: '',
+      old_designation: '',
+      new_designation: '',
+      deposit_target: '',
+      deposit_achieved: '',
+      loan_gen_target: '',
+      loan_gen_achieved: '',
+      loan_amulya_target: '',
+      loan_amulya_achieved: '',
+      audit_target: '',
+      audit_achieved: '',
+      recovery_target: '',
+      recovery_achieved: '',
+      insurance_target: '',
+      insurance_achieved: '',
+    };
   }
-}
 
+  deleteAllocationsAndTransfer(user_id: any) {
+    this.adminService.deleteAllocations(user_id).subscribe(() => {});
+  }
 
-private saveOrUpdateTransfer() {
-  const newBranchId = this.transfer.new_branch_id; 
-
-  if (this.transfer.id) {
-    this.adminService.transferUser(this.transfer.staff_id, newBranchId).subscribe(() => {
-      
-    });
+  deleteHostaffAndTransfer(ho_staff_id: any, branch_id: any) {
     this.adminService
-      .updateTrasferedStaff(this.transfer.id, this.transfer)
-      .subscribe(() => {
-        alert('Staff transferred successfully');
-        this.loadTrasferedStaff();
-        this.deleteAllocationsAndTransfer(this.transfer.staff_id);
-      });
-  } else {
-    this.adminService.transferUser(this.transfer.staff_id, newBranchId).subscribe(() => {
-      
-    });
-    this.adminService
-      .addTrasferedStaff(this.transfer)
-      .subscribe(() => {
-        alert('Staff transferred successfully');
-        this.loadTrasferedStaff();
-      });
+      .deleteSpecificHoStaff(ho_staff_id, branch_id)
+      .subscribe(() => {});
   }
 
-  // Reset
-  this.transfer = {
-    id: '',
-    staff_id: '',
-    old_branch_id: '',
-    new_branch_id: '',
-    kpi_total: '',
-  };
-}
-
-deleteAllocationsAndTransfer(user_id:any) {
-  this.adminService.deleteAllocations(user_id).subscribe(() => {
-
-  });
-}
-
-deleteHostaffAndTransfer(ho_staff_id: any, branch_id: any) {
-  this.adminService.deleteSpecificHoStaff(ho_staff_id, branch_id).subscribe(() => {
-
-  });
-}
-
-autoDistribute(branchId: string) {
-  if (branchId) {
-    this.branchManagerService.autoDistributeTargetsToTransfer(this.period, branchId).subscribe(() => {
-      console.log('Auto distribution done for branch:', branchId);
-    });
+  autoDistribute(branchId: string) {
+    if (branchId) {
+      this.branchManagerService
+        .autoDistributeTargetsToTransfer(this.period, branchId)
+        .subscribe(() => {
+          console.log('Auto distribution done for branch:', branchId);
+        });
+    }
   }
-}
-
 
   editBranch(branch: any) {
     this.transfer = { ...branch };
     console.log(this.transfer);
-    
   }
 
   deleteBranch(id: string) {
@@ -272,7 +373,6 @@ autoDistribute(branchId: string) {
     });
   }
 
-  
   employeeId = this.transfer.staff_id;
   branchId = this.transfer.old_branch_id;
   branchstaff() {

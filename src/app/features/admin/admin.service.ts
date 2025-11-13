@@ -30,6 +30,12 @@ export class AdminService {
   getUsers() {
     return this.http.get(`${environment.apiBaseUrl}/masters/users`);
   }
+   getTrafterHistory(period:any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/trasfer-history`,{period});
+  }
+   getTrafterKpiHistory(period:any,staff_id:any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/transfer-kpi-history`,{period,staff_id});
+  }
 
   addUser(user: any) {
     return this.http.post(`${environment.apiBaseUrl}/masters/users`, user);
@@ -39,8 +45,8 @@ export class AdminService {
     return this.http.put(`${environment.apiBaseUrl}/masters/users/${id}`, user);
   }
 
-  transferUser(id: string, branch_id:string) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_user/${id}`, { branch_id });
+  transferUser(id: string, branch_id:string,role:string) {
+    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_user/${id}`, { branch_id ,role });
   }
   deleteUser(id: string) {
     return this.http.delete(`${environment.apiBaseUrl}/masters/users/${id}`);
@@ -97,5 +103,45 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
 
   deleteTrasferedStaff(id: string) {
     return this.http.delete(`${environment.apiBaseUrl}/masters/transfers/${id}`);
+  }
+
+  //kpi-master
+   getKpiList() {
+    return this.http.get(`${environment.apiBaseUrl}/kpi_master/kpiMaster`);
+  }
+
+  addKpi(branch: any) {
+    return this.http.post(`${environment.apiBaseUrl}/kpi_master/kpiMaster`, branch);
+  }
+
+  updateKpi(id: string, branch: any) {
+    return this.http.put(`${environment.apiBaseUrl}/kpi_master/kpiMaster/${id}`, branch);
+  }
+
+  deleteKpi(id: string) {
+    return this.http.delete(`${environment.apiBaseUrl}/kpi_master/kpiMaster/${id}`);
+  }
+
+   //kpi-mapping
+   getKpiMappingList() {
+    return this.http.get(`${environment.apiBaseUrl}/kpi_master/kpiMapping`);
+  }
+
+  addKpiMapping(branch: any) {
+    return this.http.post(`${environment.apiBaseUrl}/kpi_master/kpiMapping`, branch);
+  }
+
+  updateKpiMapping(id: string, branch: any) {
+    return this.http.put(`${environment.apiBaseUrl}/kpi_master/kpiMapping/${id}`, branch);
+  }
+
+  deleteKpiMapping(id: string) {
+    return this.http.delete(`${environment.apiBaseUrl}/kpi_master/kpiMapping/${id}`);
+  }
+  getMonthEntries(period:any) {
+    return this.http.post(`${environment.apiBaseUrl}/entries/monthEntries`,{period});
+  }
+   deleteEntries(id: string) {
+    return this.http.delete(`${environment.apiBaseUrl}/entries/entries/${id}`);
   }
 }

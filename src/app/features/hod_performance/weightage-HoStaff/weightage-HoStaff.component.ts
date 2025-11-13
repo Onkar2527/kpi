@@ -32,13 +32,7 @@ export class WeightageHoStaffComponent implements OnInit {
     'branch_communication',
     'insurance'
   ];
- kpiListAGM = [
-    'allocated_work',
-    'IT_system_usage',
-    'work_performance',
-    'branch_communication',
-    'insurance'
-  ];
+
   constructor(
     private performanceService: HoPerformanceService,
     public auth: AuthService,
@@ -61,8 +55,7 @@ export class WeightageHoStaffComponent implements OnInit {
         }
 
       this.loadScores();
-
-
+      
       }
     });
   }
@@ -122,4 +115,5 @@ selectEmployee(employee: any) {
   calculateTotalSalary() {
     return this.salary + this.calculateKpiBasedIncrement();
   }
+
 }

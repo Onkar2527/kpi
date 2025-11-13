@@ -3,27 +3,45 @@
   <form (ngSubmit)="onSubmit()">
     <div class="mb-3">
       <label class="form-label">Upload Type</label>
-      <div class="form-check">
+      <div class="form-check" *ngIf=" auth.user?.role === 'HO' || auth.user?.role ==='loan_ho' || auth.user?.role ==='deposit_ho' || auth.user?.role === 'loanAmulya_ho' ">
         <input class="form-check-input" type="radio" name="uploadType" id="main" value="main" [(ngModel)]="uploadType">
         <label class="form-check-label" for="main">
-          Deposit, Loan General, Loan Amulya
+          Deposit OR Loan General OR Loan Amulya
         </label>
       </div>
-      <div class="form-check">
+      <div class="form-check" *ngIf="auth.user?.role === 'HO' || auth.user?.role ==='insurance_ho' || auth.user?.role ==='recovery_ho'">
         <input class="form-check-input" type="radio" name="uploadType" id="branch-specific" value="branch-specific" [(ngModel)]="uploadType">
         <label class="form-check-label" for="branch-specific">
-          Insurance, Recovery
+          Insurance OR Recovery
+        </label>
+      </div>
+      <div class="form-check" *ngIf="auth.user?.role === 'HO'">
+        <input class="form-check-input" type="radio" name="uploadType" id="dashborad" value="dashborad" [(ngModel)]="uploadType">
+        <label class="form-check-label" for="dashborad">
+          Dashborad Previous Year Data
+        </label>
+      </div>
+       <div class="form-check"  *ngIf="auth.user?.role === 'HO'">
+        <input class="form-check-input" type="radio" name="uploadType" id="dashborad-achieved" value="dashborad-achieved" [(ngModel)]="uploadType">
+        <label class="form-check-label" for="dashborad-achieved">
+          Dashborad Total Achieved Data
+        </label>
+      </div>
+       <div class="form-check"  *ngIf="auth.user?.role === 'HO'">
+        <input class="form-check-input" type="radio" name="uploadType" id="salary" value="salary" [(ngModel)]="uploadType" >
+        <label class="form-check-label" for="salary">
+          Upload Base Salary
         </label>
       </div>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3" *ngIf="uploadType">
       <label for="targetFile" class="form-label">Target File (CSV)</label>
       <input class="form-control" type="file" id="targetFile" (change)="onFileChange($event)" name="targetFile" accept=".csv" required>
     </div>
     <button type="submit" class="btn btn-primary">Upload</button>
   </form>
-   <div *ngIf="message" class="mt-3">
+   <div *ngIf="message && (auth.user?.role === 'loan_ho' || auth.user?.role === 'deposit_ho' || auth.user?.role === 'loanAmulya_ho' || auth.user?.role === 'HO' || auth.user?.role === 'insurance_ho' || auth.user?.role === 'recovery_ho')" class="mt-3" >
     <div
       class="alert"
       [ngClass]="{

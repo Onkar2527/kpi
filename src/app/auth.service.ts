@@ -8,6 +8,8 @@ export interface UserProfile {
   name: string;
   role: string;
   branchId: string | null;
+  username:string |null
+  branchName: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -35,8 +37,10 @@ export class AuthService {
         this.saveSession();
         this.router.navigateByUrl('/home');
       },
-      error: () => {
+      error: (error) => {
         console.error('Invalid credentials');
+        alert(error.error.error)
+        
       }
     });
   }
@@ -62,6 +66,7 @@ export class AuthService {
     }
   }
 
+  
   private clearSession() {
     localStorage.removeItem('user');
     localStorage.removeItem('token');

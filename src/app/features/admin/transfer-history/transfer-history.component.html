@@ -1,0 +1,112 @@
+<div class="container mt-4">
+  <h2>Trasfer History</h2>
+  
+
+  <div class="mb-3">
+    <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()">
+  </div>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>Staff ID</th>
+        <th>Name</th>
+        <th>Transfer Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of paginatedUsers">
+        <td>{{user.staff_id}}</td>
+        <td>{{ user.name }}</td>
+        <td>{{user.transfer_date | date:'dd-MM-yyyy' }}</td>
+        <td>
+          <button class="btn btn-primary btn-sm me-2" (click)="editUser(user)">View</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <nav *ngIf="totalPages > 1">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" href="#" (click)="goToPage($event, currentPage - 1)">Previous</a>
+      </li>
+      <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index" [class.active]="currentPage === i + 1">
+        <a class="page-link" href="#" (click)="goToPage($event, i + 1)">{{ i + 1 }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" href="#" (click)="goToPage($event, currentPage + 1)">Next</a>
+      </li>
+    </ul>
+  </nav>
+
+ <!-- Modal -->
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white d-flex justify-content-between align-items-center">
+      <h5 class="modal-title mb-0" id="historyModalLabel">
+        {{ history?.name }}
+      </h5>
+
+      <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-light btn-sm" (click)="printHistory()">
+          🖨️ Print
+        </button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+    </div>
+
+
+      <div class="modal-body">
+        <div *ngIf="history">
+          <small>Period: {{ history.period }}</small>
+
+          <div *ngFor="let transfer of history.transfers; let i = index" class="border rounded p-3 mb-4 shadow-sm">
+            <h5 class="text-primary mb-3">
+              Transfer {{ i + 1 }} — <span class="text-secondary">{{ transfer.transfer_date | date:'dd-MM-yyyy' }}</span>
+            </h5>
+
+            <p><strong>Old Branch NAME:</strong> {{ transfer.branch_name }} |
+              <strong>Old Designation:</strong> {{ transfer.old_designation }} 
+            </p>
+
+            <table class="table table-bordered table-striped mt-3">
+              <thead class="table-dark">
+                <tr>
+                  <th>KPI</th>
+                   <th>Weightage</th>
+                  <th>Target</th>
+                  <th>Achieved</th>
+                  <th>Score (Out of 10)</th>
+                  <th>Weightage Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let kpi of ['deposit', 'loan_gen', 'loan_amulya', 'recovery', 'audit', 'insurance']">
+                  <td>{{ kpi | titlecase }}</td>
+                  <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                  <td>{{ transfer[kpi]?.target | number:'1.0-0' }}</td>
+                  <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                  <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                  <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+                </tr>
+                <tr class="table-info">
+                  <td><strong>Total</strong></td>
+                  <td colspan="4"></td>
+                  <td><strong>{{ transfer.total_weightage_score | number:'1.2-2' }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</div>

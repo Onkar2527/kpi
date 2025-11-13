@@ -23,6 +23,7 @@ export class VerifyEntriesComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
   totalPages = 0;
+  visiblePages: number[] = [];
   pendingEntries = 0;
   verifiedEntries = 0;
 
@@ -53,6 +54,7 @@ loadPendingEntries() {
       this.pendingEntries = data.filter(e => e.status === 'Pending').length;
       this.verifiedEntries = data.filter(e => e.status === 'Verified').length;
       this.updatePagination();
+      this.updateVisiblePages();
     });
   }
 }
@@ -61,16 +63,24 @@ loadPendingEntries() {
     this.totalPages = this.paginationService.getTotalPages(this.filteredEntries, this.pageSize);
     this.paginatedEntries = this.paginationService.getPaginatedData(this.filteredEntries, this.currentPage, this.pageSize);
   }
-
+   goToPage(event: Event, page: number): void {
+    event.preventDefault();
+    if (page < 1 || page > this.totalPages) return; 
+    this.currentPage = page;
+    this.updatePagination();
+    this.updateVisiblePages(); 
+  }
   onSearch(query: string) {
     this.filteredEntries = this.searchService.filterData(this.entries, query);
     this.currentPage = 1;
     this.updatePagination();
+    this.updateVisiblePages();
   }
 
   onPageChange(page: number) {
     this.currentPage = page;
     this.updatePagination();
+    this.updateVisiblePages();
   }
 
   verify(entryId: string) {
@@ -94,5 +104,16 @@ loadPendingEntries() {
     }
     this.currentPage = 1;
     this.updatePagination();
+    this.updateVisiblePages();
+  }
+   updateVisiblePages(): void {
+    const pagesPerGroup = 10;
+    const startPage = Math.floor((this.currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+    const endPage = Math.min(startPage + pagesPerGroup - 1, this.totalPages);
+
+    this.visiblePages = [];
+    for (let i = startPage; i <= endPage; i++) {
+      this.visiblePages.push(i);
+    }
   }
 }

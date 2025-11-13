@@ -25,7 +25,7 @@ export class NewEntryComponent implements OnInit {
   typeOfDepositOptions = ['Individual', 'Combined'];
   typeOptions = ['ADD', 'Remove'];
   accountNo = '';
-  value = 0;
+  value : any;
   date = new Date().toISOString().slice(0, 10);
   minDate: string;
   maxDate: string;
@@ -50,7 +50,7 @@ export class NewEntryComponent implements OnInit {
 isSubmitted = false;
   onSubmit() {
     if (this.isSubmitted) return;
-    if (!this.kpi || !this.value || !this.typeOfDeposit || !this.type) {
+    if (!this.kpi || !this.value || !this.typeOfDeposit || !this.type || !this.accountNo || !this.date)  {
       this.error = 'Please fill in all required fields.';
       return;
     }

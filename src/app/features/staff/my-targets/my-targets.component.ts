@@ -8,6 +8,8 @@ import { KpisService } from '../../kpis/kpis.service';
 import { forkJoin } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { PeriodService } from '../../../core/period.service';
+import { LoginComponent } from '../../login/login.component';
+import { PerformanceService } from '../../performance/performance.service';
 
 @Component({
   selector: 'app-my-targets',
@@ -25,14 +27,17 @@ export class MyTargetsComponent implements OnInit {
   employeeId = this.auth.user?.id;
   branchId = this.auth.user?.branchId;
   period!: string;
-
+  staffAll:any;
+  salary:any;
+  incrementAmt:any;
   constructor(
     private staffService: StaffService,
     public auth: AuthService,
     private sharedService: SharedService,
     private branchManagerService: BranchManagerService,
     private kpisService: KpisService,
-    private periodService: PeriodService
+    private periodService: PeriodService,
+    private performanceService: PerformanceService
   ) { }
 
   ngOnInit(): void {
@@ -41,6 +46,7 @@ export class MyTargetsComponent implements OnInit {
     ).subscribe(period => {
       this.period = period;
       this.loadTargets();
+      this.getSalary(this.period, this.auth.user?.username);
     });
 
     this.sharedService.entryVerified$.subscribe(() => {
@@ -48,6 +54,54 @@ export class MyTargetsComponent implements OnInit {
         this.loadTargets();
       }
     });
+  }
+
+  getSalary(period: any, PF_NO: any) {
+    this.performanceService.getSalary(period, PF_NO).subscribe((data: any) => {
+      this.salary = data[0].salary || 0;
+      this.incrementAmt = data[0].increment || 0;
+      
+    });
+  }
+  calculateKpiBasedIncrement() {
+    if (!this.grandTotalWeightageScore) {
+      return 0;
+    }
+    const score = this.grandTotalWeightageScore;
+    if (score < 5) {
+      return 0;
+    }
+    if (score >= 5 && score < 10) {
+      return this.incrementAmt * (score / 100);
+    }
+    if (score >= 10 && score < 12.5) {
+      return this.incrementAmt;
+    }
+    return this.incrementAmt * 1.25;
+  }
+  finalSalary() {
+    const finalSalary = this.calculateTotalSalary() * 0.25;
+    return finalSalary + this.calculateTotalSalary();
+  }
+  calculateTotalSalary() {
+    return this.salary + this.calculateKpiBasedIncrement();
+  }
+
+  calculateStaffKpiBasedIncrement(score: number) {
+    if (score < 5) {
+      return 0;
+    }
+    if (score >= 5 && score < 10) {
+      return this.incrementAmt * (score / 10);
+    }
+    if (score >= 10 && score < 12.5) {
+      return this.incrementAmt;
+    }
+    return this.incrementAmt * 1.25;
+  }
+
+  calculateStaffTotalSalary(score: number) {
+    return this.salary + this.calculateStaffKpiBasedIncrement(score);
   }
 
   loadTargets(): void {
@@ -80,7 +134,7 @@ export class MyTargetsComponent implements OnInit {
               if (branchKpi) {
                 personalScores.push({
                   ...branchKpi,
-                  kpi: kpi.kpi_name, // Use the proper name
+                  kpi: kpi.kpi_name,
                   weightage: kpi.weightage,
                   
                   weightageScore: branchKpiScore ===0 ? -2 : branchKpiScore
@@ -97,6 +151,10 @@ export class MyTargetsComponent implements OnInit {
         this.staffService.getMyTargets(this.period, this.employeeId, this.branchId).subscribe((data: any) => {
           this.personalTargets = this.calculateScores(data.personal);
           this.branchTargets = this.calculateScores(data.branch);
+          this.staffAll=[...this.personalTargets,...this.branchTargets];
+         
+          
+          
           this.calculateTotals();
         });
       }
@@ -147,7 +205,7 @@ calculateScores(targets: any[]): any[] {
     }
 
     outOf10 = Math.max(0, Math.min(12.5, isNaN(outOf10) ? 0 : outOf10));
-console.log(target);
+
     return {
       ...target,
       outOf10,

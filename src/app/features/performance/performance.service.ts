@@ -17,7 +17,14 @@ export class PerformanceService {
     return this.http.get(`${environment.apiBaseUrl}/summary/bm-scores?period=${period}&branchId=${branchId}`);
   }
 
-  getStaffScores(period: string, employeeId: string) {
-    return this.http.get(`${environment.apiBaseUrl}/summary/staff-scores?period=${period}&employeeId=${employeeId}`);
+  getStaffScores(period: string, employeeId: string,branchId: string) {
+    return this.http.get(`${environment.apiBaseUrl}/summary/staff-scores?period=${period}&employeeId=${employeeId}&branchId=${branchId}`);
+  }
+
+  submitAuditScore(data:any) {
+    return this.http.post(`${environment.apiBaseUrl}/summary/addAudit`,data);
+  }
+  getSalary(period: string, PF_NO: string){
+        return this.http.get(`${environment.apiBaseUrl}/summary/get-salary?period=${period}&PF_NO=${PF_NO}`);
   }
 }

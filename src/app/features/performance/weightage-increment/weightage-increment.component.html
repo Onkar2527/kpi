@@ -139,6 +139,10 @@
             <td>{{ kpi }}</td>
             <td>{{ selectedEmployee[kpi]?.weightage }}</td>
             <td>{{ selectedEmployee[kpi]?.target | number:'1.2-2' }}</td>
+            <!-- <td *ngIf="kpi==='audit'">
+              <input type="number" class="form-control" [(ngModel)]="selectedEmployee[kpi].achieved"
+                  [ngModelOptions]="{standalone: true}" (ngModelChange)="onAuditScoreChange($event)" min="0" max="999999" />
+            </td> -->
             <td>{{ selectedEmployee[kpi]?.achieved | number:'1.2-2' }}</td>
             <td>{{ selectedEmployee[kpi]?.score | number:'1.2-2' }}</td>
             <td>{{ selectedEmployee[kpi]?.weightageScore | number:'1.2-2' }}</td>
@@ -153,7 +157,7 @@
     </div>
   </div>
 
-  <div class="card mt-4" *ngIf="auth.user?.role === 'BM' && bmScores">
+  <div class="card mt-4" *ngIf="auth.user?.role === 'BM' ">
     <div class="card-header">
       <h4>Salary Details</h4>
     </div>
@@ -162,19 +166,23 @@
         <thead class="table-info">
           <tr>
             <th>Designation</th>
-            <th>Salary</th>
-            <th>Increment Amt.</th>
+            <th>Basic Inc.</th>
+            <th>Increment Basic.</th>
             <th>KPI Based</th>
+            <th>Tot. Basic</th>
+            <th>DA</th>
             <th>Tot. Salary</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>B.M</td>
-            <td>{{ salary | number:'1.2-2' }}</td>
-            <td>{{ incrementAmt | number:'1.2-2' }}</td>
+            <td>{{ BMsalary | number:'1.2-2' }}</td>
+            <td>{{ BMincrementAmt | number:'1.2-2' }}</td>
             <td>{{ calculateKpiBasedIncrement() | number:'1.2-2' }}</td>
             <td>{{ calculateTotalSalary() | number:'1.2-2' }}</td>
+            <td>25%</td>
+            <td>{{finalSalary() | number:'1.2-2'}}</td>
           </tr>
         </tbody>
       </table>

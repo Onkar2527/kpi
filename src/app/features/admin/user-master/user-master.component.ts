@@ -16,13 +16,14 @@ export class UserMasterComponent implements OnInit {
   users: any;
   filteredUsers: any;
   paginatedUsers: any;
-  user = { id: '', username: '', name: '', password: '', role: '', branch_id: '', department_id: '' };
+  user = { id: '', username: '', name: '', password: '',PF_NO:'' ,role: '', branch_id: '', department_id: '' };
   branches: any;
   departments: any;
   searchTerm = '';
   currentPage = 1;
   pageSize = 10;
   totalPages = 0;
+  visiblePages: number[] = [];
 
   constructor(
     private adminService: AdminService,
@@ -47,6 +48,7 @@ export class UserMasterComponent implements OnInit {
     this.filteredUsers = this.searchService.filterData(this.users, this.searchTerm);
     this.totalPages = this.paginationService.getTotalPages(this.filteredUsers, this.pageSize);
     this.updatePaginatedUsers();
+    this.updateVisiblePages();
   }
 
   updatePaginatedUsers(): void {
@@ -57,6 +59,7 @@ export class UserMasterComponent implements OnInit {
     event.preventDefault();
     this.currentPage = page;
     this.updatePaginatedUsers();
+    this.updateVisiblePages();
   }
 
   saveUser() {
@@ -69,9 +72,19 @@ export class UserMasterComponent implements OnInit {
         this.loadUsers();
       });
     }
-    this.user = { id: '', username: '', name: '', password: '', role: '', branch_id: '', department_id: '' };
+    this.user = { id: '', username: '', name: '', password: '', PF_NO:'',role: '', branch_id: '', department_id: '' };
   }
 
+  updateVisiblePages(): void {
+    const pagesPerGroup = 10;
+    const startPage = Math.floor((this.currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+    const endPage = Math.min(startPage + pagesPerGroup - 1, this.totalPages);
+
+    this.visiblePages = [];
+    for (let i = startPage; i <= endPage; i++) {
+      this.visiblePages.push(i);
+    }
+  }
   editUser(user: any) {
     this.user = { ...user };
   }

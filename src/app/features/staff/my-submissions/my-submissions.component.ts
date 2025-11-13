@@ -20,6 +20,7 @@ export class MySubmissionsComponent implements OnInit {
   paginatedSubmissions: any;
   employeeId = this.auth.user?.id;
   period!: string;
+  visiblePages: number[] = [];
   searchTerm = '';
   currentPage = 1;
   pageSize = 10;
@@ -56,6 +57,7 @@ export class MySubmissionsComponent implements OnInit {
     this.filteredSubmissions = this.searchService.filterData(this.submissions, this.searchTerm);
     this.totalPages = this.paginationService.getTotalPages(this.filteredSubmissions, this.pageSize);
     this.updatePaginatedSubmissions();
+    this.updateVisiblePages();
   }
 
   updatePaginatedSubmissions(): void {
@@ -63,13 +65,26 @@ export class MySubmissionsComponent implements OnInit {
     
   }
 
-  goToPage(page: number): void {
+   goToPage(event: Event, page: number): void {
+    event.preventDefault();
+    if (page < 1 || page > this.totalPages) return; 
     this.currentPage = page;
     this.updatePaginatedSubmissions();
+    this.updateVisiblePages();
   }
 
   onCardClick(kpi: string): void {
     this.searchTerm = kpi;
     this.onSearch();
+  }
+   updateVisiblePages(): void {
+    const pagesPerGroup = 10;
+    const startPage = Math.floor((this.currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+    const endPage = Math.min(startPage + pagesPerGroup - 1, this.totalPages);
+
+    this.visiblePages = [];
+    for (let i = startPage; i <= endPage; i++) {
+      this.visiblePages.push(i);
+    }
   }
 }
