@@ -35,23 +35,23 @@
         <div class="mb-3">
           <label for="role" class="form-label">Role</label>
           <select id="role" class="form-select" [(ngModel)]="user.role" name="role" placeholder="Select Role">
-            <option value="HO">HO</option>
-            <option value="INSURANCE">INSURANCE</option>
-            <option value="BM">BM</option>
-            <option value="Attender">ATTENDER</option>
-            <option value="Clerk">CLERK</option>
-            <option value="HO_STAFF">HO_Staff</option>
+           <option value="GM">GM</option>
             <option value="AGM">AGM</option>
             <option value="DGM">DGM</option>
-            <option value="GM">GM</option>
-          </select>
+            <option value="AGM_AUDIT">AGM_AUDIT</option>
+            <option value="AGM_INSURANCE">AGM_INSURANCE</option>
+            <option value="AGM_AUDIT">AGM_IT</option>
+            <option value="BM">BM</option>
+            <option value="Clerk">CLERK</option>
+            <option value="HO_STAFF">HO_Staff</option>
+             <option value="Attender">ATTENDER</option>
+              </select>
         </div>
-        <div *ngIf="user.role === 'BM' || user.role === 'Clerk' || user.role === 'Attender'|| user.role === 'INSURANCE'||user.role === 'AGM'|| user.role ==='DGM'|| user.role ==='GM'">
+        <div *ngIf="user.role === 'BM' || user.role === 'Clerk' || user.role === 'Attender'">
         <div class="mb-3">
           <label for="branch" class="form-label">Branch</label>
           <select id="branch" class="form-select" [(ngModel)]="user.branch_id" name="branch_id">
-            <option selected>Choose...</option>
-            <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.name }}</option>
+            <option *ngFor="let branch of branches" [value]="branch.code">{{ branch.name }}</option>
           </select>
         </div>
         </div>
@@ -92,7 +92,7 @@
         <td>{{ user.department_name }}</td>
         <td>
           <button class="btn btn-primary btn-sm me-2" (click)="editUser(user)">Edit</button>
-          <button class="btn btn-danger btn-sm" (click)="deleteUser(user.id)">Delete</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteUser(user)">Resign</button>
         </td>
       </tr>
     </tbody>

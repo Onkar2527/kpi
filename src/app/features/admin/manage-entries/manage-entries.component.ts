@@ -5,7 +5,7 @@ import { AdminService } from '../admin.service';
 import { SearchService } from '../../../core/search.service';
 import { PaginationService } from '../../../core/pagination.service';
 import { PeriodService } from 'src/app/core/period.service';
-
+declare var bootstrap: any;
 @Component({
   selector: 'app-entries-master',
   standalone: true,
@@ -23,7 +23,9 @@ export class manageEntriesComponent implements OnInit {
   totalPages = 0;
   visiblePages: number[] = [];
   period: any;
-
+  modal: any;
+  toastMessage: string = '';
+  entriesData={ id:'', kpi:'', account_no:'', value:'', date:''  };
   constructor(
     private adminService: AdminService,
     private searchService: SearchService,
@@ -34,7 +36,18 @@ export class manageEntriesComponent implements OnInit {
   ngOnInit(): void {
     this.getPeriod();
   }
-
+  editEntries() {
+    if(this.entriesData.account_no.length < 14){
+      this.showToast('Account Number must be 14 digits long');
+      return;
+    }
+    this.adminService.updateEntries(this.entriesData.id, this.entriesData).subscribe(() => {
+      this.loadEntries();
+      this.entriesData={ id:'', kpi:'', account_no:'', value:'', date:''  };
+      this.showToast('Entry updated successfully!');
+      this.modal.hide();
+    });
+  }
   getPeriod() {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
@@ -87,7 +100,28 @@ export class manageEntriesComponent implements OnInit {
       this.visiblePages.push(i);
     }
   }
+  formatDate(dateString: string) {
+  const d = new Date(dateString);
+  return (
+    d.getFullYear() +
+    '-' +
+    String(d.getMonth() + 1).padStart(2, '0') +
+    '-' +
+    String(d.getDate()).padStart(2, '0')
+  );
+}
 
+  editEntry(entry: any) {
+    console.log(entry);
+ 
+    entry.date = this.formatDate(entry.date);
+
+    this.entriesData = { ...entry };
+    const modalEl = document.getElementById('editEntriesModal');
+    this.modal = new bootstrap.Modal(modalEl);
+    this.modal.show();
+    
+  }
   deleteEntry(id: string) {
     if (confirm('Are you sure you want to delete this entry?')) {
       this.adminService.deleteEntries(id).subscribe(() => {
@@ -95,4 +129,12 @@ export class manageEntriesComponent implements OnInit {
       });
     }
   }
+
+showToast(msg: string) {
+  this.toastMessage = msg;
+
+  setTimeout(() => {
+    this.toastMessage = '';
+  }, 3000); 
+}
 }

@@ -27,4 +27,8 @@ export class PerformanceService {
   getSalary(period: string, PF_NO: string){
         return this.http.get(`${environment.apiBaseUrl}/summary/get-salary?period=${period}&PF_NO=${PF_NO}`);
   }
+  getAllStaffSalary(period: string, branch_id: string){
+        return this.http.get(`${environment.apiBaseUrl}/summary/get-salary-all-staff?period=${period}&branch_id=${branch_id}`);
+  }
+
 }

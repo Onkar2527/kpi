@@ -28,23 +28,20 @@
         <div class="mb-3">
           <label for="oldBranch" class="form-label">Old Branch</label>
           <select id="oldBranch" class="form-select" [(ngModel)]="transfer.old_branch_id" name="oldbranch_id">
-            <option selected>Choose...</option>
-            <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.name }}</option>
+            <option *ngFor="let branch of branches" [value]="branch.code">{{ branch.name }}</option>
           </select>
         </div>
         
         <div class="mb-3">
           <label for="newBranch" class="form-label">New Branch</label>
           <select id="newBranch" class="form-select" [(ngModel)]="transfer.new_branch_id" name="newbranch_id">
-            <option selected>Choose...</option>
-            <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.name }}</option>
+            <option *ngFor="let branch of branches" [value]="branch.code">{{ branch.name }}</option>
           </select>
         </div>
 
         <div class="mb-3">
           <label for="role" class="form-label">Role</label>
           <select id="role" class="form-select" [(ngModel)]="transfer.new_designation" name="role">
-            <option selected>Choose...</option>
             <option value="HO">HO</option>
             <option value="INSURANCE">INSURANCE</option>
             <option value="BM">BM</option>
@@ -56,6 +53,10 @@
             <option value="GM">GM</option>
           </select>
         </div>
+         <!-- <div class="mb-3">
+          <label for="date" class="form-label">Date of Transfered </label>
+          <input type="date" class="form-control" id="date" [(ngModel)]="transfer.transfer_date" name="date"  value="">
+        </div> -->
         <button type="submit" class="btn btn-primary">Save</button>
       </form>
     </div>

@@ -19,10 +19,12 @@
         <option *ngFor="let typeOfDeposit of typeOfDepositOptions" [value]="typeOfDeposit">{{ typeOfDeposit }}</option>
       </select>
     </div>
+  
     <div class="mb-3" *ngIf="kpi !== 'loan_amulya'">
-      <label for="accountNumber" class="form-label">Account Number</label>
-      <input type="text" class="form-control" id="accountNumber" [(ngModel)]="accountNo" name="accountNo" minlength="14" maxlength="14" placeholder="0" required>
-    </div>
+    <label for="accountNumber" class="form-label">Account Number</label>
+   <input type="text" class="form-control" id="accountNumber" [(ngModel)]="accountNo" name="accountNo"  maxlength="14" placeholder="Enter 14-digit Account No"  (input)="allowOnlyNumbers($event)" required >
+   </div>
+
     <div class="mb-3">
       <label for="value" class="form-label">{{ kpi === 'loan_amulya' ? 'Number of Accounts' : 'Value' }}</label>
       <input type="number" class="form-control" id="value" [(ngModel)]="value" name="value" required>

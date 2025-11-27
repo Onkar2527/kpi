@@ -59,7 +59,62 @@
           </svg>
           <span class="d-none d-lg-inline ms-1">Logout</span>
         </a>
+        <div class="nav-divider d-none d-md-block me-3"></div>
+        <a class="nav-link logout-btn p-2 rounded"  (click)="changePassword()" title="Change Password">
+          <i class="bi  bi-lock-fill"></i>
+          <span class="d-none d-lg-inline ms-1">Change Password</span>
+        </a>
       </div>
     </div>
   </div>
 </nav>
+
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Change Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+         <div *ngIf="step === 1">
+      
+          <label class="form-label">Old Password</label>
+          <input type="password" class="form-control" [(ngModel)]="oldPassword">
+
+          <p class="text-danger mt-2">{{ error }}</p>
+        </div>
+
+        <div *ngIf="step === 2">
+          <label class="form-label">New Password</label>
+          <input type="password" class="form-control" [(ngModel)]="newPassword">
+
+          <label class="form-label mt-3">Confirm Password</label>
+          <input type="password" class="form-control" [(ngModel)]="confirmPassword">
+
+          <p class="text-danger mt-2">{{ error }}</p>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+        <button class="btn btn-primary" *ngIf="step === 1" (click)="verifyOldPassword()">
+          Verify
+        </button>
+
+        <button class="btn btn-success" *ngIf="step === 2" (click)="updatePassword()">
+          Change Password
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="toast-message" *ngIf="toastMessage">
+  {{ toastMessage }}
+</div>

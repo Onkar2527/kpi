@@ -15,7 +15,6 @@
         <div class="mb-3">
           <label for="role" class="form-label">Role</label>
           <select id="role" class="form-select" [(ngModel)]="kpiMapping.role" name="role">
-            <option selected>Choose...</option>
             <option value="GM">GM</option>
             <option value="AGM">AGM</option>
             <option value="AGM_IT">AGM_IT</option>
@@ -30,7 +29,6 @@
        <div class="mb-3">
           <label for="kpi_id" class="form-label">KPI Name</label>
           <select id="kpi_id" class="form-select" [(ngModel)]="kpiMapping.kpi_id" name="kpi_id">
-            <option selected>Choose...</option>
             <option *ngFor="let kpi of kpiList" [value]="kpi.id">{{ kpi.kpi_name }}</option>
           </select>
         </div>

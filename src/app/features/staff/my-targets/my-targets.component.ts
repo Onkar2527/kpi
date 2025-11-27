@@ -10,6 +10,7 @@ import { filter } from 'rxjs/operators';
 import { PeriodService } from '../../../core/period.service';
 import { LoginComponent } from '../../login/login.component';
 import { PerformanceService } from '../../performance/performance.service';
+import { AdminService } from '../../admin/admin.service';
 
 @Component({
   selector: 'app-my-targets',
@@ -30,6 +31,15 @@ export class MyTargetsComponent implements OnInit {
   staffAll:any;
   salary:any;
   incrementAmt:any;
+  history:any;
+   kpiOrder = [
+  "deposit",
+  "loan_gen",
+  "loan_amulya",
+  "recovery",
+  "audit",
+  "insurance"
+];
   constructor(
     private staffService: StaffService,
     public auth: AuthService,
@@ -37,7 +47,8 @@ export class MyTargetsComponent implements OnInit {
     private branchManagerService: BranchManagerService,
     private kpisService: KpisService,
     private periodService: PeriodService,
-    private performanceService: PerformanceService
+    private performanceService: PerformanceService,
+    private adminService: AdminService
   ) { }
 
   ngOnInit(): void {
@@ -47,6 +58,7 @@ export class MyTargetsComponent implements OnInit {
       this.period = period;
       this.loadTargets();
       this.getSalary(this.period, this.auth.user?.username);
+      this.transferHistory();
     });
 
     this.sharedService.entryVerified$.subscribe(() => {
@@ -103,6 +115,13 @@ export class MyTargetsComponent implements OnInit {
   calculateStaffTotalSalary(score: number) {
     return this.salary + this.calculateStaffKpiBasedIncrement(score);
   }
+ 
+
+sortKpis(list: any[]) {
+  return list.sort((a, b) => {
+    return this.kpiOrder.indexOf(a.kpi) - this.kpiOrder.indexOf(b.kpi);
+  });
+}
 
   loadTargets(): void {
     if (this.employeeId && this.branchId) {
@@ -151,7 +170,11 @@ export class MyTargetsComponent implements OnInit {
         this.staffService.getMyTargets(this.period, this.employeeId, this.branchId).subscribe((data: any) => {
           this.personalTargets = this.calculateScores(data.personal);
           this.branchTargets = this.calculateScores(data.branch);
-          this.staffAll=[...this.personalTargets,...this.branchTargets];
+          console.log(this.personalTargets);
+          console.log('branch',this.branchTargets);
+          
+          this.staffAll=this.sortKpis([...this.personalTargets,...this.branchTargets]);
+          
          
           
           
@@ -168,6 +191,20 @@ calculateScores(targets: any[]): any[] {
 
   return targets.map(target => {
     let outOf10;
+    if(target.amount===0){
+      outOf10=0;
+      return {
+        ...target,
+        outOf10,
+        weightageScore:
+          target.kpi === 'insurance' && (target.weightage === 0 || target.achieved === 0)
+            ? -2
+            : isNaN((outOf10 * target.weightage) / 100)
+            ? 0
+            : (outOf10 * target.weightage) / 100
+      };
+    }
+    
     const ratio = target.achieved / target.amount;
     const auditRatio = target.kpi === 'audit' ? target.achieved / target.amount : 0;
     const recoveryRatio = target.kpi === 'recovery' ? target.achieved / target.amount : 0;
@@ -217,7 +254,6 @@ calculateScores(targets: any[]): any[] {
           : (outOf10 * target.weightage) / 100
     };
     
-    
   });
 }
 
@@ -227,4 +263,16 @@ calculateScores(targets: any[]): any[] {
     this.branchTotalWeightageScore = this.branchTargets?.reduce((acc: any, target: any) => acc + target.weightageScore, 0) || 0;
     this.grandTotalWeightageScore = this.personalTotalWeightageScore + this.branchTotalWeightageScore;
   }
+
+   transferHistory() {
+    this.adminService
+      .getTrafterKpiHistory(this.period, this.auth.user?.id)
+      .subscribe((data: any) => {
+        if (Array.isArray(data) && data.length > 0) {
+          this.history = data[0];
+        } else {
+          this.history = null;
+        }
+      });
+  } 
 }

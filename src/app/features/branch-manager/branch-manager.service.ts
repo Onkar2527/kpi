@@ -24,6 +24,18 @@ export class BranchManagerService {
 autoDistributeTargetsToTransfer(period: string, branchId: string) {
     return this.http.post(`${environment.apiBaseUrl}/allocations/auto-distribute-transfer?period=${period}&branchId=${branchId}`, {});
   }
+  autoDistributeTargetsTorResign(period: string, branchId: string) {
+    return this.http.post(`${environment.apiBaseUrl}/allocations/auto-distribute-resign?period=${period}&branchId=${branchId}`, {});
+  }
+  autoDistributeTargetsNewUser(period: string, branchId: string) {
+    return this.http.post(`${environment.apiBaseUrl}/allocations/auto-distribute-new-user?period=${period}&branchId=${branchId}`, {});
+  }
+   autoDistributeTargetsOldBranch(period: string, branchId: string){
+    return this.http.post(`${environment.apiBaseUrl}/allocations/auto-distribute-old-branch?period=${period}&branchId=${branchId}`, {})
+  }
+   autoDistributeTargetsNewBranch(period: string, branchId: string){
+    return this.http.post(`${environment.apiBaseUrl}/allocations/auto-distribute-new-branch?period=${period}&branchId=${branchId}`, {})
+  }
   publishAllocations(period: string, branchId: string) {
     return this.http.post(`${environment.apiBaseUrl}/allocations/publish`, { period, branchId });
   }

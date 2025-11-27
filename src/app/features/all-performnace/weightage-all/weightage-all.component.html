@@ -47,7 +47,7 @@
   <!-- HOD KPI VIEW -->
   <div class="card mt-4" *ngIf="auth.user?.role === 'AGM' && hodScores">
     <div class="card-header bg-info text-white">
-      <h4>HOD KPI Scores</h4>
+      <h4>{{auth.user?.role}} KPI Scores</h4>
     </div>
     <div class="card-body">
       <table class="table table-bordered table-striped">
@@ -71,7 +71,7 @@
           <tr>
             <td><strong>Total</strong></td>
             <td colspan="3"></td>
-            <td><strong>{{ hodScores.total | number:'1.2-2' }}</strong></td>
+            <td><strong>{{ hodTotalScore | number:'1.2-2' }}</strong></td>
           </tr>
         </tbody>
       </table>
@@ -79,7 +79,7 @@
   </div>
 
   <!-- STAFF KPI SECTION (EDITABLE BY HOD) -->
-  <div class="card mt-4" *ngIf="auth.user?.role === 'HOD' && scores">
+  <div class="card mt-4" *ngIf="auth.user?.role === 'AGM' && scores">
     <div class="card-header">
       <h4>HoStaff KPI Scores (out of 10)</h4>
       <div class="d-flex flex-wrap">
@@ -103,15 +103,15 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let kpi of kpiList">
-              <td>{{ kpi }}</td>
-              <td>{{ selectedEmployee[kpi]?.weightage }}</td>
+            <tr *ngFor="let kpi of kpiListStaff">
+              <td>{{ kpi.kpi_name }}</td>
+              <td>{{ selectedEmployee[kpi.kpi_name]?.weightage }}</td>
               <td>
-                <input type="number" class="form-control" [(ngModel)]="selectedEmployee[kpi].achieved"
+                <input type="number" class="form-control" [(ngModel)]="selectedEmployee[kpi.kpi_name].achieved"
                   [ngModelOptions]="{standalone: true}" min="0" max="999999" />
               </td>
-              <td>{{ selectedEmployee[kpi]?.score | number:'1.2-2' }}</td>
-              <td>{{ selectedEmployee[kpi]?.weightageScore | number:'1.2-2' }}</td>
+              <td>{{ selectedEmployee[kpi.kpi_name]?.score | number:'1.2-2' }}</td>
+              <td>{{ selectedEmployee[kpi.kpi_name]?.weightageScore | number:'1.2-2' }}</td>
             </tr>
 
 

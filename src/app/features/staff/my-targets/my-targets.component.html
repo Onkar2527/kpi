@@ -114,4 +114,54 @@
       </table>
     </div>
   </div>
+
+<div class="mt-5" *ngIf="auth.user?.role === 'Clerk' && history">
+    <div class="card-header mt-4">
+      <h4>KPI Transfer History</h4>
+    </div>
+    
+      <div class="modal-body">
+        <div *ngIf="history">
+          <small>Period: {{ history.period }}</small>
+
+          <div *ngFor="let transfer of history.transfers; let i = index" class="border rounded p-3 mb-4 shadow-sm">
+            <h5 class="text-primary mb-3">
+              Transfer {{ i + 1 }} — <span class="text-secondary">{{ transfer.transfer_date | date:'dd-MM-yyyy' }}</span>
+            </h5>
+
+            <p><strong>Old Branch NAME:</strong> {{ transfer.branch_name }} |
+              <strong>Old Designation:</strong> {{ transfer.old_designation }} 
+            </p>
+
+            <table class="table table-bordered table-striped mt-3">
+              <thead class="table-dark">
+                <tr>
+                  <th>KPI</th>
+                   <th>Weightage</th>
+                  <th>Target</th>
+                  <th>Achieved</th>
+                  <th>Score (Out of 10)</th>
+                  <th>Weightage Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let kpi of ['deposit', 'loan_gen', 'loan_amulya', 'recovery', 'audit', 'insurance']">
+                  <td>{{ kpi | titlecase }}</td>
+                  <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                  <td>{{ transfer[kpi]?.target | number:'1.0-0' }}</td>
+                  <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                  <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                  <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+                </tr>
+                <tr class="table-info">
+                  <td><strong>Total</strong></td>
+                  <td colspan="4"></td>
+                  <td><strong>{{ transfer.total_weightage_score | number:'1.2-2' }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+  </div>
 </div>

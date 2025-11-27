@@ -37,8 +37,9 @@ export class TrasferHistoryComponent implements OnInit {
   ngOnInit(): void {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
+      this.loadUsers();
     });
-    this.loadUsers();
+    
   }
 
   loadUsers() {
@@ -71,6 +72,7 @@ export class TrasferHistoryComponent implements OnInit {
       this.currentPage,
       this.pageSize
     );
+  
   }
 
   goToPage(event: Event, page: number): void {
@@ -82,6 +84,8 @@ export class TrasferHistoryComponent implements OnInit {
 
   editUser(user: any) {
     this.selectedEmployee = user;
+    console.log(this.selectedEmployee);
+      
     this.adminService
       .getTrafterKpiHistory(this.period, user.staff_id)
       .subscribe((data: any) => {

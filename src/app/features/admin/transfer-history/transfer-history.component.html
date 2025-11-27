@@ -18,7 +18,9 @@
     <tbody>
       <tr *ngFor="let user of paginatedUsers">
         <td>{{user.staff_id}}</td>
-        <td>{{ user.name }}</td>
+        <td>{{ user.name }}
+           <span *ngIf="user.resign === 1" class="text-danger me-5" style="font-size: 24px; font-weight: bold; margin-left: 10px;">⦸</span>
+        </td>
         <td>{{user.transfer_date | date:'dd-MM-yyyy' }}</td>
         <td>
           <button class="btn btn-primary btn-sm me-2" (click)="editUser(user)">View</button>
@@ -66,7 +68,7 @@
 
           <div *ngFor="let transfer of history.transfers; let i = index" class="border rounded p-3 mb-4 shadow-sm">
             <h5 class="text-primary mb-3">
-              Transfer {{ i + 1 }} — <span class="text-secondary">{{ transfer.transfer_date | date:'dd-MM-yyyy' }}</span>
+              <span *ngIf="history.resigned===1">Resigned</span><span *ngIf="history.resigned===0">Transfer {{ i + 1 }} </span>— <span class="text-secondary">{{ transfer.transfer_date | date:'dd-MM-yyyy' }}</span>
             </h5>
 
             <p><strong>Old Branch NAME:</strong> {{ transfer.branch_name }} |
@@ -106,7 +108,5 @@
     </div>
   </div>
 </div>
-
-
 
 </div>

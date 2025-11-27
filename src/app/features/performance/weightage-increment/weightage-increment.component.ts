@@ -4,6 +4,7 @@ import { PerformanceService } from '../performance.service';
 import { AuthService } from '../../../auth.service';
 import { PeriodService } from '../../../core/period.service';
 import { FormsModule } from '@angular/forms';
+import { AdminService } from '../../admin/admin.service';
 
 @Component({
   selector: 'app-weightage-increment',
@@ -17,15 +18,22 @@ export class WeightageIncrementComponent implements OnInit {
   branchId = this.auth.user?.branchId;
   scores: any;
   bmScores: any;
+  staffTotalScore: any;
   staffScores: any;
   selectedEmployee: any;
   BMsalary: any;
-  BMincrementAmt : any;
+  staffSalary: any;
+  BMincrementAmt: any;
+  staffIncrementAmt: any;
   auditScore: any;
+  history: any;
+  allStaffSalaries: any;
+  history1: any;
   constructor(
     private performanceService: PerformanceService,
     public auth: AuthService,
-    private periodService: PeriodService
+    private periodService: PeriodService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit(): void {
@@ -44,7 +52,7 @@ export class WeightageIncrementComponent implements OnInit {
           this.auth.user?.role === 'Attender'
         ) {
           this.performanceService
-            .getStaffScores(this.period, this.auth.user.id,this.branchId)
+            .getStaffScores(this.period, this.auth.user.id, this.branchId)
             .subscribe((data) => {
               this.staffScores = data;
             });
@@ -56,9 +64,13 @@ export class WeightageIncrementComponent implements OnInit {
             if (this.scores.length > 0) {
               this.selectedEmployee = this.scores[0];
             }
+            this.getAllStaffSalary(this.period, this.branchId!);
+              this.transferStaffHistory();
           });
       }
       this.getSalary(this.period, this.auth.user?.username);
+
+      this.transferHistory();
     });
   }
   getSalary(period: any, PF_NO: any) {
@@ -67,11 +79,31 @@ export class WeightageIncrementComponent implements OnInit {
       this.BMincrementAmt = data[0].increment || 0;
     });
   }
+  getAllStaffSalary(period: string, branch_id: string) {
+    this.performanceService
+      .getAllStaffSalary(period, branch_id)
+      .subscribe((data: any) => {
+        this.allStaffSalaries = data;
+
+        const staff = this.allStaffSalaries.find(
+          (s: any) => s.id === this.selectedEmployee.staffId
+        );
+        if (staff === undefined) {
+          this.staffSalary = 0;
+          this.staffIncrementAmt = 0;
+          return;
+        }else {
+          this.staffSalary = staff.salary || 0;
+          this.staffIncrementAmt = staff.increment || 0;
+        }
+      });
+  }
+
   calculateKpiBasedIncrement() {
     if (!this.bmScores) {
       return 0;
     }
-    const score = this.bmScores.total|| 8;
+    const score = this.bmScores.total || 8;
     if (score < 5) {
       return 0;
     }
@@ -91,6 +123,28 @@ export class WeightageIncrementComponent implements OnInit {
     return this.BMsalary + this.calculateKpiBasedIncrement();
   }
 
+  transferHistory() {
+    this.adminService
+      .getTrafterKpiHistory(this.period, this.auth.user?.id)
+      .subscribe((data: any) => {
+        if (Array.isArray(data) && data.length > 0) {
+          this.history = data[0];
+        } else {
+          this.history = null;
+        }
+      });
+  }
+   transferStaffHistory() {
+    this.adminService
+      .getTrafterKpiHistory(this.period, this.selectedEmployee.staffId)
+      .subscribe((data: any) => {
+        if (Array.isArray(data) && data.length > 0) {
+          this.history1 = data[0];
+        } else {
+          this.history1 = null;
+        }
+      });
+  }
   calculateStaffKpiBasedIncrement(score: number) {
     if (score < 5) {
       return 0;
@@ -110,6 +164,8 @@ export class WeightageIncrementComponent implements OnInit {
 
   selectEmployee(employee: any) {
     this.selectedEmployee = employee;
+    this.getAllStaffSalary(this.period, this.branchId!);
+    this.transferStaffHistory();
     console.log(this.selectedEmployee);
   }
   private auditTimer: any;
@@ -147,5 +203,44 @@ export class WeightageIncrementComponent implements OnInit {
         console.error('Error:', error);
       }
     );
+  }
+
+  calculateKpiBasedIncrementStaff() {
+    if (!this.staffTotalScore) {
+      return 0;
+    }
+    const score = this.staffTotalScore || 0;
+    if (score < 5) {
+      return 0;
+    }
+    if (score >= 5 && score < 10) {
+      return this.staffIncrementAmt * (score / 100);
+    }
+    if (score >= 10 && score < 12.5) {
+      return this.staffIncrementAmt;
+    }
+    return this.staffIncrementAmt * 1.25;
+  }
+  finalSalaryStaff() {
+    const basic = this.calculateTotalSalaryStaff();
+    const da = basic * 0.25;
+    return basic + da;
+  }
+  calculateTotalSalaryStaff() {
+    return (
+      this.staffSalary + this.calculateKpiIncrement(this.selectedEmployee.total)
+    );
+  }
+  calculateKpiIncrement(score: number) {
+    if (score < 5) {
+      return 0;
+    }
+    if (score >= 5 && score < 10) {
+      return this.staffIncrementAmt * (score / 100);
+    }
+    if (score >= 10 && score < 12.5) {
+      return this.staffIncrementAmt;
+    }
+    return this.staffIncrementAmt * 1.25;
   }
 }

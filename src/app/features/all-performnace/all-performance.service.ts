@@ -9,12 +9,12 @@ export class AllPerformanceService {
 
   constructor(private http: HttpClient) { }
 
-  getScores(period: string, HODId: string, branch_id: string) {
-    return this.http.get(`${environment.apiBaseUrl}/summary/ho-staff-scores-all?period=${period}&hod_id=${HODId}&branch_id=${branch_id}`);
+  getScores(period: string, HODId: string, role: string) {
+    return this.http.get(`${environment.apiBaseUrl}/performnceMaster/ho-staff-scores-all?period=${period}&hod_id=${HODId}&role=${role}`);
   }
 
-  getHoScores(period: string, HODId: string, branch_id: string) {
-    return this.http.get(`${environment.apiBaseUrl}/performnceMaster/ho-Allhod-scores?period=${period}&hod_id=${HODId}`);
+  getHoScores(period: string, HODId: string, role: string) {
+    return this.http.get(`${environment.apiBaseUrl}/performnceMaster/ho-Allhod-scores?period=${period}&hod_id=${HODId}&role=${role}`);
   }
 
   getStaffScores(period: string, ho_staff_id: string, branch_id: string) {

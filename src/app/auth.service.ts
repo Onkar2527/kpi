@@ -8,14 +8,17 @@ export interface UserProfile {
   name: string;
   role: string;
   branchId: string | null;
-  username:string |null
+  username: string | null;
   branchName: string | null;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
   private _user = signal<UserProfile | null>(null);
   private _token = '';
+  private sessionTimeoutId: any;
 
   constructor(private http: HttpClient, private router: Router) {
     this.loadSession();
@@ -35,12 +38,12 @@ export class AuthService {
         this._token = resp.token;
         this._user.set(resp.user);
         this.saveSession();
+        this.startClearLocalStorageTimer(); 
         this.router.navigateByUrl('/home');
       },
       error: (error) => {
         console.error('Invalid credentials');
-        alert(error.error.error)
-        
+        alert(error.error.error);
       }
     });
   }
@@ -49,6 +52,7 @@ export class AuthService {
     this._token = '';
     this._user.set(null);
     this.clearSession();
+    this.clearClearLocalStorageTimer(); 
     this.router.navigateByUrl('/login');
   }
 
@@ -63,12 +67,28 @@ export class AuthService {
     if (user && token) {
       this._user.set(JSON.parse(user));
       this._token = token;
+      this.startClearLocalStorageTimer(); 
     }
   }
 
-  
   private clearSession() {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+  }
+
+
+  private startClearLocalStorageTimer() {
+    this.clearClearLocalStorageTimer(); 
+    this.sessionTimeoutId = setTimeout(() => {
+      this.clearSession(); 
+      console.log('Local storage cleared after 2 minutes');
+    }, 2* 60 * 1000);
+  }
+
+  private clearClearLocalStorageTimer() {
+    if (this.sessionTimeoutId) {
+      clearTimeout(this.sessionTimeoutId);
+      this.sessionTimeoutId = null;
+    }
   }
 }

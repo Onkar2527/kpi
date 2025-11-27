@@ -94,7 +94,10 @@
   .navbar.scrolled {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
   }
-  
+  .modal-backdrop {
+  display: none !important;
+}
+
   /* Responsive adjustments */
   @media (max-width: 767.98px) {
     .navbar-collapse {
@@ -117,3 +120,25 @@
   .navbar-nav .nav-item {
     animation: fadeIn 0.3s ease forwards;
   }
+  .toast-message {
+  position: fixed;
+  bottom: 30px;
+  left: 45%;
+  transform: translateX(-50%);
+  background: black;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  animation: fadeInOut 3s ease forwards;
+  z-index: 9999;
+}
+
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(20px); }
+}

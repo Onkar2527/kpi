@@ -48,10 +48,25 @@ export class AdminService {
   transferUser(id: string, branch_id:string,role:string) {
     return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_user/${id}`, { branch_id ,role });
   }
+  transferDate(id:string){
+    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_date/${id}`, {});
+  }
+  resignUser(id: string) {
+    return this.http.put(`${environment.apiBaseUrl}/masters/Resign_user/${id}`, {});
+  }
   deleteUser(id: string) {
     return this.http.delete(`${environment.apiBaseUrl}/masters/users/${id}`);
   }
-
+  updateEmployeeTrasfer(data:any){
+    return this.http.post(`${environment.apiBaseUrl}/masters/update_employee_transfer`,data);
+  }
+  updateEmployeeTrasfert(data:any){
+    return this.http.post(`${environment.apiBaseUrl}/masters/update_employee_transfer_Transfered`,data);
+  }
+  updateEmployeeTransferBM(staff_id:any, period:any){
+    return this.http.post(`${environment.apiBaseUrl}/allocations/update-prorated-targets`,{staff_id, period});
+  }
+  
 deleteAllocations(user_id: string) {
   return this.http.delete(
     `${environment.apiBaseUrl}/masters/Transfer_for_delete_allocation`,
@@ -143,5 +158,15 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
   }
    deleteEntries(id: string) {
     return this.http.delete(`${environment.apiBaseUrl}/entries/entries/${id}`);
+  }
+  verifyOldPassword(data: any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/verifyPassword`, data);
+  }
+
+  updatePassword(id: any, newPassword: any) {
+    return this.http.put(`${environment.apiBaseUrl}/masters/changePassword/${id}`, { newPassword: newPassword });
+  }
+  updateEntries(id: string, entry: any) {
+    return this.http.put(`${environment.apiBaseUrl}/masters/updateentries/${id}`, entry);
   }
 }

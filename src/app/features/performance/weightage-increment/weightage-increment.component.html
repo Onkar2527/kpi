@@ -111,55 +111,9 @@
       </table>
     </div>
   </div>
-
-  <div class="card mt-4">
-    <div class="card-header">
-      <h4>Staff KPI Scores (out of 10)</h4>
-      <div class="d-flex flex-wrap">
-        <div *ngFor="let score of scores" class="chip" [class.selected]="score === selectedEmployee"
-          (click)="selectEmployee(score)">
-          {{ score.staffName }}
-        </div>
-      </div>
-    </div>
-    <div class="card-body" *ngIf="selectedEmployee">
-      <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-          <tr>
-            <th>KPI</th>
-            <th>Weightage</th>
-            <th>Target</th>
-            <th>Achieved</th>
-            <th>Out of 10</th>
-            <th>Weightage Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let kpi of ['deposit', 'loan_gen', 'loan_amulya', 'recovery', 'audit', 'insurance']">
-            <td>{{ kpi }}</td>
-            <td>{{ selectedEmployee[kpi]?.weightage }}</td>
-            <td>{{ selectedEmployee[kpi]?.target | number:'1.2-2' }}</td>
-            <!-- <td *ngIf="kpi==='audit'">
-              <input type="number" class="form-control" [(ngModel)]="selectedEmployee[kpi].achieved"
-                  [ngModelOptions]="{standalone: true}" (ngModelChange)="onAuditScoreChange($event)" min="0" max="999999" />
-            </td> -->
-            <td>{{ selectedEmployee[kpi]?.achieved | number:'1.2-2' }}</td>
-            <td>{{ selectedEmployee[kpi]?.score | number:'1.2-2' }}</td>
-            <td>{{ selectedEmployee[kpi]?.weightageScore | number:'1.2-2' }}</td>
-          </tr>
-          <tr>
-            <td><strong>Total</strong></td>
-            <td colspan="4"></td>
-            <td><strong>{{ selectedEmployee.total | number:'1.2-2' }}</strong></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
   <div class="card mt-4" *ngIf="auth.user?.role === 'BM' ">
     <div class="card-header">
-      <h4>Salary Details</h4>
+      <h4>BM Salary Details</h4>
     </div>
     <div class="card-body">
       <table class="table table-bordered">
@@ -189,4 +143,176 @@
     </div>
   </div>
 
+  <div class="card mt-4">
+    <div class="card-header">
+      <h4>Staff KPI Scores (out of 10)</h4>
+      <div class="d-flex flex-wrap">
+        <div *ngFor="let score of scores" class="chip" [class.selected]="score === selectedEmployee"
+          (click)="selectEmployee(score)">
+          {{ score.staffName }}
+        </div>
+      </div>
+    </div>
+    <div class="card-body" *ngIf="selectedEmployee">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>KPI</th>
+            <th>Weightage</th>
+            <th>Target</th>
+            <th>Achieved</th>
+            <th>Out of 10</th>
+            <th>Weightage Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let kpi of ['deposit', 'loan_gen', 'loan_amulya', 'recovery', 'audit', 'insurance']">
+            <td>{{ kpi }}</td>
+            <td>{{ selectedEmployee[kpi]?.weightage }}</td>
+            <td>{{ selectedEmployee[kpi]?.target | number:'1.2-2' }}</td>
+            <td>{{ selectedEmployee[kpi]?.achieved | number:'1.2-2' }}</td>
+            <td>{{ selectedEmployee[kpi]?.score | number:'1.2-2' }}</td>
+            <td>{{ selectedEmployee[kpi]?.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td colspan="4"></td>
+            <td><strong>{{ selectedEmployee.total | number:'1.2-2' }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+     <div class="card mt-4" *ngIf="auth.user?.role === 'BM' && selectedEmployee">
+    <div class="card-header">
+      <h4>{{selectedEmployee.staffName}} SALARY DETAILS</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead class="table-info">
+          <tr>
+            <th>Designation</th>
+            <th>Basic Inc.</th>
+            <th>Increment Basic.</th>
+            <th>KPI Based</th>
+            <th>Tot. Basic</th>
+            <th>DA</th>
+            <th>Tot. Salary</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>B.M</td>
+            <td>{{ staffSalary | number:'1.2-2' }}</td>
+            <td>{{ staffIncrementAmt | number:'1.2-2' }}</td>
+            <td>{{ calculateKpiBasedIncrementStaff() | number:'1.2-2' }}</td>
+            <td>{{ calculateTotalSalaryStaff() | number:'1.2-2' }}</td>
+            <td>25%</td>
+            <td>{{finalSalaryStaff() | number:'1.2-2'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-4" *ngIf="auth.user?.role === 'BM' && history">
+    <div class="card-header mt-5">
+      <h4>KPI Transfer History</h4>
+    </div>
+    
+      <div class="modal-body">
+        <div *ngIf="history">
+          <small>Period: {{ history.period }}</small>
+
+          <div *ngFor="let transfer of history.transfers; let i = index" class="border rounded p-3 mb-4 shadow-sm mt-1">
+            <h5 class="text-primary mb-3">
+              Transfer {{ i + 1 }} — <span class="text-secondary">{{ transfer.transfer_date | date:'dd-MM-yyyy' }}</span>
+            </h5>
+
+            <p><strong>Old Branch NAME:</strong> {{ transfer.branch_name }} |
+              <strong>Old Designation:</strong> {{ transfer.old_designation }} 
+            </p>
+
+            <table class="table table-bordered table-striped mt-3">
+              <thead class="table-dark">
+                <tr>
+                  <th>KPI</th>
+                   <th>Weightage</th>
+                  <th>Target</th>
+                  <th>Achieved</th>
+                  <th>Score (Out of 10)</th>
+                  <th>Weightage Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let kpi of ['deposit', 'loan_gen', 'loan_amulya', 'recovery', 'audit', 'insurance']">
+                  <td>{{ kpi | titlecase }}</td>
+                  <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                  <td>{{ transfer[kpi]?.target | number:'1.0-0' }}</td>
+                  <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                  <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                  <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+                </tr>
+                <tr class="table-info">
+                  <td><strong>Total</strong></td>
+                  <td colspan="4"></td>
+                  <td><strong>{{ transfer.total_weightage_score | number:'1.2-2' }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
+
+    <div *ngIf="history1">
+    <div class="card-header mt-5">
+      <h4> {{selectedEmployee.staffName}} KPI Transfer History</h4>
+    </div>
+    
+      <div class="modal-body">
+        <div *ngIf="history1">
+          <small>Period: {{ history1.period }}</small>
+
+          <div *ngFor="let transfer of history1.transfers; let i = index" class="border rounded p-3 mb-4 shadow-sm mt-1">
+            <h5 class="text-primary mb-3">
+              Transfer {{ i + 1 }} — <span class="text-secondary">{{ transfer.transfer_date | date:'dd-MM-yyyy' }}</span>
+            </h5>
+
+            <p><strong>Old Branch NAME:</strong> {{ transfer.branch_name }} |
+              <strong>Old Designation:</strong> {{ transfer.old_designation }} 
+            </p>
+
+            <table class="table table-bordered table-striped mt-3">
+              <thead class="table-dark">
+                <tr>
+                  <th>KPI</th>
+                   <th>Weightage</th>
+                  <th>Target</th>
+                  <th>Achieved</th>
+                  <th>Score (Out of 10)</th>
+                  <th>Weightage Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let kpi of ['deposit', 'loan_gen', 'loan_amulya', 'recovery', 'audit', 'insurance']">
+                  <td>{{ kpi | titlecase }}</td>
+                  <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                  <td>{{ transfer[kpi]?.target | number:'1.0-0' }}</td>
+                  <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                  <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                  <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+                </tr>
+                <tr class="table-info">
+                  <td><strong>Total</strong></td>
+                  <td colspan="4"></td>
+                  <td><strong>{{ transfer.total_weightage_score | number:'1.2-2' }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 </div>

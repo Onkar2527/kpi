@@ -47,13 +47,44 @@ export class NewEntryComponent implements OnInit {
     this.periodService.currentPeriod.subscribe(period => this.period = period);
     
   }
+allowOnlyNumbers(event: any) {
+  let input = event.target.value;
+
+  
+  input = input.replace(/[eE.+-]/g, '');
+
+  input = input.replace(/[^0-9]/g, '');
+
+  if (input.length > 14) {
+    input = input.substring(0, 14);
+  }
+
+  event.target.value = input;
+  this.accountNo = input;
+}
+
+
+
+
 isSubmitted = false;
   onSubmit() {
     if (this.isSubmitted) return;
-    if (!this.kpi || !this.value || !this.typeOfDeposit || !this.type || !this.accountNo || !this.date)  {
+    if(this.accountNo.length < 14 && (this.kpi==="deposit"||this.kpi==="loan_gen") ){
+      this.error = 'Account Number must be at least 14 digits long.';
+      return;
+    }
+    if (this.kpi === 'loan_amulya') {
+    if (!this.value || !this.typeOfDeposit || !this.type || !this.date) {
+      this.error = 'Please fill in all required fields for Loan Amulya.';
+      return;
+    }
+  } else {
+    if (!this.kpi || !this.value || !this.typeOfDeposit || !this.type || !this.accountNo || !this.date) {
       this.error = 'Please fill in all required fields.';
       return;
     }
+  }
+
     this.error = null;
     this.isSubmitted = true;
     const entry = {

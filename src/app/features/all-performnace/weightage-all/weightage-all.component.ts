@@ -24,6 +24,8 @@ export class WeightageAllComponent implements OnInit {
   salary = 35000;
   incrementAmt = 1000;
   kpiList: any;
+  kpiListStaff:any;
+  hodTotalScore: any;
 
   constructor(
     private performanceService: AllPerformanceService,
@@ -37,9 +39,10 @@ export class WeightageAllComponent implements OnInit {
       if (this.HODId) {
         if (this.auth.user?.role === 'AGM') {
           this.performanceService
-            .getHoScores(this.period, this.HODId, this.branchId)
+            .getHoScores(this.period, this.HODId, this.auth.user?.role)
             .subscribe((data: any) => {
-              this.hodScores = data.scores;
+              this.hodScores = data.kpis;
+              this.hodTotalScore=data.total;
             });
         } else if (
           this.auth.user?.role === 'HO_STAFF' ||
@@ -48,19 +51,20 @@ export class WeightageAllComponent implements OnInit {
           const userId = this.auth.user?.id ?? '';
           this.performanceService
             .getSpecificALLScores(this.period, this.auth.user?.id,this.auth.user?.role)
-            .subscribe((data) => {
-              this.hostaffScores = data;    
+            .subscribe((data:any) => {
+              this.hostaffScores = data.scores;    
             });
         }
 
         this.loadScores();
         this.loadKpiroleWise();
+        this.loadKpiroleWiseStaff();
       }
     });
   }
   loadScores() {
     this.performanceService
-      .getScores(this.period, this.HODId, this.branchId)
+      .getScores(this.period, this.HODId,'HO_STAFF')
       .subscribe((data: any) => {
         this.scores = data;
         if (this.scores.length > 0) {
@@ -75,14 +79,16 @@ export class WeightageAllComponent implements OnInit {
       this.kpiList = res.data;   
     });
   }
+   loadKpiroleWiseStaff() {
+    const payload={role:'HO_STAFF'};
+    this.performanceService.getAllKpiRoleWise(payload).subscribe((res:any)=>{
+      this.kpiListStaff = res.data;   
+    });
+  }
   selectEmployee(employee: any) {
     this.selectedEmployee = employee;
-    // Ensure all KPI objects exist to avoid "undefined" access
-    //   this.kpiList.forEach(kpi => {
-    //     if (!this.selectedEmployee[kpi]) {
-    //       this.selectedEmployee[kpi] = { weightage: 0, achieved: 0, score: 0, weightageScore: 0 };
-    //     }
-    //   });
+    this.loadKpiroleWiseStaff();
+  
   }
 
   submitScores() {
