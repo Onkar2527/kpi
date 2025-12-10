@@ -31,7 +31,7 @@ export class TransferMasterComponent implements OnInit {
     new_branch_id: string;
     kpi_total: string;
     period: string;
-    transfer_date:string;
+    transfer_date: string;
     old_designation: string;
     new_designation: string;
     deposit_target: string;
@@ -53,7 +53,7 @@ export class TransferMasterComponent implements OnInit {
     new_branch_id: '',
     kpi_total: '',
     period: '',
-    transfer_date:'',
+    transfer_date: '',
     old_designation: '',
     new_designation: '',
     deposit_target: '',
@@ -193,8 +193,8 @@ export class TransferMasterComponent implements OnInit {
     this.updatePaginatedTrasferedStaff();
   }
   formatDate(date: Date) {
-  return date.toISOString().split('T')[0]; 
- }
+    return date.toISOString().split('T')[0];
+  }
 
   saveBranch() {
     const kpis = [
@@ -308,7 +308,7 @@ export class TransferMasterComponent implements OnInit {
     const oldBranchId = this.transfer.old_branch_id;
     const role = this.transfer.new_designation;
     const staff_id = this.transfer.staff_id;
-    const transfer_date=this.transfer.transfer_date;
+    const transfer_date = this.transfer.transfer_date;
     const confirmed = confirm('Do you want to Transfer the Staff?');
     if (!confirmed) return;
 
@@ -324,7 +324,10 @@ export class TransferMasterComponent implements OnInit {
         if (this.selectedUserRole === 'BM') {
           await this.updateEmployee_Trasnfer_table_BM(
             staff_id,
-            this.period
+            this.period,
+            oldBranchId,
+            newBranchId
+
           ).toPromise();
         } else {
           await this.updateEmploye_Trasfer_table(
@@ -340,6 +343,7 @@ export class TransferMasterComponent implements OnInit {
           await this.updateEmployee_Trasnfer_table_BM(
             staff_id,
             this.period
+            ,oldBranchId, newBranchId
           ).toPromise();
         } else {
           await this.updateEmploye_Trasfer_table(
@@ -373,7 +377,7 @@ export class TransferMasterComponent implements OnInit {
       new_branch_id: '',
       kpi_total: '',
       period: '',
-      transfer_date:'',
+      transfer_date: '',
       old_designation: '',
       new_designation: '',
       deposit_target: '',
@@ -428,8 +432,8 @@ export class TransferMasterComponent implements OnInit {
     };
     return this.adminService.updateEmployeeTrasfert(payload);
   }
-  updateEmployee_Trasnfer_table_BM(staff_id: any, period: any) {
-    return this.adminService.updateEmployeeTransferBM(staff_id, period);
+  updateEmployee_Trasnfer_table_BM(staff_id: any, period: any,old_branchId: any, new_branchId: any) {
+    return this.adminService.updateEmployeeTransferBM(staff_id, period, old_branchId,new_branchId);
   }
   editBranch(branch: any) {
     this.transfer = { ...branch };

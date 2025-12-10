@@ -29,6 +29,7 @@ export class WeightageIncrementComponent implements OnInit {
   history: any;
   allStaffSalaries: any;
   history1: any;
+  transferBmScores: any;
   constructor(
     private performanceService: PerformanceService,
     public auth: AuthService,
@@ -65,12 +66,13 @@ export class WeightageIncrementComponent implements OnInit {
               this.selectedEmployee = this.scores[0];
             }
             this.getAllStaffSalary(this.period, this.branchId!);
-              this.transferStaffHistory();
+            this.transferStaffHistory();
           });
       }
       this.getSalary(this.period, this.auth.user?.username);
-
+      this.gettrasferBMScore(this.period, this.branchId!);
       this.transferHistory();
+
     });
   }
   getSalary(period: any, PF_NO: any) {
@@ -78,6 +80,13 @@ export class WeightageIncrementComponent implements OnInit {
       this.BMsalary = data[0].salary || 0;
       this.BMincrementAmt = data[0].increment || 0;
     });
+  }
+  gettrasferBMScore(period: string, branchId: string){
+    this.performanceService
+      .getBmTransferScores(period, branchId)
+      .subscribe((data) => {
+        this.transferBmScores = data;
+      });
   }
   getAllStaffSalary(period: string, branch_id: string) {
     this.performanceService
@@ -92,7 +101,7 @@ export class WeightageIncrementComponent implements OnInit {
           this.staffSalary = 0;
           this.staffIncrementAmt = 0;
           return;
-        }else {
+        } else {
           this.staffSalary = staff.salary || 0;
           this.staffIncrementAmt = staff.increment || 0;
         }
@@ -134,7 +143,7 @@ export class WeightageIncrementComponent implements OnInit {
         }
       });
   }
-   transferStaffHistory() {
+  transferStaffHistory() {
     this.adminService
       .getTrafterKpiHistory(this.period, this.selectedEmployee.staffId)
       .subscribe((data: any) => {

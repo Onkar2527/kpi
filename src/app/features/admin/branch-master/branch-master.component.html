@@ -24,6 +24,12 @@
           <label for="branchName" class="form-label">Branch Name</label>
           <input type="text" class="form-control" id="branchName" [(ngModel)]="branch.name" name="name">
         </div>
+         <div class="mb-3">
+          <label for="AGMS" class="form-label"> Asign Incharge</label>
+          <select id="AGMS" class="form-select" [(ngModel)]="branch.incharge_id" name="incharge_id">
+            <option *ngFor="let agm of AGMS" [value]="agm.id">{{ agm.username }}</option>
+          </select>
+        </div>
         <button type="submit" class="btn btn-primary">Save</button>
       </form>
     </div>
@@ -35,6 +41,7 @@
         <th>Branch ID</th>
         <th>Branch Code</th>
         <th>Branch Name</th>
+        <th>Branch Incharge</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -43,6 +50,7 @@
         <td>{{ branch.id }}</td>
         <td>{{ branch.code }}</td>
         <td>{{ branch.name }}</td>
+        <td>{{ branch.incharge_id }}</td>
         <td>
           <button class="btn btn-primary btn-sm me-2" (click)="editBranch(branch)">Edit</button>
           <button class="btn btn-danger btn-sm" (click)="deleteBranch(branch.id)">Delete</button>

@@ -111,7 +111,81 @@
       </table>
     </div>
   </div>
-  <div class="card mt-4" *ngIf="auth.user?.role === 'BM' ">
+  <div class="card" *ngIf="auth.user?.role === 'BM' && transferBmScores">
+    <div class="card-header">
+     <h4>Transfer Branch Manager KPI Scores ({{ transferBmScores.totalMonthsWorked }} Months)</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>KPI</th>
+            <th>Weightage</th>
+            <th>Target</th>
+            <th>Achieved</th>
+            <th>Out of 10</th>
+            <th>Weightage Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Deposit</td>
+            <td>{{ transferBmScores.deposit.weightage }}</td>
+            <td>{{ transferBmScores.deposit.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.deposit.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.deposit.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.deposit.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td>Loan Gen</td>
+            <td>{{ transferBmScores.loan_gen.weightage }}</td>
+            <td>{{ transferBmScores.loan_gen.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.loan_gen.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.loan_gen.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.loan_gen.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td>Loan Amulya</td>
+            <td>{{ transferBmScores.loan_amulya.weightage }}</td>
+            <td>{{ transferBmScores.loan_amulya.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.loan_amulya.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.loan_amulya.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.loan_amulya.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td>Recovery</td>
+            <td>{{ transferBmScores.recovery.weightage }}</td>
+            <td>{{ transferBmScores.recovery.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.recovery.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.recovery.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.recovery.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td>Audit</td>
+            <td>{{ transferBmScores.audit.weightage }}</td>
+            <td>{{ transferBmScores.audit.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.audit.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.audit.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.audit.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td>Insurance</td>
+            <td>{{ transferBmScores.insurance.weightage }}</td>
+            <td>{{ transferBmScores.insurance.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.insurance.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.insurance.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores.insurance.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td colspan="4"></td>
+            <td><strong>{{ transferBmScores.total | number:'1.2-2' }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card mt-4" *ngIf="auth.user?.role === 'BM'">
     <div class="card-header">
       <h4>BM Salary Details</h4>
     </div>
@@ -202,7 +276,7 @@
         </thead>
         <tbody>
           <tr>
-            <td>B.M</td>
+            <td>Clerk</td>
             <td>{{ staffSalary | number:'1.2-2' }}</td>
             <td>{{ staffIncrementAmt | number:'1.2-2' }}</td>
             <td>{{ calculateKpiBasedIncrementStaff() | number:'1.2-2' }}</td>

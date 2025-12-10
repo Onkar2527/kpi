@@ -21,7 +21,7 @@ export class AllPerformanceService {
     return this.http.get(`${environment.apiBaseUrl}/summary/specfic-hostaff-scores?period=${period}&ho_staff_id=${ho_staff_id}&branch_id=${branch_id}`);
   }
   createHoStaffScores(payload: any) {
-    return this.http.post(`${environment.apiBaseUrl}/summary/save-or-update-ho-staff-kpi`, payload);
+    return this.http.post(`${environment.apiBaseUrl}/performnceMaster/save-or-update-ho-staff-kpi`, payload);
   }
   //original for all perfromance
   getAllKpiRoleWise(role:any){
@@ -29,5 +29,9 @@ export class AllPerformanceService {
   }
    getSpecificALLScores(period: string, ho_staff_id: string, role: string) {
     return this.http.get(`${environment.apiBaseUrl}/performnceMaster/specfic-ALLstaff-scores?period=${period}&ho_staff_id=${ho_staff_id}&role=${role}`);
+  }
+  getDashbroadCount(hod_id:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/get-Total-Ho_staff-details`,{hod_id});
+  
   }
 }

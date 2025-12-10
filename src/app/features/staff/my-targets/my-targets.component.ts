@@ -32,6 +32,9 @@ export class MyTargetsComponent implements OnInit {
   salary:any;
   incrementAmt:any;
   history:any;
+  branchKpiTotal: number = 0;
+ branchKpiAvg: number = 0;
+
    kpiOrder = [
   "deposit",
   "loan_gen",
@@ -261,7 +264,7 @@ calculateScores(targets: any[]): any[] {
   calculateTotals(): void {
     this.personalTotalWeightageScore = this.personalTargets?.reduce((acc: any, target: any) => acc + target.weightageScore, 0) || 0;
     this.branchTotalWeightageScore = this.branchTargets?.reduce((acc: any, target: any) => acc + target.weightageScore, 0) || 0;
-    this.grandTotalWeightageScore = this.personalTotalWeightageScore + this.branchTotalWeightageScore;
+    this.grandTotalWeightageScore = this.personalTotalWeightageScore + this.branchTotalWeightageScore +this.branchKpiAvg ;
   }
 
    transferHistory() {
@@ -270,9 +273,33 @@ calculateScores(targets: any[]): any[] {
       .subscribe((data: any) => {
         if (Array.isArray(data) && data.length > 0) {
           this.history = data[0];
+          this.calculateBranchKpiTotals();
+          console.log(this.branchKpiAvg );
+          
         } else {
           this.history = null;
         }
       });
   } 
+  calculateBranchKpiTotals() {
+  if (!this.history || !this.history.transfers) {
+    this.branchKpiTotal = 0;
+    return;
+  }
+
+
+  const branchTotals = this.history.transfers.map(
+    (t: any) => t.total_weightage_score || 0
+  );
+
+ 
+  this.branchKpiTotal = branchTotals.reduce((acc: number, val: number) => acc + val, 0);
+
+  
+  this.branchKpiAvg = 
+    branchTotals.length > 0 
+      ? this.branchKpiTotal / branchTotals.length 
+      : 0;
+}
+
 }

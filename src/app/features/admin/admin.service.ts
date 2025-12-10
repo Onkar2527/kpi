@@ -54,8 +54,8 @@ export class AdminService {
   resignUser(id: string) {
     return this.http.put(`${environment.apiBaseUrl}/masters/Resign_user/${id}`, {});
   }
-  deleteUser(id: string) {
-    return this.http.delete(`${environment.apiBaseUrl}/masters/users/${id}`);
+  deleteUser(id: string,resignedDate: string) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/users/${id}`,{resignedDate});
   }
   updateEmployeeTrasfer(data:any){
     return this.http.post(`${environment.apiBaseUrl}/masters/update_employee_transfer`,data);
@@ -63,8 +63,8 @@ export class AdminService {
   updateEmployeeTrasfert(data:any){
     return this.http.post(`${environment.apiBaseUrl}/masters/update_employee_transfer_Transfered`,data);
   }
-  updateEmployeeTransferBM(staff_id:any, period:any){
-    return this.http.post(`${environment.apiBaseUrl}/allocations/update-prorated-targets`,{staff_id, period});
+  updateEmployeeTransferBM(staff_id:any, period:any,old_branchId:any, new_branchId:any){
+    return this.http.post(`${environment.apiBaseUrl}/allocations/update-prorated-targets`,{staff_id, period,old_branchId, new_branchId});
   }
   
 deleteAllocations(user_id: string) {
@@ -81,7 +81,9 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
   getBranches() {
     return this.http.get(`${environment.apiBaseUrl}/masters/branches`);
   }
-
+  getAGMS() {
+    return this.http.get(`${environment.apiBaseUrl}/masters/get-AGM`);
+  }
   addBranch(branch: any) {
     return this.http.post(`${environment.apiBaseUrl}/masters/branches`, branch);
   }

@@ -11,7 +11,7 @@ import { AuthService } from 'src/app/auth.service';
 export class UploadTargetsComponent {
   file: File | null = null;
 
-  uploadType: 'main' | 'branch-specific' | 'dashborad' | 'dashborad-achieved' | 'salary'= 'main'; 
+  uploadType: 'main' | 'branch-specific' | 'dashborad' | 'dashborad-achieved' |'salary' |'recovery-achiveved' |'insurance-achiveved' |'audit-achiveved'= 'main'; 
 
   message: string = '';
   messageType: 'success' | 'error' | '' = '';
@@ -123,7 +123,7 @@ export class UploadTargetsComponent {
           } else if (role === 'loanAmulya_ho'){
              upload$ = this.hoService.uploadTargets(period, this.file!);
           }
-          else if (role === 'HO'|| role === 'insurance_ho' || role === 'recovery_ho') {
+          else if (role === 'HO'|| role === 'insurance_ho' || role === 'recovery_ho' || role === 'audit_ho') {
            
             switch (this.uploadType) {
               case 'main':
@@ -140,6 +140,15 @@ export class UploadTargetsComponent {
                 break;
               case 'salary':
                 upload$ = this.hoService.uploadSalary(period, this.file!);
+                break;
+              case 'insurance-achiveved':
+                upload$ = this.hoService.uploadInsuranceAchieved(period, this.file!);
+                break;
+              case 'recovery-achiveved':
+                upload$ = this.hoService.uploadRecoveryAchieved(period, this.file!);
+                break;
+               case 'audit-achiveved':
+                upload$ = this.hoService.uploadAuditAchieved(period, this.file!);
                 break;
               default:
                 this.message = 'Invalid upload type selected.';

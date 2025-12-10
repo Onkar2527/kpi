@@ -16,6 +16,9 @@ export class PerformanceService {
   getBmScores(period: string, branchId: string) {
     return this.http.get(`${environment.apiBaseUrl}/summary/bm-scores?period=${period}&branchId=${branchId}`);
   }
+   getBmTransferScores(period: string, branchId: string) {
+    return this.http.get(`${environment.apiBaseUrl}/summary/transfer-bm-scores?period=${period}&branchId=${branchId}`);
+  }
 
   getStaffScores(period: string, employeeId: string,branchId: string) {
     return this.http.get(`${environment.apiBaseUrl}/summary/staff-scores?period=${period}&employeeId=${employeeId}&branchId=${branchId}`);

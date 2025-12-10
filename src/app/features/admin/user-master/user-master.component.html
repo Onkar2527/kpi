@@ -56,7 +56,12 @@
         </div>
         </div>
         <div *ngIf="user.role === 'HO_STAFF'">
-          
+          <div class="mb-3">
+          <label for="AGMS" class="form-label">DGM/AGM</label>
+          <select id="AGMS" class="form-select" [(ngModel)]="user.hod_id" name="hod_id">
+            <option *ngFor="let agm of AGMS" [value]="agm.id">{{ agm.username }}</option>
+          </select>
+        </div>
         </div>
         <div class="mb-3">
           <label for="department" class="form-label">Department</label>
@@ -92,7 +97,7 @@
         <td>{{ user.department_name }}</td>
         <td>
           <button class="btn btn-primary btn-sm me-2" (click)="editUser(user)">Edit</button>
-          <button class="btn btn-danger btn-sm" (click)="deleteUser(user)">Resign</button>
+          <button class="btn btn-danger btn-sm" (click)="openResignPopup(user)">Resign</button>
         </td>
       </tr>
     </tbody>
@@ -117,4 +122,28 @@
     </li>
   </ul>
 </nav>
+</div>
+<!-- Resign Modal -->
+<div class="modal fade" id="resignModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Enter Resign Date</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="date" class="form-control" [(ngModel)]="resignedDate">
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-danger" (click)="confirmResign()">
+          Confirm Resignation
+        </button>
+      </div>
+
+    </div>
+  </div>
 </div>

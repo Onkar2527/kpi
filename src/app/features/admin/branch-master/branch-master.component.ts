@@ -16,11 +16,12 @@ export class BranchMasterComponent implements OnInit {
   branches: any;
   filteredBranches: any;
   paginatedBranches: any;
-  branch = { id: '', code: '', name: '' };
+  branch = { id: '', code: '', name: '',incharge_id:''};
   searchTerm = '';
   currentPage = 1;
   pageSize = 10;
   totalPages = 0;
+  AGMS: any;
 
   constructor(
     private adminService: AdminService,
@@ -30,6 +31,7 @@ export class BranchMasterComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadBranches();
+    this.adminService.getAGMS().subscribe((data)=>(this.AGMS = data));
   }
 
   loadBranches() {
@@ -65,7 +67,7 @@ export class BranchMasterComponent implements OnInit {
         this.loadBranches();
       });
     }
-    this.branch = { id: '', code: '', name: '' };
+    this.branch = { id: '', code: '', name: '',incharge_id:''};
   }
 
   editBranch(branch: any) {

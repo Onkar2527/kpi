@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { WeightageAllComponent } from './weightage-all/weightage-all.component';
+import { DashboardComponent } from './Dashboard/dashborad.component';
 
 
 const routes: Routes = [
@@ -12,6 +13,10 @@ const routes: Routes = [
   {
     path: 'weightage-all',
     component: WeightageAllComponent
+  },
+  {
+    path: 'dashboard-AGM',
+    component:DashboardComponent
   }
 ];
 

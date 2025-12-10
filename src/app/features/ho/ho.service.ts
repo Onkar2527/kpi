@@ -51,4 +51,22 @@ export class HoService {
     formData.append('salaryFile', file);
     return this.http.post(`${environment.apiBaseUrl}/targets/uploadSalary`, formData);
   }
+   uploadInsuranceAchieved(period: string, file: File) {
+    const formData = new FormData();
+    formData.append('period', period);
+    formData.append('insuranceFile', file);
+    return this.http.post(`${environment.apiBaseUrl}/targets/uploadInsurance`, formData);
+  }
+    uploadRecoveryAchieved(period: string, file: File) {
+    const formData = new FormData();
+    formData.append('period', period);
+    formData.append('totalRecoveryAchievedFile', file);
+    return this.http.post(`${environment.apiBaseUrl}/targets/totalRecoveryAchieved`, formData);
+  }
+   uploadAuditAchieved(period: string, file: File) {
+    const formData = new FormData();
+    formData.append('period', period);
+    formData.append('totalAuditAchievedFile', file);
+    return this.http.post(`${environment.apiBaseUrl}/targets/totalAuditAchieved`, formData);
+  }
 }

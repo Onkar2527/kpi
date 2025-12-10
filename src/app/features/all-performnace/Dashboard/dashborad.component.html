@@ -1,0 +1,179 @@
+<div class="container mt-4">
+
+  <h3 class="fw-bold mb-4 text-primary">
+    <i class="bi bi-speedometer2"></i> Performance Dashboard
+  </h3>
+
+  <!-- Cards Row -->
+  <div class="row g-4">
+
+    <!-- Total HO Staff -->
+    <div class="col-md-4" (click)="openHOStaffModal()" style="cursor:pointer;">
+    <div class="card shadow-lg border-0 rounded-4 hover-card bg-gradient" style="background: #007bff;">
+        <div class="card-body text-white">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+            <i class="bi bi-people-fill fs-1"></i>
+            </div>
+            <div>
+            <h5 class="card-title fw-bold mb-1">Total HO Staff</h5>
+            <h2 class="fw-bolder">{{ totalHOStaffCount }}</h2>
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+
+
+    <!-- Total Branches -->
+    <div class="col-md-4" (click)="openBranchesModal()" style="cursor:pointer;">
+      <div class="card shadow-lg border-0 rounded-4 hover-card bg-success">
+        <div class="card-body text-white">
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              <i class="bi bi-building fs-1"></i>
+            </div>
+            <div>
+              <h5 class="card-title fw-bold mb-1">Total Branches</h5>
+              <h2 class="fw-bolder"> {{totalBranchesCount}}</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGM + DGM total -->
+    <div class="col-md-4" (click)="openAGMDGMModal()" style="cursor:pointer;">
+      <div class="card shadow-lg border-0 rounded-4 hover-card bg-warning">
+        <div class="card-body text-dark">
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              <i class="bi bi-person-badge fs-1"></i>
+            </div>
+            <div>
+              <h5 class="card-title fw-bold mb-1">AGM / DGM</h5>
+              <h2 class="fw-bolder">{{totalAGMDGMCount}}</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- row end -->
+
+</div>
+<!-- HO STAFF MODAL -->
+<div class="modal fade" id="hoStaffModal" tabindex="-1" data-bs-focus="false" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">HO Staff Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let staff of totalHOStaff">
+              <td>{{ staff.username }}</td>
+              <td>{{ staff.name }}</td>
+              <td>{{ staff.role }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- branch list model -->
+<div class="modal fade" id="branchesModal" tabindex="-1" data-bs-focus="false" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Branch Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Branch Code</th>
+              <th>Branch Name</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let branch of totalBranches">
+              <td>{{ branch.code }}</td>
+              <td>{{ branch.name }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- AGM/DGM MODAL -->
+<div class="modal fade" id="agmDgmModal" tabindex="-1" data-bs-focus="false" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content rounded-4 shadow">
+
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">AGM/DGM Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let staff of totalAGMDGM">
+              <td>{{ staff.username }}</td>
+              <td>{{ staff.name }}</td>
+              <td>{{ staff.role }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
