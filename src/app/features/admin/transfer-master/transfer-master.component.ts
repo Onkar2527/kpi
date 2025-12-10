@@ -144,10 +144,12 @@ export class TransferMasterComponent implements OnInit {
     if (user) {
       this.transfer.staff_id = user.id;
       this.selectedUserRole = user.role;
+      
       const branch_id = this.branches.find(
         (b: any) => b.name === user.branch_name
       )?.code;
-
+      
+      
       this.transfer.old_branch_id = branch_id;
     } else {
       this.transfer.staff_id = '';
@@ -308,7 +310,6 @@ export class TransferMasterComponent implements OnInit {
     const oldBranchId = this.transfer.old_branch_id;
     const role = this.transfer.new_designation;
     const staff_id = this.transfer.staff_id;
-    const transfer_date = this.transfer.transfer_date;
     const confirmed = confirm('Do you want to Transfer the Staff?');
     if (!confirmed) return;
 
@@ -352,13 +353,18 @@ export class TransferMasterComponent implements OnInit {
             staff_id
           ).toPromise();
         }
+       
       }
-
+      
       await this.adminService
         .transferUser(staff_id, newBranchId, role)
         .toPromise();
 
       this.loadTrasferedStaff();
+
+       if(this.transfer.new_designation==='BM' && this.selectedUserRole==='Clerk'){
+          await this.adminService.addClearkToBMTraget( this.period, newBranchId, staff_id).toPromise();
+        }
 
       await this.autoDistributeNewBranch(newBranchId).toPromise();
 

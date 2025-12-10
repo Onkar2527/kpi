@@ -72,9 +72,10 @@ export class WeightageIncrementComponent implements OnInit {
       this.getSalary(this.period, this.auth.user?.username);
       this.gettrasferBMScore(this.period, this.branchId!);
       this.transferHistory();
-
+      
     });
   }
+ 
   getSalary(period: any, PF_NO: any) {
     this.performanceService.getSalary(period, PF_NO).subscribe((data: any) => {
       this.BMsalary = data[0].salary || 0;

@@ -264,7 +264,9 @@ calculateScores(targets: any[]): any[] {
   calculateTotals(): void {
     this.personalTotalWeightageScore = this.personalTargets?.reduce((acc: any, target: any) => acc + target.weightageScore, 0) || 0;
     this.branchTotalWeightageScore = this.branchTargets?.reduce((acc: any, target: any) => acc + target.weightageScore, 0) || 0;
-    this.grandTotalWeightageScore = this.personalTotalWeightageScore + this.branchTotalWeightageScore +this.branchKpiAvg ;
+    this.grandTotalWeightageScore = this.personalTotalWeightageScore + this.branchTotalWeightageScore ;
+    
+    
   }
 
    transferHistory() {
@@ -274,7 +276,6 @@ calculateScores(targets: any[]): any[] {
         if (Array.isArray(data) && data.length > 0) {
           this.history = data[0];
           this.calculateBranchKpiTotals();
-          console.log(this.branchKpiAvg );
           
         } else {
           this.history = null;

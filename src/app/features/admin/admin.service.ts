@@ -66,6 +66,9 @@ export class AdminService {
   updateEmployeeTransferBM(staff_id:any, period:any,old_branchId:any, new_branchId:any){
     return this.http.post(`${environment.apiBaseUrl}/allocations/update-prorated-targets`,{staff_id, period,old_branchId, new_branchId});
   }
+  addClearkToBMTraget( period:any, branchId:any, staff_id:any){
+    return this.http.post(`${environment.apiBaseUrl}/allocations/CLEARK-TO-BM-Target`,{period, branchId, staff_id});
+  }
   
 deleteAllocations(user_id: string) {
   return this.http.delete(
