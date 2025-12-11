@@ -21,26 +21,33 @@ export class WeightageAllComponent implements OnInit {
   hodScores: any;
   hostaffScores: any;
   selectedEmployee: any;
-  AGMsalary = 0; 
+  AGMsalary = 0;
   AGMincrementAmt = 0;
-  HOsalary = 0; 
+  HOsalary = 0;
   HOincrementAmt = 0;
   kpiList: any;
   kpiListStaff: any;
   hodTotalScore: any;
   allStaffSalaries: any;
+  AGMArray: any[] = [];
   constructor(
     private performanceService: AllPerformanceService,
     public auth: AuthService,
     private periodService: PeriodService,
-     private performanceServicestaff: PerformanceService
+    private performanceServicestaff: PerformanceService
   ) {}
 
   ngOnInit(): void {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
       if (this.HODId) {
-        if (this.auth.user?.role === 'AGM' ||this.auth.user?.role === 'DGM') {
+        if (
+          this.auth.user?.role === 'AGM' ||
+          this.auth.user?.role === 'DGM' ||
+          this.auth.user?.role === 'AGM_AUDIT' ||
+          this.auth.user?.role === 'AGM_IT' ||
+          this.auth.user?.role === 'AGM_INSURANCE'
+        ) {
           this.performanceService
             .getHoScores(this.period, this.HODId, this.auth.user?.role)
             .subscribe((data: any) => {
@@ -66,6 +73,7 @@ export class WeightageAllComponent implements OnInit {
         this.loadScores();
         this.loadKpiroleWise();
         this.loadKpiroleWiseStaff();
+        this.getAllAGMScores(this.period);
       }
     });
   }
@@ -79,13 +87,26 @@ export class WeightageAllComponent implements OnInit {
         }
       });
   }
- getSalary(period: any, PF_NO: any) {
-    this.performanceServicestaff.getSalary(period, PF_NO).subscribe((data: any) => {
-      this.AGMsalary = data[0].salary || 0;
-      this.AGMincrementAmt = data[0].increment || 0;
+  getAllAGMScores(period: string) {
+    this.performanceService.getAllAGMScores(period).subscribe((data: any) => {
+      data.forEach((element: any) => {
+        this.AGMArray.push({
+          hod_id: element.hod_id,
+          name: element.name,
+          total_score: element.total,
+        });
+      });
     });
   }
-   getAllHOStaffSalary(period: string, branch_id: string) {
+  getSalary(period: any, PF_NO: any) {
+    this.performanceServicestaff
+      .getSalary(period, PF_NO)
+      .subscribe((data: any) => {
+        this.AGMsalary = data[0].salary || 0;
+        this.AGMincrementAmt = data[0].increment || 0;
+      });
+  }
+  getAllHOStaffSalary(period: string, branch_id: string) {
     this.performanceServicestaff
       .getAllStaffSalary(period, branch_id)
       .subscribe((data: any) => {
@@ -98,7 +119,7 @@ export class WeightageAllComponent implements OnInit {
           this.HOsalary = 0;
           this.HOincrementAmt = 0;
           return;
-        }else {
+        } else {
           this.HOsalary = staff.salary || 0;
           this.HOincrementAmt = staff.increment || 0;
         }
@@ -116,7 +137,7 @@ export class WeightageAllComponent implements OnInit {
       this.kpiListStaff = res.data;
     });
   }
-  selectEmployee(employee: any) { 
+  selectEmployee(employee: any) {
     this.selectedEmployee = employee;
     this.loadKpiroleWiseStaff();
     this.getAllHOStaffSalary(this.period, this.branchId!);
@@ -164,7 +185,7 @@ export class WeightageAllComponent implements OnInit {
   calculateTotalSalary() {
     return this.AGMsalary + this.calculateKpiBasedIncrement();
   }
-   finalSalaryHOStaff() {
+  finalSalaryHOStaff() {
     const finalSalary = this.calculateTotalSalary() * 0.25;
     return finalSalary + this.calculateTotalSalary();
   }

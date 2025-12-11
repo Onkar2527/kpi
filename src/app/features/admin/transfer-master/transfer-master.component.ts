@@ -315,13 +315,15 @@ export class TransferMasterComponent implements OnInit {
 
     try {
       this.giveTransferDate(staff_id);
+      this.delay(2000);
       await this.autoDistributeOldBranch(oldBranchId).toPromise();
 
       if (this.transfer.id) {
         await this.adminService
           .updateTrasferedStaff(this.transfer.id, this.transfer)
           .toPromise();
-        await this.delay(3000);
+
+        await this.delay(5000);
         if (this.selectedUserRole === 'BM') {
           await this.updateEmployee_Trasnfer_table_BM(
             staff_id,

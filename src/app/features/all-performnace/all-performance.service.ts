@@ -23,6 +23,11 @@ export class AllPerformanceService {
   createHoStaffScores(payload: any) {
     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/save-or-update-ho-staff-kpi`, payload);
   }
+
+  getAllAGMScores(period:string){
+    return this.http.get(`${environment.apiBaseUrl}/performnceMaster/AGM-DGM-Scores?period=${period}`);
+  }
+
   //original for all perfromance
   getAllKpiRoleWise(role:any){
     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/getKpiRoleWise`, role);

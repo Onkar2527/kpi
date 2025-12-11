@@ -62,10 +62,10 @@
        <!-- <li class="nav-item" *ngIf="auth.user?.role === 'HOD'  || auth.user?.role === 'HO_STAFF' || auth.user?.role === 'AGM'">
         <a class="nav-link" routerLink="/hod_performance/weightage-HoStaff" routerLinkActive="active">Weightage & Increment</a>
       </li> -->
-      <li class="nav-item" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'HO_STAFF' || auth.user?.role === 'DGM' ">
+      <li class="nav-item" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE'">
         <a class="nav-link" routerLink="/all-performnace/dashboard-AGM" routerLinkActive="active">Dashboard</a>
       </li>
-      <li class="nav-item" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'HO_STAFF' || auth.user?.role === 'DGM' ">
+      <li class="nav-item" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'HO_STAFF' || auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE'">
         <a class="nav-link" routerLink="/all-performnace/weightage-all" routerLinkActive="active">Weightage & Increment</a>
       </li>
       
@@ -73,5 +73,5 @@
         <a class="nav-link" (click)="logout()" href="#">Logout</a>
       </li>
     </ul>
-  </div>
+  </div>  
 </nav>
