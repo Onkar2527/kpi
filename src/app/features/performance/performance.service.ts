@@ -33,5 +33,5 @@ export class PerformanceService {
   getAllStaffSalary(period: string, branch_id: string){
         return this.http.get(`${environment.apiBaseUrl}/summary/get-salary-all-staff?period=${period}&branch_id=${branch_id}`);
   }
-
+  
 }

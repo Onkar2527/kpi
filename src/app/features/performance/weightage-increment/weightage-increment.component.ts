@@ -178,16 +178,6 @@ export class WeightageIncrementComponent implements OnInit {
     this.transferStaffHistory();
     console.log(this.selectedEmployee);
   }
-  private auditTimer: any;
-
-  onAuditScoreChange(newValue: number) {
-    this.auditScore = newValue;
-
-    clearTimeout(this.auditTimer);
-    this.auditTimer = setTimeout(() => {
-      this.submitScores();
-    }, 800);
-  }
 
   submitScores() {
     const today = new Date();

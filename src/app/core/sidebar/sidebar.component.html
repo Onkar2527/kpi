@@ -65,7 +65,7 @@
       <li class="nav-item" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE'">
         <a class="nav-link" routerLink="/all-performnace/dashboard-AGM" routerLinkActive="active">Dashboard</a>
       </li>
-      <li class="nav-item" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'HO_STAFF' || auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE'">
+      <li class="nav-item" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'HO_STAFF' || auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE' || auth.user?.role === 'GM'">
         <a class="nav-link" routerLink="/all-performnace/weightage-all" routerLinkActive="active">Weightage & Increment</a>
       </li>
       

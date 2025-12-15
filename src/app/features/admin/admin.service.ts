@@ -80,6 +80,7 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
   return this.http.delete(`${environment.apiBaseUrl}/masters/Transfer_for_delete_ho_staff`, { body: { ho_staff_id, branch_id } });
 }
 
+
   // Branches
   getBranches() {
     return this.http.get(`${environment.apiBaseUrl}/masters/branches`);
@@ -173,5 +174,12 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
   }
   updateEntries(id: string, entry: any) {
     return this.http.put(`${environment.apiBaseUrl}/masters/updateentries/${id}`, entry);
+  }
+
+  transferMaster(data:any){
+    return this.http.post(`${environment.apiBaseUrl}/trans/transfer-staff-master`,data);
+  }
+   transferMasterUpdate(data:any){
+    return this.http.post(`${environment.apiBaseUrl}/trans/transfer-staff-master-update`,data);
   }
 }

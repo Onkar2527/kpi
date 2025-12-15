@@ -23,13 +23,24 @@ export class WeightageAllComponent implements OnInit {
   selectedEmployee: any;
   AGMsalary = 0;
   AGMincrementAmt = 0;
+  ALLAGMsalary = 0;
+  ALLAGMincrementAmt = 0;
+  GMsalary = 0;
+  GMincrementAmt = 0;
   HOsalary = 0;
   HOincrementAmt = 0;
   kpiList: any;
   kpiListStaff: any;
+  kpiListAGM: any;
   hodTotalScore: any;
   allStaffSalaries: any;
   AGMArray: any[] = [];
+  agmScore: any;
+  gmFinalTotal: number = 0;
+ fixedWeightage: number = 10;
+  totalAGMsScore: number = 0;
+ originalScores: any = {};
+
   constructor(
     private performanceService: AllPerformanceService,
     public auth: AuthService,
@@ -68,14 +79,59 @@ export class WeightageAllComponent implements OnInit {
             .subscribe((data: any) => {
               this.hostaffScores = data;
             });
+        } else if (this.auth.user?.role === 'GM') {
+          this.loadAGMScores();
         }
-        this.getSalary(this.period, this.auth.user?.username);
-        this.loadScores();
-        this.loadKpiroleWise();
-        this.loadKpiroleWiseStaff();
-        this.getAllAGMScores(this.period);
+        this.getSalary(this.period, this.auth.user?.PF_NO);
+        this.getGMSalary(this.period, this.auth.user?.PF_NO);
+        if (
+          this.auth.user?.role === 'AGM' ||
+          this.auth.user?.role === 'DGM' ||
+          this.auth.user?.role === 'AGM_AUDIT' ||
+          this.auth.user?.role === 'AGM_IT' ||
+          this.auth.user?.role === 'AGM_INSURANCE'
+        ) {
+          this.loadScores();
+          this.loadKpiroleWise();
+          this.loadKpiroleWiseStaff();
+        } else if (this.auth.user?.role === 'GM') {
+          this.loadKpiroleWiseAGM(this.selectedEmployee.role);
+        }
       }
     });
+  }
+  loadAGMScores() {
+    this.performanceService
+            .getAllAGMScores(this.period)
+            .subscribe((data: any) => {
+              this.agmScore = data;
+              if (this.agmScore.length > 0) {
+                this.selectEmployee(this.agmScore[0]);
+              }
+                const totalAGMs = data.length;
+                const totalWeightage = 100;
+                const perAGMWeightage = totalWeightage / totalAGMs;
+
+                this.AGMArray = data.map((agm: any) => ({
+                  hod_id: agm.hod_id,
+                  name: agm.name,
+                  total_score: agm.total,
+                  weightage: perAGMWeightage,
+                  weightageScore: (perAGMWeightage * agm.total) / 100
+                }));
+
+
+              
+                const sum = data.reduce((acc: number, x: any) => acc + x.total, 0);
+                this.totalAGMsScore = sum;
+                this.gmFinalTotal = this.AGMArray.reduce(
+                  (acc: number, x: any) => acc + x.weightageScore,
+                  0
+                );
+
+
+              this.loadKpiroleWiseAGM(this.agmScore.role);
+            });
   }
   loadScores() {
     this.performanceService
@@ -87,23 +143,28 @@ export class WeightageAllComponent implements OnInit {
         }
       });
   }
-  getAllAGMScores(period: string) {
-    this.performanceService.getAllAGMScores(period).subscribe((data: any) => {
-      data.forEach((element: any) => {
-        this.AGMArray.push({
-          hod_id: element.hod_id,
-          name: element.name,
-          total_score: element.total,
-        });
-      });
-    });
-  }
   getSalary(period: any, PF_NO: any) {
     this.performanceServicestaff
       .getSalary(period, PF_NO)
       .subscribe((data: any) => {
         this.AGMsalary = data[0].salary || 0;
         this.AGMincrementAmt = data[0].increment || 0;
+      });
+  }
+  getGMSalary(period: any, PF_NO: any) {
+    this.performanceServicestaff
+      .getSalary(period, PF_NO)
+      .subscribe((data: any) => {
+        this.GMsalary = data[0].salary || 0;
+        this.GMincrementAmt = data[0].increment || 0;
+      });
+  }
+   getAGMSalary(period: any, hod_id: any) {
+    this.performanceService
+      .getAllAGMSalary(period, hod_id)
+      .subscribe((data: any) => {
+        this.HOsalary = data[0].salary || 0;
+        this.HOincrementAmt = data[0].increment || 0;
       });
   }
   getAllHOStaffSalary(period: string, branch_id: string) {
@@ -137,37 +198,93 @@ export class WeightageAllComponent implements OnInit {
       this.kpiListStaff = res.data;
     });
   }
+  loadKpiroleWiseAGM(role: string) {
+    const payload = { role: role };
+    this.performanceService.getAllKpiRoleWise(payload).subscribe((res: any) => {
+      this.kpiListAGM = res.data;
+    });
+  }
   selectEmployee(employee: any) {
+    if (!employee) return;
     this.selectedEmployee = employee;
-    this.loadKpiroleWiseStaff();
-    this.getAllHOStaffSalary(this.period, this.branchId!);
+    console.log(this.selectedEmployee);
+    
+    if (this.selectedEmployee.kpis) {
+      Object.keys(this.selectedEmployee.kpis).forEach((key) => {
+        this.selectedEmployee[key] = this.selectedEmployee.kpis[key];
+      });
+    }
+    this.originalScores = JSON.parse(JSON.stringify(this.selectedEmployee));
+
+    if (
+      this.auth.user?.role === 'AGM' ||
+      this.auth.user?.role === 'DGM' ||
+      this.auth.user?.role === 'AGM_AUDIT' ||
+      this.auth.user?.role === 'AGM_IT' ||
+      this.auth.user?.role === 'AGM_INSURANCE'
+    ) {
+      this.loadKpiroleWiseStaff();
+      this.getAllHOStaffSalary(this.period, this.branchId!);
+    }
+    if (this.auth.user?.role === 'GM') {
+       if (this.selectedEmployee?.role)
+        this.loadKpiroleWiseAGM(this.selectedEmployee.role);
+      this.getAGMSalary(this.period, this.selectedEmployee.hod_id);
+    }
+    
   }
 
   submitScores() {
-    if (!this.selectedEmployee) return;
+  if (!this.selectedEmployee) return;
 
-    const payload = {
-      user_id: this.selectedEmployee.staffId,
-      period: this.period,
-      master_user_id: this.HODId,
-      scores: this.kpiListStaff
-        .filter((k: any) => k.kpi_name.toLowerCase() !== 'insurance')
-        .map((k: any) => ({
-          kpi_name: k.kpi_name,
-          role_kpi_mapping_id: k.id,
-          value: this.selectedEmployee[k.kpi_name]?.achieved || 0,
-        })),
-    };
-
-    console.log(payload);
-
-    this.performanceService.createHoStaffScores(payload).subscribe({
-      next: (response: any) =>
-        alert(response.message || 'Scores created successfully!'),
-      complete: () => this.loadScores(),
-      error: (err) => console.error('Error creating scores:', err),
-    });
+  let kpiListToUse = [];
+  if (
+    this.auth.user?.role === 'AGM' ||
+    this.auth.user?.role === 'DGM' ||
+    this.auth.user?.role === 'AGM_AUDIT' ||
+    this.auth.user?.role === 'AGM_IT' ||
+    this.auth.user?.role === 'AGM_INSURANCE'
+  ) {
+    kpiListToUse = this.kpiListStaff;
+  } else if (this.auth.user?.role === 'GM') {
+    kpiListToUse = this.kpiListAGM;
   }
+
+  const changedScores = kpiListToUse
+    .filter((k: any) => k.kpi_name.toLowerCase() !== 'insurance')
+    .filter((k: any) => {
+      const newVal = this.selectedEmployee[k.kpi_name]?.achieved;
+      const oldVal = this.originalScores[k.kpi_name]?.achieved;
+
+      return newVal !== undefined && newVal !== oldVal;
+    })
+    .map((k: any) => ({
+      kpi_name: k.kpi_name,
+      role_kpi_mapping_id: k.id,
+      value: this.selectedEmployee[k.kpi_name].achieved,
+    }));
+
+  if (changedScores.length === 0) {
+    alert("No changes detected");
+    return;
+  }
+
+  const payload = {
+    user_id: this.selectedEmployee.staffId || this.selectedEmployee.hod_id,
+    period: this.period,
+    master_user_id: this.HODId,
+    scores: changedScores,
+  };
+
+  this.performanceService.createHoStaffScores(payload).subscribe({
+    next: (response: any) =>
+      alert(response.message || 'Scores created successfully!'),
+    complete: () => { if(this.auth.user?.role === 'GM') {this.loadAGMScores();}else{
+      this.loadScores();}},
+    error: (err) => console.error('Error creating scores:', err),
+  });
+}
+
   finalSalary() {
     const finalSalary = this.calculateTotalSalary() * 0.25;
     return finalSalary + this.calculateTotalSalary();
@@ -201,5 +318,19 @@ export class WeightageAllComponent implements OnInit {
 
   calculateTotalSalaryHOStaff() {
     return this.HOsalary + this.calculateKpiBasedIncrement();
+  }
+  
+  calculateGMKpiBasedIncrement() {
+    if(!this.gmFinalTotal) return 0;
+    const score = this.gmFinalTotal;
+    return this.GMincrementAmt/10* score;
+  }
+  calculateGMTotalSalary() {
+    return this.GMsalary + this.calculateGMKpiBasedIncrement();
+  }
+
+  finalGmSalary() {
+    const finalSalary = this.calculateGMTotalSalary() * 0.25;
+    return finalSalary + this.calculateGMTotalSalary();
   }
 }

@@ -9,11 +9,12 @@ import { PeriodService } from 'src/app/core/period.service';
 import { PerformanceService } from '../../performance/performance.service';
 import { HoPerformanceService } from '../../hod_performance/hod_performance.service';
 import { BranchManagerService } from '../../branch-manager/branch-manager.service';
-import { filter } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
+
 
 @Component({
   selector: 'app-transfer-master',
-  standalone: true,
+  standalone  : true,
   imports: [CommonModule, FormsModule],
   templateUrl: './transfer-master.component.html',
   styleUrls: ['./transfer-master.component.scss'],
@@ -31,7 +32,6 @@ export class TransferMasterComponent implements OnInit {
     new_branch_id: string;
     kpi_total: string;
     period: string;
-    transfer_date: string;
     old_designation: string;
     new_designation: string;
     deposit_target: string;
@@ -53,7 +53,7 @@ export class TransferMasterComponent implements OnInit {
     new_branch_id: '',
     kpi_total: '',
     period: '',
-    transfer_date: '',
+   
     old_designation: '',
     new_designation: '',
     deposit_target: '',
@@ -105,7 +105,7 @@ export class TransferMasterComponent implements OnInit {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
     });
-    this.transfer.transfer_date = this.formatDate(new Date());
+    // this.transfer.transfer_date = this.formatDate(new Date());
     this.loadTrasferedStaff();
     this.loadUsers();
     this.loadBranches();
@@ -314,47 +314,66 @@ export class TransferMasterComponent implements OnInit {
     if (!confirmed) return;
 
     try {
-      this.giveTransferDate(staff_id);
-      this.delay(2000);
-      await this.autoDistributeOldBranch(oldBranchId).toPromise();
+      // await  this.giveTransferDate(staff_id).toPromise();
+     
+      // await this.autoDistributeOldBranch(oldBranchId).toPromise();
 
       if (this.transfer.id) {
-        await this.adminService
-          .updateTrasferedStaff(this.transfer.id, this.transfer)
-          .toPromise();
+        // await this.adminService
+        //   .updateTrasferedStaff(this.transfer.id, this.transfer)
+        //   .toPromise();
 
-        await this.delay(5000);
-        if (this.selectedUserRole === 'BM') {
-          await this.updateEmployee_Trasnfer_table_BM(
-            staff_id,
-            this.period,
-            oldBranchId,
-            newBranchId
+        // await this.delay(5000);
+        // if (this.selectedUserRole === 'BM') {
+        //   await this.updateEmployee_Trasnfer_table_BM(
+        //     staff_id,
+        //     this.period,
+        //     oldBranchId,
+        //     newBranchId
 
-          ).toPromise();
-        } else {
-          await this.updateEmploye_Trasfer_table(
-            this.period,
-            oldBranchId,
-            staff_id
-          ).toPromise();
-        }
+        //   ).toPromise();
+        // } else {
+        //   await this.updateEmploye_Trasfer_table(
+        //     this.period,
+        //     oldBranchId,
+        //     staff_id
+        //   ).toPromise();
+        // }
+         await this.adminService.transferMasterUpdate({
+  staff_id: this.transfer.staff_id,
+  period: this.period,
+  old_branchId: this.transfer.old_branch_id,
+  new_branchId: this.transfer.new_branch_id,
+  role: this.selectedUserRole,
+  transferData: this.transfer
+}).toPromise();
       } else {
-        await this.adminService.addTrasferedStaff(this.transfer).toPromise();
-        await this.delay(3000);
-        if (this.selectedUserRole === 'BM') {
-          await this.updateEmployee_Trasnfer_table_BM(
-            staff_id,
-            this.period
-            ,oldBranchId, newBranchId
-          ).toPromise();
-        } else {
-          await this.updateEmploye_Trasfer_table(
-            this.period,
-            oldBranchId,
-            staff_id
-          ).toPromise();
-        }
+        // await this.adminService.addTrasferedStaff(this.transfer).toPromise();
+        // await this.delay(3000);
+        // if (this.selectedUserRole === 'BM') {
+        //   await this.updateEmployee_Trasnfer_table_BM(
+        //     staff_id,
+        //     this.period
+        //     ,oldBranchId, newBranchId
+        //   ).toPromise();
+        // } else {
+        //   await this.updateEmploye_Trasfer_table(
+        //     this.period,
+        //     oldBranchId,
+        //     staff_id
+        //   ).toPromise();
+        // }
+        await this.adminService.transferMaster({
+  staff_id: this.transfer.staff_id,
+  period: this.period,
+  old_branchId: this.transfer.old_branch_id,
+  new_branchId: this.transfer.new_branch_id,
+  role: this.selectedUserRole,
+  transferData: this.transfer
+}).toPromise();
+
+console.log("Transfer completed successfully");
+
        
       }
       
@@ -385,7 +404,7 @@ export class TransferMasterComponent implements OnInit {
       new_branch_id: '',
       kpi_total: '',
       period: '',
-      transfer_date: '',
+     
       old_designation: '',
       new_designation: '',
       deposit_target: '',
@@ -431,6 +450,7 @@ export class TransferMasterComponent implements OnInit {
   }
   giveTransferDate(id: any) {
     this.adminService.transferDate(id).subscribe(() => {});
+    return { toPromise: () => Promise.resolve() } as any;
   }
   updateEmploye_Trasfer_table(period: any, branchId: any, userId: any) {
     const payload = {

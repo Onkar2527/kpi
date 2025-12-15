@@ -4,10 +4,10 @@
     <i class="bi bi-speedometer2"></i> Performance Dashboard
   </h3>
 
-  <!-- Cards Row -->
+ 
   <div class="row g-4">
 
-    <!-- Total HO Staff -->
+    
     <div class="col-md-4" (click)="openHOStaffModal()" style="cursor:pointer;">
     <div class="card shadow-lg border-0 rounded-4 hover-card bg-gradient" style="background: #007bff;">
         <div class="card-body text-white">
@@ -25,7 +25,7 @@
     </div>
 
 
-    <!-- Total Branches -->
+  
     <div class="col-md-4" (click)="openBranchesModal()" style="cursor:pointer;">
       <div class="card shadow-lg border-0 rounded-4 hover-card bg-success">
         <div class="card-body text-white">
@@ -42,7 +42,7 @@
       </div>
     </div>
 
-    <!-- AGM + DGM total -->
+  
     <div class="col-md-4" (click)="openAGMDGMModal()" style="cursor:pointer;">
       <div class="card shadow-lg border-0 rounded-4 hover-card bg-warning">
         <div class="card-body text-dark">
@@ -59,10 +59,10 @@
       </div>
     </div>
 
-  </div> <!-- row end -->
+  </div> 
 
 </div>
-<!-- HO STAFF MODAL -->
+
 <div class="modal fade" id="hoStaffModal" tabindex="-1" data-bs-focus="false" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content rounded-4 shadow">
@@ -101,7 +101,7 @@
     </div>
   </div>
 </div>
-<!-- branch list model -->
+
 <div class="modal fade" id="branchesModal" tabindex="-1" data-bs-focus="false" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content rounded-4 shadow">
@@ -118,6 +118,7 @@
             <tr>
               <th>Branch Code</th>
               <th>Branch Name</th>
+              <th>Branch Score</th>
             </tr>
           </thead>
 
@@ -125,6 +126,7 @@
             <tr *ngFor="let branch of totalBranches">
               <td>{{ branch.code }}</td>
               <td>{{ branch.name }}</td>
+              <td>{{ branch.bmTotalScore | number:'1.2-2' }}</td>
             </tr>
           </tbody>
         </table>
@@ -138,7 +140,7 @@
     </div>
   </div>
 </div>
-<!-- AGM/DGM MODAL -->
+
 <div class="modal fade" id="agmDgmModal" tabindex="-1" data-bs-focus="false" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content rounded-4 shadow">

@@ -27,6 +27,9 @@ export class AllPerformanceService {
   getAllAGMScores(period:string){
     return this.http.get(`${environment.apiBaseUrl}/performnceMaster/AGM-DGM-Scores?period=${period}`);
   }
+   getAllAGMSalary(period: string, hod_id: string){
+        return this.http.get(`${environment.apiBaseUrl}/summary/get-salary-all-agms?period=${period}&hod_id=${hod_id}`);
+  }
 
   //original for all perfromance
   getAllKpiRoleWise(role:any){
@@ -35,8 +38,8 @@ export class AllPerformanceService {
    getSpecificALLScores(period: string, ho_staff_id: string, role: string) {
     return this.http.get(`${environment.apiBaseUrl}/performnceMaster/specfic-ALLstaff-scores?period=${period}&ho_staff_id=${ho_staff_id}&role=${role}`);
   }
-  getDashbroadCount(hod_id:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/get-Total-Ho_staff-details`,{hod_id});
-  
+  getDashbroadCount(hod_id:any,period:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/get-Total-Ho_staff-details`,{hod_id,period});
+
   }
 }

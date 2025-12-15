@@ -10,6 +10,7 @@ export interface UserProfile {
   branchId: string | null;
   username: string | null;
   branchName: string | null;
+  PF_NO: string | null;
 }
 
 @Injectable({

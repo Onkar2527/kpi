@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AllPerformanceService } from '../all-performance.service';
 import { AuthService } from 'src/app/auth.service';
 import { CommonModule } from '@angular/common';
+import { PeriodService } from 'src/app/core/period.service';
 
 declare var bootstrap: any;
 
@@ -21,19 +22,27 @@ export class DashboardComponent implements OnInit {
 
   totalAGMDGM: any[] = [];
   totalAGMDGMCount: number = 0;
+  period:any;
 
   constructor(
     private performanceService: AllPerformanceService,
+    private periodService: PeriodService,
     public auth: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.loadDashboardCounts();
+    this.periodService.currentPeriod.subscribe((period) => {
+      this.period = period;
+      if(this.period){
+      this.loadDashboardCounts();
+      }
+    });
+    
   }
 
   loadDashboardCounts() {
     this.performanceService
-      .getDashbroadCount(this.auth.user?.id)
+      .getDashbroadCount(this.auth.user?.id, this.period)
       .subscribe((data: any) => {
         this.totalHOStaff = data.totalHOStaff;
         this.totalHOStaffCount = data.totalHOStaffCount;
