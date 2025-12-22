@@ -13,7 +13,10 @@
       <li class="nav-item" *ngIf="auth.user?.role === 'BM'">
         <a class="nav-link" routerLink="/branch-manager/weightage-increment" routerLinkActive="active">Weightage & Increment</a>
       </li>
-      <li class="nav-item" *ngIf="auth.user?.role === 'Clerk' || auth.user?.role === 'Attender'">
+       <li class="nav-item" *ngIf="auth.user?.role === 'BM'">
+        <a class="nav-link" routerLink="/branch-manager/attender-kpis" routerLinkActive="active">Attender Evaluation</a>
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'Clerk'">
         <a class="nav-link" routerLink="/staff/my-targets" routerLinkActive="active">My Targets</a>
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'Clerk'">
@@ -46,6 +49,9 @@
        <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
         <a class="nav-link" routerLink="/admin/trasfer-history" routerLinkActive="active">Transfer History</a>
       </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a class="nav-link" routerLink="/admin/report" routerLinkActive="active">Generate Report</a>
+      </li>
        <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
         <a class="nav-link" routerLink="/admin/kpi-master" routerLinkActive="active">KPI Master</a>
       </li>
@@ -68,6 +74,7 @@
       <li class="nav-item" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'HO_STAFF' || auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE' || auth.user?.role === 'GM'">
         <a class="nav-link" routerLink="/all-performnace/weightage-all" routerLinkActive="active">Weightage & Increment</a>
       </li>
+      
       
       <li class="nav-item">
         <a class="nav-link" (click)="logout()" href="#">Logout</a>

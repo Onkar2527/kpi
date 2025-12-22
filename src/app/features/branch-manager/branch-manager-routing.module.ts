@@ -4,6 +4,7 @@ import { AllocateTargetsComponent } from './allocate-targets/allocate-targets.co
 import { VerifyEntriesComponent } from './verify-entries/verify-entries.component';
 import { WeightageIncrementComponent } from '../performance/weightage-increment/weightage-increment.component';
 import { BmDashboardComponent } from './bm-dashboard/bm-dashboard.component';
+import { AttenderKpisComponent } from '../performance/attender-kpis/attender-kpis.component';
 
 const routes: Routes = [
   {
@@ -26,6 +27,10 @@ const routes: Routes = [
   {
     path: 'weightage-increment',
     component: WeightageIncrementComponent
+  },
+  {
+    path: 'attender-kpis',
+    component:AttenderKpisComponent
   }
 ];
 

@@ -49,6 +49,13 @@
           Upload Base Salary
         </label>
       </div>
+       <div class="form-check" *ngIf="auth.user?.role === 'HO'">
+        <input class="form-check-input" type="radio" name="uploadType" id="deputation-staff" value="deputation-staff"
+          [(ngModel)]="uploadType">
+        <label class="form-check-label" for="deputation-staff">
+          Upload Deputation Staff
+        </label>
+      </div>
        <div class="form-check" *ngIf="auth.user?.role === 'insurance_ho'">
         <input class="form-check-input" type="radio" name="uploadType" id="insurance-achiveved"
           value="insurance-achiveved" [(ngModel)]="uploadType">

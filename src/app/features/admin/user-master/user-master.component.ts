@@ -537,9 +537,8 @@ export class UserMasterComponent implements OnInit {
       .subscribe(() => {});
   }
 
-  // ------------------------------------------------------------------------------------
-  //                               RESIGNATION WORKFLOW
-  // ------------------------------------------------------------------------------------
+  //     RESIGNATION WORKFLOW
+ 
 
   openResignPopup(user: any) {
     this.selectedUser = user;

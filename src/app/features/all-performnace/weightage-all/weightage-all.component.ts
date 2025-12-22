@@ -139,7 +139,7 @@ export class WeightageAllComponent implements OnInit {
       .subscribe((data: any) => {
         this.scores = data;
         if (this.scores.length > 0) {
-          this.selectedEmployee = this.scores[0];
+          this.selectEmployee(this.scores[0]);
         }
       });
   }
@@ -215,7 +215,7 @@ export class WeightageAllComponent implements OnInit {
       });
     }
     this.originalScores = JSON.parse(JSON.stringify(this.selectedEmployee));
-
+   
     if (
       this.auth.user?.role === 'AGM' ||
       this.auth.user?.role === 'DGM' ||
@@ -255,7 +255,8 @@ export class WeightageAllComponent implements OnInit {
     .filter((k: any) => {
       const newVal = this.selectedEmployee[k.kpi_name]?.achieved;
       const oldVal = this.originalScores[k.kpi_name]?.achieved;
-
+      console.log(newVal,oldVal);
+      
       return newVal !== undefined && newVal !== oldVal;
     })
     .map((k: any) => ({

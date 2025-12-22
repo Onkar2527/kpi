@@ -69,4 +69,10 @@ export class HoService {
     formData.append('totalAuditAchievedFile', file);
     return this.http.post(`${environment.apiBaseUrl}/targets/totalAuditAchieved`, formData);
   }
+   uploaddeputationStaff(period: string, file: File) {
+    const formData = new FormData();
+    formData.append('period', period);
+    formData.append('deputationFile', file);
+    return this.http.post(`${environment.apiBaseUrl}/targets/upload-deputation-staff`, formData);
+  }
 }

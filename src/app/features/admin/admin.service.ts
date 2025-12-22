@@ -182,4 +182,7 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
    transferMasterUpdate(data:any){
     return this.http.post(`${environment.apiBaseUrl}/trans/transfer-staff-master-update`,data);
   }
+  deputationStaffReport(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/deputation-report`,data);
+  }
 }

@@ -386,8 +386,9 @@ console.log("Transfer completed successfully");
        if(this.transfer.new_designation==='BM' && this.selectedUserRole==='Clerk'){
           await this.adminService.addClearkToBMTraget( this.period, newBranchId, staff_id).toPromise();
         }
-
-      await this.autoDistributeNewBranch(newBranchId).toPromise();
+      if(this.transfer.new_designation === 'Clerk'){
+          await this.autoDistributeNewBranch(newBranchId).toPromise();
+      }
 
       console.log('Transfer Completed Successfully');
 

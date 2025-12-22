@@ -30,6 +30,7 @@ export class WeightageIncrementComponent implements OnInit {
   allStaffSalaries: any;
   history1: any;
   transferBmScores: any;
+  attenderScores:any;
   constructor(
     private performanceService: PerformanceService,
     public auth: AuthService,
@@ -48,9 +49,9 @@ export class WeightageIncrementComponent implements OnInit {
             .subscribe((data) => {
               this.bmScores = data;
             });
+            this.getAttenderScore(this.period, this.branchId);
         } else if (
-          this.auth.user?.role === 'Clerk' ||
-          this.auth.user?.role === 'Attender'
+          this.auth.user?.role === 'Clerk' 
         ) {
           this.performanceService
             .getStaffScores(this.period, this.auth.user.id, this.branchId)
@@ -87,6 +88,13 @@ export class WeightageIncrementComponent implements OnInit {
       .getBmTransferScores(period, branchId)
       .subscribe((data) => {
         this.transferBmScores = data;
+      });
+  }
+  getAttenderScore(period: string, branchId: string){
+    this.performanceService
+      .getAttenderScores(period, branchId)
+      .subscribe((data) => {
+        this.attenderScores = data;
       });
   }
   getAllStaffSalary(period: string, branch_id: string) {

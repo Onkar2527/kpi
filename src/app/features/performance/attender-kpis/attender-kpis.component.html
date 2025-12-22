@@ -1,0 +1,144 @@
+<div class="container mt-4">
+  <h2>Attender Evaluation</h2>
+  <p>Computed KPI scores and salary increments based on performance.</p>
+
+
+<div class="card mt-4" *ngIf="auth.user?.role === 'BM' && attenderScores ">
+    <div class="card-header">
+        <h4>Attender KPI Scores (out of 10)</h4>
+        <div class="d-flex flex-wrap">
+            <div *ngFor="let score of attenderScores" class="chip" [class.selected]="score === selectedEmployee"
+                (click)="selectEmployee(score)">
+                {{ score.staffName }}
+            </div>
+        </div>
+    </div>
+    <div class="card-body" *ngIf="selectedEmployee">
+        <form (ngSubmit)="submitScores()">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>KPI</th>
+                        <th>Weightage</th>
+                        <th>Target</th>
+                        <th>Achieved</th>
+                        <th>Out of 10</th>
+                        <th>Weightage Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let kpi of kpiList">
+                        <td>{{ kpi.kpi_name }}</td>
+                        <td>{{ selectedEmployee.kpis[kpi.kpi_name]?.weightage }}</td>
+                        <td>{{ selectedEmployee.kpis[kpi.kpi_name]?.target | number:'1.2-2' }}</td>
+                        <td *ngIf="kpi.kpi_name === 'Insurance Target'; else normalInput" class="text-center">
+                            {{ selectedEmployee.kpis[kpi.kpi_name]?.achieved | number:'1.2-2' }}
+                        </td>
+                        <ng-template #normalInput>
+                            <td>
+                                <input type="number" class="form-control"
+                                    [(ngModel)]="selectedEmployee.kpis[kpi.kpi_name].achieved"
+                                    [ngModelOptions]="{ standalone: true }" min="0" max="999999" />
+                            </td>
+                        </ng-template>
+                        <td>{{ selectedEmployee.kpis[kpi.kpi_name]?.score | number:'1.2-2' }}</td>
+                        <td>{{ selectedEmployee.kpis[kpi.kpi_name]?.weightageScore | number:'1.2-2' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td colspan="4"></td>
+                        <td><strong>{{ selectedEmployee.total | number:'1.2-2' }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div *ngIf="auth.user?.role === 'BM'" class="text-end mt-3">
+                <button class="btn text-white bg-primary" type="submit">{{ originalScores ?  'Update':'Save'  }}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card mt-4" *ngIf="auth.user?.role === 'BM' && selectedEmployee">
+        <div class="card-header">
+            <h4>{{selectedEmployee.staffName}} SALARY DETAILS</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead class="table-info">
+                    <tr>
+                        <th>Designation</th>
+                        <th>Basic Inc.</th>
+                        <th>Increment Basic.</th>
+                        <th>KPI Based</th>
+                        <th>Tot. Basic</th>
+                        <th>DA</th>
+                        <th>Tot. Salary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Attender</td>
+                        <td>{{ staffSalary | number:'1.2-2' }}</td>
+                        <td>{{ staffIncrementAmt | number:'1.2-2' }}</td>
+                        <td>{{ calculateKpiBasedIncrementStaff() | number:'1.2-2' }}</td>
+                        <td>{{ calculateTotalSalaryStaff() | number:'1.2-2' }}</td>
+                        <td>25%</td>
+                        <td>{{finalSalaryStaff() | number:'1.2-2'}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- <div *ngIf="history1">
+    <div class="card-header mt-5">
+      <h4> {{selectedEmployee.staffName}} KPI Transfer History</h4>
+    </div>
+    
+      <div class="modal-body">
+        <div *ngIf="history1">
+          <small>Period: {{ history1.period }}</small>
+
+          <div *ngFor="let transfer of history1.transfers; let i = index" class="border rounded p-3 mb-4 shadow-sm mt-1">
+            <h5 class="text-primary mb-3">
+              Transfer {{ i + 1 }} — <span class="text-secondary">{{ transfer.transfer_date | date:'dd-MM-yyyy' }}</span>
+            </h5>
+
+            <p><strong>Old Branch NAME:</strong> {{ transfer.branch_name }} |
+              <strong>Old Designation:</strong> {{ transfer.old_designation }} 
+            </p>
+
+            <table class="table table-bordered table-striped mt-3">
+              <thead class="table-dark">
+                <tr>
+                  <th>KPI</th>
+                   <th>Weightage</th>
+                  <th>Target</th>
+                  <th>Achieved</th>
+                  <th>Score (Out of 10)</th>
+                  <th>Weightage Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let kpi of ['deposit', 'loan_gen', 'loan_amulya', 'recovery', 'audit', 'insurance']">
+                  <td>{{ kpi | titlecase }}</td>
+                  <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                  <td>{{ transfer[kpi]?.target | number:'1.0-0' }}</td>
+                  <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                  <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                  <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+                </tr>
+                <tr class="table-info">
+                  <td><strong>Total</strong></td>
+                  <td colspan="4"></td>
+                  <td><strong>{{ transfer.total_weightage_score | number:'1.2-2' }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div> -->
+</div>
+  
+</div>

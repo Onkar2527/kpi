@@ -10,6 +10,7 @@ import { TrasferHistoryComponent } from './transfer-history/transfer-history.com
 import { KpiMasterComponent } from './kpi-master/kpi-master.component';
 import { KpiMappingComponent } from './kpi-mapping/kpi-mapping.component';
 import { manageEntriesComponent } from './manage-entries/manage-entries.component';
+import { ReportsComponent } from './report/report.component';
 
 const routes: Routes = [
   {
@@ -40,6 +41,9 @@ const routes: Routes = [
   {
     path: 'trasfer-history',
     component: TrasferHistoryComponent
+  },{
+    path: 'report',
+    component: ReportsComponent
   },
   {
     path: 'kpi-master',
