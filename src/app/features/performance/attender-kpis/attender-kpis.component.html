@@ -3,7 +3,7 @@
   <p>Computed KPI scores and salary increments based on performance.</p>
 
 
-<div class="card mt-4" *ngIf="auth.user?.role === 'BM' && attenderScores ">
+<div class="card mt-4" *ngIf="attenderScores ">
     <div class="card-header">
         <h4>Attender KPI Scores (out of 10)</h4>
         <div class="d-flex flex-wrap">
@@ -51,14 +51,14 @@
                     </tr>
                 </tbody>
             </table>
-            <div *ngIf="auth.user?.role === 'BM'" class="text-end mt-3">
+            <div *ngIf="auth.user?.role === 'BM' || auth.user?.role === 'GM'" class="text-end mt-3">
                 <button class="btn text-white bg-primary" type="submit">{{ originalScores ?  'Update':'Save'  }}
                 </button>
             </div>
         </form>
     </div>
 
-    <div class="card mt-4" *ngIf="auth.user?.role === 'BM' && selectedEmployee">
+    <div class="card mt-4" *ngIf="selectedEmployee">
         <div class="card-header">
             <h4>{{selectedEmployee.staffName}} SALARY DETAILS</h4>
         </div>

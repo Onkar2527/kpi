@@ -45,7 +45,8 @@
   </div>
 
   <!-- HOD KPI VIEW -->
-  <div class="card mt-4" *ngIf="auth.user?.role === 'AGM' ||auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE' && hodScores">
+  <div class="card mt-4"
+    *ngIf="auth.user?.role === 'AGM' ||auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE' && hodScores">
     <div class="card-header bg-info text-white">
       <h4>{{auth.user?.role}} KPI Scores</h4>
     </div>
@@ -63,22 +64,45 @@
         <tbody>
           <tr *ngFor="let kpi of kpiList">
             <td>{{ kpi.kpi_name }}</td>
-            <td>{{ hodScores?.[kpi.kpi_name]?.weightage || 0 }}</td>
-            <td>{{ hodScores?.[kpi.kpi_name]?.achieved | number:'1.2-2' }}</td>
-            <td>{{ hodScores?.[kpi.kpi_name]?.score | number:'1.2-2' }}</td>
-            <td>{{ hodScores?.[kpi.kpi_name]?.weightageScore | number:'1.2-2' }}</td>
+            <td>
+              <ng-container *ngIf="!isHodScoreLoading; else textLoader">
+                {{ hodScores?.[kpi.kpi_name]?.weightage || 0 }}
+              </ng-container>
+            </td>
+
+            <td>
+              <ng-container *ngIf="!isHodScoreLoading; else textLoader">
+                {{ hodScores?.[kpi.kpi_name]?.achieved | number:'1.2-2' }}
+              </ng-container>
+            </td>
+
+            <td>
+              <ng-container *ngIf="!isHodScoreLoading; else textLoader">
+                {{ hodScores?.[kpi.kpi_name]?.score | number:'1.2-2' }}
+              </ng-container>
+            </td>
+
+            <td>
+              <ng-container *ngIf="!isHodScoreLoading; else textLoader">
+                {{ hodScores?.[kpi.kpi_name]?.weightageScore | number:'1.2-2' }}
+              </ng-container>
+            </td>
+
           </tr>
 
           <tr>
             <td><strong>Total</strong></td>
             <td colspan="3"></td>
-            <td><strong>{{ hodTotalScore | number:'1.2-2' }}</strong></td>
+            <td><strong> <ng-container *ngIf="!isHodScoreLoading; else textLoader">
+                  {{ hodTotalScore | number:'1.2-2' }}
+                </ng-container></strong></td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
-  <div class="card mt-4" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE' && hodScores">
+  <div class="card mt-4"
+    *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE' && hodScores">
     <div class="card-header">
       <h4>Salary Details</h4>
     </div>
@@ -109,9 +133,18 @@
       </table>
     </div>
   </div>
+  <ng-template #textLoader>
+    <span class="dot-loader">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </ng-template>
 
   <!-- STAFF KPI SECTION (EDITABLE BY HOD) -->
-  <div class="card mt-4" *ngIf="auth.user?.role === 'AGM'  ||auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE' && scores">
+  <div class="card mt-4"
+    *ngIf="auth.user?.role === 'AGM'  ||auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE' && scores">
     <div class="card-header">
       <h4>HoStaff KPI Scores (out of 10)</h4>
       <div class="d-flex flex-wrap">
@@ -201,7 +234,7 @@
   </div>
 
   <!-- GM KPI VIEW -->
-  <div class="card mt-4" *ngIf="auth.user?.role === 'GM' && AGMArray ">
+  <!-- <div class="card mt-4" *ngIf="auth.user?.role === 'GM' && AGMArray ">
     <div class="card-header bg-info text-white">
       <h4>{{auth.user?.role}} KPI Scores</h4>
     </div>
@@ -231,8 +264,8 @@
         </tbody>
       </table>
     </div>
-  </div>
-  <div class="card mt-4" *ngIf="auth.user?.role === 'GM'">
+  </div> -->
+  <!-- <div class="card mt-4" *ngIf="auth.user?.role === 'GM'">
     <div class="card-header">
       <h4>Salary Details</h4>
     </div>
@@ -262,10 +295,10 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </div> -->
 
   <!-- All AGM-DGM KPIS-->
-  <div class="card mt-4" *ngIf="auth.user?.role === 'GM' && agmScore">
+  <!-- <div class="card mt-4" *ngIf="auth.user?.role === 'GM' && agmScore">
     <div class="card-header">
       <h4>AGM/DGM KPI Scores (out of 10)</h4>
       <div class="d-flex flex-wrap">
@@ -369,5 +402,193 @@
       </div>
     </div>
 
-  </div>
+  </div> -->
+
+
+  <ng-container *ngIf="auth.user?.role === 'GM'">
+
+    <ng-container *ngIf="isGmScoreLoading; else gmContent">
+      <div class="gm-loader-center">
+        <div class="gm-line-loader">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="mt-2 text-muted">
+          Loading GM Data…
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #gmContent>
+
+      <div class="card mt-4" *ngIf="AGMArray?.length">
+        <div class="card-header bg-info text-white">
+          <h4>GM KPI Scores</h4>
+        </div>
+        <div class="card-body">
+          <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+              <tr>
+                <th>AGM/DGM Name</th>
+                <th>Weightage</th>
+                <th>Total Score</th>
+                <th>Weightage Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let agm of AGMArray">
+                <td>{{ agm.name }}</td>
+                <td>{{ agm.weightage | number:'1.2-2' }}</td>
+                <td>{{ agm.total_score | number:'1.2-2' }}</td>
+                <td>{{ agm.weightageScore | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td></td>
+                <td>{{ totalAGMsScore | number:'1.2-2' }}</td>
+                <td><strong>{{ gmFinalTotal | number:'1.2-2' }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <div class="card mt-4">
+        <div class="card-header">
+          <h4>Salary Details</h4>
+        </div>
+        <div class="card-body">
+          <table class="table table-bordered">
+            <thead class="table-info">
+              <tr>
+                <th>Designation</th>
+                <th>Basic Inc.</th>
+                <th>Increment Basic.</th>
+                <th>KPI Based</th>
+                <th>Tot. Basic</th>
+                <th>DA</th>
+                <th>Tot. Salary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{auth.user?.role}}</td>
+                <td>{{ GMsalary | number : '1.2-2' }}</td>
+                <td>{{ GMincrementAmt | number : '1.2-2' }}</td>
+                <td>{{ calculateGMKpiBasedIncrement() | number : '1.2-2' }}</td>
+                <td>{{ calculateGMTotalSalary() | number : '1.2-2' }}</td>
+                <td>25%</td>
+                <td>{{finalGmSalary() | number:'1.2-2'}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="card mt-4" *ngIf="agmScore?.length">
+        <div class="card-header">
+          <h4>AGM/DGM KPI Scores (out of 10)</h4>
+          <div class="d-flex flex-wrap">
+            <div *ngFor="let score of agmScore" class="chip" [class.selected]="score === selectedEmployee"
+              (click)="selectEmployee(score)">
+              {{ score.name }}
+            </div>
+          </div>
+        </div>
+        <div class="card-body" *ngIf="selectedEmployee">
+          <form (ngSubmit)="submitScores()">
+            <table class="table table-bordered table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>KPI</th>
+                  <th>Weightage</th>
+                  <th>Achieved</th>
+                  <th>Out of 10</th>
+                  <th>Weightage Score</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let kpi of kpiListAGM">
+                  <td>{{ kpi.kpi_name }}</td>
+                  <td>{{ selectedEmployee.kpis[kpi.kpi_name]?.weightage ?? 0 }}</td>
+                  <td *ngIf="
+              kpi.kpi_name === 'Insurance' ||
+              kpi.kpi_name === 'Section Work Efficiency' ||
+              kpi.kpi_name === 'Incharge Branch Performance & Visits';
+              else normalInput
+            ">
+                    {{ selectedEmployee.kpis[kpi.kpi_name]?.achieved ?? 0 | number:'1.2-2' }}
+                  </td>
+                  <ng-template #normalInput>
+                    <td>
+                      <input type="number" class="form-control"
+                        [(ngModel)]="selectedEmployee.kpis[kpi.kpi_name].achieved"
+                        [ngModelOptions]="{ standalone: true }" min="0" max="999999" />
+                    </td>
+                  </ng-template>
+                  <td>{{ selectedEmployee.kpis[kpi.kpi_name]?.score ?? 0 | number:'1.2-2' }}</td>
+                  <td>{{ selectedEmployee.kpis[kpi.kpi_name]?.weightageScore ?? 0 | number:'1.2-2' }}</td>
+                </tr>
+                <tr>
+                  <td><strong>Total</strong></td>
+                  <td colspan="3"></td>
+                  <td>
+                    <strong>{{ selectedEmployee.total ?? 0 | number:'1.2-2' }}</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="text-end mt-3">
+              <button class="btn text-white bg-primary" type="submit">
+                {{ selectedEmployee?.achieved === 0 ? 'Save' : 'Update' }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+
+        <div class="card mt-4">
+          <div class="card-header">
+            <h4>Salary Details</h4>
+          </div>
+          <div class="card-body">
+            <table class="table table-bordered">
+              <thead class="table-info">
+                <tr>
+                  <th>Designation</th>
+                  <th>Basic Inc.</th>
+                  <th>Increment Basic.</th>
+                  <th>KPI Based</th>
+                  <th>Tot. Basic</th>
+                  <th>DA</th>
+                  <th>Tot. Salary</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{selectedEmployee?.role}}</td>
+                  <td>{{ HOsalary | number : '1.2-2' }}</td>
+                  <td>{{ HOincrementAmt | number : '1.2-2' }}</td>
+                  <td>{{ calculateKpiBasedIncrement() | number : '1.2-2' }}</td>
+                  <td>{{ calculateTotalSalary() | number : '1.2-2' }}</td>
+                  <td>25%</td>
+                  <td>{{finalSalary() | number:'1.2-2'}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </ng-template>
+
+  </ng-container>
+
 </div>

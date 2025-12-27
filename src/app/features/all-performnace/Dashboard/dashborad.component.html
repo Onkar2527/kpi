@@ -17,7 +17,12 @@
             </div>
             <div>
             <h5 class="card-title fw-bold mb-1">Total HO Staff</h5>
-            <h2 class="fw-bolder">{{ totalHOStaffCount }}</h2>
+           <h2 class="fw-bolder">
+            <ng-container *ngIf="!isDashboardLoading; else countLoader">
+              {{ totalHOStaffCount }}
+            </ng-container>
+          </h2>
+
             </div>
         </div>
         </div>
@@ -35,8 +40,12 @@
             </div>
             <div>
               <h5 class="card-title fw-bold mb-1">Total Branches</h5>
-              <h2 class="fw-bolder"> {{totalBranchesCount}}</h2>
-            </div>
+              <h2 class="fw-bolder">
+              <ng-container *ngIf="!isDashboardLoading; else countLoader">
+                {{ totalBranchesCount }}
+              </ng-container>
+            </h2>
+           </div>
           </div>
         </div>
       </div>
@@ -52,7 +61,11 @@
             </div>
             <div>
               <h5 class="card-title fw-bold mb-1">AGM / DGM</h5>
-              <h2 class="fw-bolder">{{totalAGMDGMCount}}</h2>
+              <h2 class="fw-bolder">
+              <ng-container *ngIf="!isDashboardLoading; else countLoader">
+                {{ totalAGMDGMCount }}
+              </ng-container>
+            </h2>
             </div>
           </div>
         </div>
@@ -179,3 +192,7 @@
     </div>
   </div>
 </div>
+
+<ng-template #countLoader>
+  <div class="spinner-border spinner-border-sm text-light"></div>
+</ng-template>

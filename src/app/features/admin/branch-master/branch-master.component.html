@@ -27,7 +27,7 @@
          <div class="mb-3">
           <label for="AGMS" class="form-label"> Asign Incharge</label>
           <select id="AGMS" class="form-select" [(ngModel)]="branch.incharge_id" name="incharge_id">
-            <option *ngFor="let agm of AGMS" [value]="agm.id">{{ agm.username }}</option>
+            <option *ngFor="let agm of AGMS" [value]="agm.id">{{ agm.name }}</option>
           </select>
         </div>
         <button type="submit" class="btn btn-primary">Save</button>

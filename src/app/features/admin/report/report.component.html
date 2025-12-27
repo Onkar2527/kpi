@@ -13,7 +13,7 @@
 
     <tbody class="text-center">
         <tr *ngFor="let row of reportRows">
-           
+
             <td>{{ row.name }}</td>
 
             <!-- PF -->
@@ -24,7 +24,7 @@
                 </ng-template>
             </td>
 
-           
+
             <td>
                 <span *ngIf="row.type === 'deputation_staff'; else dash">
                     <span *ngIf="row.department; else noDept">

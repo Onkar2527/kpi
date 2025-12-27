@@ -40,7 +40,8 @@ export class WeightageAllComponent implements OnInit {
  fixedWeightage: number = 10;
   totalAGMsScore: number = 0;
  originalScores: any = {};
-
+ isGmScoreLoading = false;
+ isHodScoreLoading = true;
   constructor(
     private performanceService: AllPerformanceService,
     public auth: AuthService,
@@ -59,12 +60,7 @@ export class WeightageAllComponent implements OnInit {
           this.auth.user?.role === 'AGM_IT' ||
           this.auth.user?.role === 'AGM_INSURANCE'
         ) {
-          this.performanceService
-            .getHoScores(this.period, this.HODId, this.auth.user?.role)
-            .subscribe((data: any) => {
-              this.hodScores = data.kpis;
-              this.hodTotalScore = data.total;
-            });
+          this.loadHodScores();
         } else if (
           this.auth.user?.role === 'HO_STAFF' ||
           this.auth.user?.role === 'attender'
@@ -100,39 +96,75 @@ export class WeightageAllComponent implements OnInit {
       }
     });
   }
-  loadAGMScores() {
-    this.performanceService
-            .getAllAGMScores(this.period)
-            .subscribe((data: any) => {
-              this.agmScore = data;
-              if (this.agmScore.length > 0) {
-                this.selectEmployee(this.agmScore[0]);
-              }
-                const totalAGMs = data.length;
-                const totalWeightage = 100;
-                const perAGMWeightage = totalWeightage / totalAGMs;
+  
 
-                this.AGMArray = data.map((agm: any) => ({
-                  hod_id: agm.hod_id,
-                  name: agm.name,
-                  total_score: agm.total,
-                  weightage: perAGMWeightage,
-                  weightageScore: (perAGMWeightage * agm.total) / 100
-                }));
+loadHodScores() {
+  this.isHodScoreLoading = true;
 
+ this.performanceService
+            .getHoScores(this.period, this.HODId, this.auth.user!.role).subscribe({
+    next: (res:any) => {
+      this.hodScores = res.kpis;
+      this.hodTotalScore = res.total;
+    },
+    error: () => {
+      this.hodScores = null;
+      this.hodTotalScore = 0;
+    },
+    complete: () => {
+      this.isHodScoreLoading = false;
+    }
+  });
+}
 
-              
-                const sum = data.reduce((acc: number, x: any) => acc + x.total, 0);
-                this.totalAGMsScore = sum;
-                this.gmFinalTotal = this.AGMArray.reduce(
-                  (acc: number, x: any) => acc + x.weightageScore,
-                  0
-                );
+loadAGMScores() {
+  this.isGmScoreLoading = true;   
 
+  this.performanceService
+    .getAllAGMScores(this.period)
+    .subscribe({
+      next: (data: any) => {
+        this.agmScore = data || [];
 
-              this.loadKpiroleWiseAGM(this.agmScore.role);
-            });
-  }
+        if (this.agmScore.length > 0) {
+          this.selectEmployee(this.agmScore[0]);
+        }
+
+        const totalAGMs = data.length || 1;
+        const totalWeightage = 100;
+        const perAGMWeightage = totalWeightage / totalAGMs;
+
+        this.AGMArray = data.map((agm: any) => ({
+          hod_id: agm.hod_id,
+          name: agm.name,
+          total_score: agm.total,
+          weightage: perAGMWeightage,
+          weightageScore: (perAGMWeightage * agm.total) / 100
+        }));
+
+        this.totalAGMsScore = data.reduce(
+          (acc: number, x: any) => acc + x.total,
+          0
+        );
+
+        this.gmFinalTotal = this.AGMArray.reduce(
+          (acc: number, x: any) => acc + x.weightageScore,
+          0
+        );
+      },
+      error: (err) => {
+        console.error(err);
+        this.agmScore = [];
+        this.AGMArray = [];
+        this.totalAGMsScore = 0;
+        this.gmFinalTotal = 0;
+      },
+      complete: () => {
+        this.isGmScoreLoading = false;  
+      }
+    });
+}
+
   loadScores() {
     this.performanceService
       .getScores(this.period, this.HODId, 'HO_STAFF')

@@ -22,6 +22,7 @@ export class DashboardComponent implements OnInit {
 
   totalAGMDGM: any[] = [];
   totalAGMDGMCount: number = 0;
+   isDashboardLoading = false;
   period:any;
 
   constructor(
@@ -41,9 +42,12 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardCounts() {
-    this.performanceService
-      .getDashbroadCount(this.auth.user?.id, this.period)
-      .subscribe((data: any) => {
+  this.isDashboardLoading = true;
+
+  this.performanceService
+    .getDashbroadCount(this.auth.user?.id, this.period)
+    .subscribe({
+      next: (data: any) => {
         this.totalHOStaff = data.totalHOStaff;
         this.totalHOStaffCount = data.totalHOStaffCount;
 
@@ -52,8 +56,21 @@ export class DashboardComponent implements OnInit {
 
         this.totalAGMDGM = data.totalAGMDGM;
         this.totalAGMDGMCount = data.totalAGMDGMCount;
-      });
-  }
+      },
+      error: (err) => {
+        console.error("Dashboard load failed", err);
+
+        
+        this.totalHOStaffCount = 0;
+        this.totalBranchesCount = 0;
+        this.totalAGMDGMCount = 0;
+      },
+      complete: () => {
+        this.isDashboardLoading = false;
+      }
+    });
+}
+
 
   openHOStaffModal() {
     (document.activeElement as HTMLElement)?.blur();

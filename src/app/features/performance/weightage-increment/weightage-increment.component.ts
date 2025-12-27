@@ -49,7 +49,6 @@ export class WeightageIncrementComponent implements OnInit {
             .subscribe((data) => {
               this.bmScores = data;
             });
-            this.getAttenderScore(this.period, this.branchId);
         } else if (
           this.auth.user?.role === 'Clerk' 
         ) {
@@ -90,13 +89,7 @@ export class WeightageIncrementComponent implements OnInit {
         this.transferBmScores = data;
       });
   }
-  getAttenderScore(period: string, branchId: string){
-    this.performanceService
-      .getAttenderScores(period, branchId)
-      .subscribe((data) => {
-        this.attenderScores = data;
-      });
-  }
+ 
   getAllStaffSalary(period: string, branch_id: string) {
     this.performanceService
       .getAllStaffSalary(period, branch_id)

@@ -33,8 +33,8 @@ export class PerformanceService {
   getAllStaffSalary(period: string, branch_id: string){
         return this.http.get(`${environment.apiBaseUrl}/summary/get-salary-all-staff?period=${period}&branch_id=${branch_id}`);
   }
-  getAttenderScores(period: string, branchId: string){
-        return this.http.get(`${environment.apiBaseUrl}/summary/branch-attenders?period=${period}&branchId=${branchId}`);
+  getAttenderScores(period: string, branchId: string,hod_id:String){
+        return this.http.get(`${environment.apiBaseUrl}/summary/branch-attenders?period=${period}&branchId=${branchId}&hod_id=${hod_id}`);
   }
   
 }

@@ -21,14 +21,14 @@ export class AttenderKpisComponent implements OnInit {
   scores: any;
   history: any;
   history1: any; 
-    attenderScores:any;
-    allStaffSalaries: any;
-    selectedEmployee: any;
-    staffSalary=0;
-    staffIncrementAmt=0;
-    staffTotalScore: any;    
-    kpiList: any;
-    originalScores: any;
+  attenderScores:any;
+  allStaffSalaries: any;
+  selectedEmployee: any;
+  staffSalary=0;
+  staffIncrementAmt=0;
+  staffTotalScore: any;
+  kpiList: any;
+  originalScores: any;      
   constructor(
     private performanceService: PerformanceService,
     private performance_all:AllPerformanceService,
@@ -40,13 +40,13 @@ export class AttenderKpisComponent implements OnInit {
   ngOnInit(): void {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
-
-      if (this.branchId) {
-        if (this.auth.user?.role === 'BM') {
-            this.getAttenderScore(this.period, this.branchId);
+       if (this.auth.user?.role === 'BM'|| this.auth.user?.role === 'GM') {
+            this.getAttenderScore(this.period, this.branchId!,this.auth.user!.id);
         } 
-      }
+      if(this.auth.user?.role === 'BM'){
       this.getAllStaffSalary(this.period, this.branchId!);
+      }
+      this.getAGMSalary(this.period,this.auth.user!.id)
       this.loadKpiroleWise()
       this.transferHistory();
       
@@ -58,9 +58,9 @@ export class AttenderKpisComponent implements OnInit {
       this.kpiList = res.data;
     });
   }
-  getAttenderScore(period: string, branchId: string){
+  getAttenderScore(period: string, branchId: string,hod_id:string){
     this.performanceService
-      .getAttenderScores(period, branchId)
+      .getAttenderScores(period, branchId,hod_id)
       .subscribe((data) => {
         this.attenderScores = data;
         if (this.attenderScores.length > 0) {
@@ -88,6 +88,14 @@ export class AttenderKpisComponent implements OnInit {
       });
   }
 
+    getAGMSalary(period: any, hod_id: any) {
+    this.performance_all
+      .getAllAGMSalary(period, hod_id)
+      .subscribe((data: any) => {
+        this.staffSalary = data[0].salary || 0;
+        this.staffIncrementAmt = data[0].increment || 0;
+      });
+  }
   transferHistory() {
     this.adminService
       .getTrafterKpiHistory(this.period, this.auth.user?.id)
@@ -114,7 +122,10 @@ export class AttenderKpisComponent implements OnInit {
 
   selectEmployee(employee: any) {
     this.selectedEmployee = employee;
+    if(this.auth.user?.role === 'BM'){
     this.getAllStaffSalary(this.period, this.branchId!);
+    }
+    this.getAGMSalary(this.period,this.auth.user!.id)
     this.originalScores = JSON.parse(JSON.stringify(this.selectedEmployee));
    
     this.transferStaffHistory();
@@ -154,7 +165,7 @@ export class AttenderKpisComponent implements OnInit {
   this.performance_all.createHoStaffScores(payload).subscribe({
     next: (res: any) => {
       alert(res.message || "Scores saved successfully");
-      this.getAttenderScore(this.period, this.branchId!);
+      this.getAttenderScore(this.period, this.branchId!,this.auth.user!.id);
     },
     error: (err) => {
       console.error(err);

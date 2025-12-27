@@ -368,50 +368,59 @@ export class ReportsComponent implements OnInit {
   } 
   isPdfDownloading = false;
   downloadPdf(modalId: string) {
-    if (this.isPdfDownloading) return;
-    this.isPdfDownloading = true;
+  if (this.isPdfDownloading) return;
+  this.isPdfDownloading = true;
 
-    const modalEl = document.getElementById(modalId);
-    if (!modalEl) {
-      this.isPdfDownloading = false;
-      return;
-    }
-
-    const contentEl = modalEl.querySelector('.modal-body') as HTMLElement;
-    if (!contentEl) {
-      this.isPdfDownloading = false;
-      return;
-    }
-
-    html2pdf()
-      .set({
-        margin: 20,
-        filename: `${modalId}.pdf`,
-        html2canvas: { scale: 2, scrollY: 0 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] },
-      } as any)
-      .from(contentEl)
-      .toPdf()
-      .get('pdf')
-      .then((pdf: any) => {
-        const pages = pdf.internal.getNumberOfPages();
-        const w = pdf.internal.pageSize.getWidth();
-        const h = pdf.internal.pageSize.getHeight();
-
-        pdf.setFontSize(9);
-        for (let i = 1; i <= pages; i++) {
-          pdf.setPage(i);
-          pdf.text(`Page ${i} of ${pages}`, w / 2, h - 8, { align: 'center' });
-        }
-
-        pdf.save();
-
-        const instance = bootstrap.Modal.getInstance(modalEl);
-        instance?.hide();
-      })
-      .finally(() => {
-        this.isPdfDownloading = false;
-      });
+  const modalEl = document.getElementById(modalId);
+  if (!modalEl) {
+    this.isPdfDownloading = false;
+    return;
   }
+
+  const contentEl = modalEl.querySelector('.modal-body') as HTMLElement;
+  if (!contentEl) {
+    this.isPdfDownloading = false;
+    return;
+  }
+
+
+  const fileName =
+    this.entredUserData?.name?.trim() &&
+    this.entredUserData?.role?.trim()
+      ? `${this.entredUserData.name} ${this.entredUserData.role} report.pdf`
+      : `${this.selectedDepartment} Deputation staff report.pdf`;
+
+      
+  html2pdf()
+    .set({
+      margin: 20,
+      filename: fileName,
+      html2canvas: { scale: 2, scrollY: 0 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] },
+    } as any)
+    .from(contentEl)
+    .toPdf()
+    .get('pdf')
+    .then((pdf: any) => {
+      const pages = pdf.internal.getNumberOfPages();
+      const w = pdf.internal.pageSize.getWidth();
+      const h = pdf.internal.pageSize.getHeight();
+
+      pdf.setFontSize(9);
+      for (let i = 1; i <= pages; i++) {
+        pdf.setPage(i);
+        pdf.text(`Page ${i} of ${pages}`, w / 2, h - 8, { align: 'center' });
+      }
+
+      pdf.save(fileName);
+
+      const instance = bootstrap.Modal.getInstance(modalEl);
+      instance?.hide();
+    })
+    .finally(() => {
+      this.isPdfDownloading = false;
+    });
+}
+
 }
