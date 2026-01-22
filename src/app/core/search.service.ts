@@ -17,4 +17,28 @@ export class SearchService {
       });
     });
   }
+
+filterByBranchSearch(data: any[], searchTerm: string): any[] {
+  if (!searchTerm) {
+    return data;
+  }
+
+  const searchStr = String(searchTerm).trim();
+
+ 
+  if (searchStr.length >=10) {
+    return data.filter(item => String(item.account_no) === searchStr);
+  } 
+  
+  if (searchStr.length <= 5) {
+    return data.filter(item => String(item.PF_NO) === searchStr);
+  } 
+  
+
+  return data.filter(item => 
+    String(item.branchName).toLowerCase().includes(searchStr.toLowerCase())
+  );
+}
+
+
 }

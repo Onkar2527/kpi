@@ -11,10 +11,9 @@ import { HoPerformanceService } from '../../hod_performance/hod_performance.serv
 import { BranchManagerService } from '../../branch-manager/branch-manager.service';
 import { lastValueFrom } from 'rxjs';
 
-
 @Component({
   selector: 'app-transfer-master',
-  standalone  : true,
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './transfer-master.component.html',
   styleUrls: ['./transfer-master.component.scss'],
@@ -53,7 +52,7 @@ export class TransferMasterComponent implements OnInit {
     new_branch_id: '',
     kpi_total: '',
     period: '',
-   
+
     old_designation: '',
     new_designation: '',
     deposit_target: '',
@@ -89,6 +88,9 @@ export class TransferMasterComponent implements OnInit {
   selectedUser: any;
   searchText: string = '';
   filteredUsers: any[] = [];
+  branchSearch: string = '';
+  filteredBranches: any[] = [];
+  showDropdown = false;
 
   constructor(
     private adminService: AdminService,
@@ -144,12 +146,11 @@ export class TransferMasterComponent implements OnInit {
     if (user) {
       this.transfer.staff_id = user.id;
       this.selectedUserRole = user.role;
-      
+
       const branch_id = this.branches.find(
         (b: any) => b.name === user.branch_name
       )?.code;
-      
-      
+
       this.transfer.old_branch_id = branch_id;
     } else {
       this.transfer.staff_id = '';
@@ -161,6 +162,26 @@ export class TransferMasterComponent implements OnInit {
     this.adminService.getBranches().subscribe((data) => {
       this.branches = data;
     });
+  }
+
+  filterBranches(event: any) {
+    const value = event.target.value.toLowerCase();
+    console.log('input value:', value);
+
+    this.filteredBranches = this.branches.filter((branch: any) =>
+      branch.name.toLowerCase().includes(value)
+    );
+
+    console.log('filter', this.filteredBranches);
+  }
+
+  selectBranch(branch: any) {
+    this.branchSearch = '';
+    this.branchSearch = branch.name;
+    console.log('patch', this.branchSearch);
+
+    this.transfer.new_branch_id = branch.code;
+    this.showDropdown = false;
   }
   loadTrasferedStaff() {
     this.adminService.getTrasferedStaff().subscribe((data) => {
@@ -315,7 +336,7 @@ export class TransferMasterComponent implements OnInit {
 
     try {
       // await  this.giveTransferDate(staff_id).toPromise();
-     
+
       // await this.autoDistributeOldBranch(oldBranchId).toPromise();
 
       if (this.transfer.id) {
@@ -339,14 +360,16 @@ export class TransferMasterComponent implements OnInit {
         //     staff_id
         //   ).toPromise();
         // }
-         await this.adminService.transferMasterUpdate({
-  staff_id: this.transfer.staff_id,
-  period: this.period,
-  old_branchId: this.transfer.old_branch_id,
-  new_branchId: this.transfer.new_branch_id,
-  role: this.selectedUserRole,
-  transferData: this.transfer
-}).toPromise();
+        await this.adminService
+          .transferMasterUpdate({
+            staff_id: this.transfer.staff_id,
+            period: this.period,
+            old_branchId: this.transfer.old_branch_id,
+            new_branchId: this.transfer.new_branch_id,
+            role: this.selectedUserRole,
+            transferData: this.transfer,
+          })
+          .toPromise();
       } else {
         // await this.adminService.addTrasferedStaff(this.transfer).toPromise();
         // await this.delay(3000);
@@ -363,31 +386,36 @@ export class TransferMasterComponent implements OnInit {
         //     staff_id
         //   ).toPromise();
         // }
-        await this.adminService.transferMaster({
-  staff_id: this.transfer.staff_id,
-  period: this.period,
-  old_branchId: this.transfer.old_branch_id,
-  new_branchId: this.transfer.new_branch_id,
-  role: this.selectedUserRole,
-  transferData: this.transfer
-}).toPromise();
+        await this.adminService
+          .transferMaster({
+            staff_id: this.transfer.staff_id,
+            period: this.period,
+            old_branchId: this.transfer.old_branch_id,
+            new_branchId: this.transfer.new_branch_id,
+            role: this.selectedUserRole,
+            transferData: this.transfer,
+          })
+          .toPromise();
 
-console.log("Transfer completed successfully");
-
-       
+        console.log('Transfer completed successfully');
       }
-      
+
       await this.adminService
         .transferUser(staff_id, newBranchId, role)
         .toPromise();
 
       this.loadTrasferedStaff();
 
-       if(this.transfer.new_designation==='BM' && this.selectedUserRole==='Clerk'){
-          await this.adminService.addClearkToBMTraget( this.period, newBranchId, staff_id).toPromise();
-        }
-      if(this.transfer.new_designation === 'Clerk'){
-          await this.autoDistributeNewBranch(newBranchId).toPromise();
+      if (
+        this.transfer.new_designation === 'BM' &&
+        this.selectedUserRole === 'Clerk'
+      ) {
+        await this.adminService
+          .addClearkToBMTraget(this.period, newBranchId, staff_id)
+          .toPromise();
+      }
+      if (this.transfer.new_designation === 'Clerk') {
+        await this.autoDistributeNewBranch(newBranchId).toPromise();
       }
 
       console.log('Transfer Completed Successfully');
@@ -405,7 +433,7 @@ console.log("Transfer completed successfully");
       new_branch_id: '',
       kpi_total: '',
       period: '',
-     
+
       old_designation: '',
       new_designation: '',
       deposit_target: '',
@@ -461,8 +489,18 @@ console.log("Transfer completed successfully");
     };
     return this.adminService.updateEmployeeTrasfert(payload);
   }
-  updateEmployee_Trasnfer_table_BM(staff_id: any, period: any,old_branchId: any, new_branchId: any) {
-    return this.adminService.updateEmployeeTransferBM(staff_id, period, old_branchId,new_branchId);
+  updateEmployee_Trasnfer_table_BM(
+    staff_id: any,
+    period: any,
+    old_branchId: any,
+    new_branchId: any
+  ) {
+    return this.adminService.updateEmployeeTransferBM(
+      staff_id,
+      period,
+      old_branchId,
+      new_branchId
+    );
   }
   editBranch(branch: any) {
     this.transfer = { ...branch };

@@ -39,7 +39,6 @@ export class AuthService {
         this._token = resp.token;
         this._user.set(resp.user);
         this.saveSession();
-        this.startClearLocalStorageTimer(); 
         this.router.navigateByUrl('/home');
       },
       error: (error) => {
@@ -53,37 +52,34 @@ export class AuthService {
     this._token = '';
     this._user.set(null);
     this.clearSession();
-    this.clearClearLocalStorageTimer(); 
     this.router.navigateByUrl('/login');
   }
 
   private saveSession() {
-    localStorage.setItem('user', JSON.stringify(this.user));
-    localStorage.setItem('token', this._token);
+    sessionStorage.setItem('user', JSON.stringify(this.user));
+    sessionStorage.setItem('token', this._token);
   }
 
   private loadSession() {
-    const user = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
+    const user = sessionStorage.getItem('user');
+    const token = sessionStorage.getItem('token');
     if (user && token) {
       this._user.set(JSON.parse(user));
       this._token = token;
-      this.startClearLocalStorageTimer(); 
     }
   }
 
   private clearSession() {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('token');
   }
-
 
   private startClearLocalStorageTimer() {
     this.clearClearLocalStorageTimer(); 
     this.sessionTimeoutId = setTimeout(() => {
       this.clearSession(); 
-      console.log('Local storage cleared after 2 minutes');
-    }, 2* 60 * 1000);
+      console.log('Session storage cleared after 2 minutes');
+    }, 2 * 60 * 1000);
   }
 
   private clearClearLocalStorageTimer() {

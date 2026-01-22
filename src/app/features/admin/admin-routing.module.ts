@@ -11,6 +11,7 @@ import { KpiMasterComponent } from './kpi-master/kpi-master.component';
 import { KpiMappingComponent } from './kpi-mapping/kpi-mapping.component';
 import { manageEntriesComponent } from './manage-entries/manage-entries.component';
 import { ReportsComponent } from './report/report.component';
+import { ResignHistoryComponent } from './resign-history/resign-history.component';
 
 const routes: Routes = [
   {
@@ -41,7 +42,12 @@ const routes: Routes = [
   {
     path: 'trasfer-history',
     component: TrasferHistoryComponent
-  },{
+  },
+  {
+    path: 'resign-history', 
+    component: ResignHistoryComponent
+  },
+  {
     path: 'report',
     component: ReportsComponent
   },

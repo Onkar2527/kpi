@@ -2,82 +2,233 @@
   <div class="position-sticky pt-3">
     <ul class="nav flex-column">
       <li class="nav-item" *ngIf="auth.user?.role === 'BM'">
-        <a class="nav-link" routerLink="/branch-manager/dashboard" routerLinkActive="active">Dashboard</a>
+        <a
+          class="nav-link"
+          routerLink="/branch-manager/dashboard"
+          routerLinkActive="active"
+          >Dashboard</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'BM'">
-        <a class="nav-link" routerLink="/branch-manager/allocate-targets" routerLinkActive="active">Allocate Targets</a>
+        <a
+          class="nav-link"
+          routerLink="/branch-manager/allocate-targets"
+          routerLinkActive="active"
+          >Allocate Targets</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'BM'">
-        <a class="nav-link" routerLink="/branch-manager/verify-entries" routerLinkActive="active">Verify Entries</a>
+        <a
+          class="nav-link"
+          routerLink="/branch-manager/verify-entries"
+          routerLinkActive="active"
+          >Verify Entries</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'BM'">
-        <a class="nav-link" routerLink="/branch-manager/weightage-increment" routerLinkActive="active">Weightage & Increment</a>
+        <a
+          class="nav-link"
+          routerLink="/branch-manager/weightage-increment"
+          routerLinkActive="active"
+          >Weightage & Increment</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'Clerk'">
-        <a class="nav-link" routerLink="/staff/my-targets" routerLinkActive="active">My Targets</a>
+        <a
+          class="nav-link"
+          routerLink="/staff/my-targets"
+          routerLinkActive="active"
+          >My Targets</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'Clerk'">
-        <a class="nav-link" routerLink="/staff/new-entry" routerLinkActive="active">New Entry</a>
+        <a
+          class="nav-link"
+          routerLink="/staff/new-entry"
+          routerLinkActive="active"
+          >New Entry</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'Clerk'">
-        <a class="nav-link" routerLink="/staff/my-submissions" routerLinkActive="active">My Submissions</a>
+        <a
+          class="nav-link"
+          routerLink="/staff/my-submissions"
+          routerLinkActive="active"
+          >My Submissions</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'attender-head'">
-        <a class="nav-link" routerLink="/attender-head/evaluate" routerLinkActive="active">Evaluate Attenders</a>
+        <a
+          class="nav-link"
+          routerLink="/attender-head/evaluate"
+          routerLinkActive="active"
+          >Evaluate Attenders</a
+        >
       </li>
-      <li class="nav-item" *ngIf="auth.user?.role === 'HO'  || auth.user?.role === 'loan_ho' || auth.user?.role === 'deposit_ho' || auth.user?.role === 'loanAmulya_ho' || auth.user?.role === 'insurance_ho' || auth.user?.role === 'recovery_ho' || auth.user?.role === 'audit_ho'">
-        <a class="nav-link" routerLink="/ho/upload-targets" routerLinkActive="active">Upload Targets</a>
+      <li
+        class="nav-item"
+        *ngIf="
+          auth.user?.role === 'HO' ||
+          auth.user?.role === 'loan_ho' ||
+          auth.user?.role === 'deposit_ho' ||
+          auth.user?.role === 'loanAmulya_ho' ||
+          auth.user?.role === 'insurance_ho' ||
+          auth.user?.role === 'recovery_ho' ||
+          auth.user?.role === 'audit_ho'
+        "
+      >
+        <a
+          class="nav-link"
+          routerLink="/ho/upload-targets"
+          routerLinkActive="active"
+          >Upload Targets</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
-        <a class="nav-link" routerLink="/admin/branch-master" routerLinkActive="active">Branch Master</a>
+        <a
+          class="nav-link"
+          routerLink="/admin/branch-master"
+          routerLinkActive="active"
+          >Branch Master</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
-        <a class="nav-link" routerLink="/admin/user-master" routerLinkActive="active">User Master</a>
+        <a
+          class="nav-link"
+          routerLink="/admin/user-master"
+          routerLinkActive="active"
+          >User Master</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
-        <a class="nav-link" routerLink="/admin/department-master" routerLinkActive="active">Department Master</a>
+        <a
+          class="nav-link"
+          routerLink="/admin/department-master"
+          routerLinkActive="active"
+          >Department Master</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
-        <a class="nav-link" routerLink="/admin/weightage-master" routerLinkActive="active">Weightage Master</a>
+        <a
+          class="nav-link"
+          routerLink="/admin/weightage-master"
+          routerLinkActive="active"
+          >Weightage Master</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
-        <a class="nav-link" routerLink="/admin/transfer-master" routerLinkActive="active">Transfer Master</a>
-      </li>
-       <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
-        <a class="nav-link" routerLink="/admin/trasfer-history" routerLinkActive="active">Transfer History</a>
+        <a
+          class="nav-link"
+          routerLink="/admin/transfer-master"
+          routerLinkActive="active"
+          >Transfer Master</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
-        <a class="nav-link" routerLink="/admin/report" routerLinkActive="active">Generate Report</a>
+        <a
+          class="nav-link"
+          routerLink="/admin/trasfer-history"
+          routerLinkActive="active"
+          >Transfer History</a
+        >
       </li>
-       <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
-        <a class="nav-link" routerLink="/admin/kpi-master" routerLinkActive="active">KPI Master</a>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a
+          class="nav-link"
+          routerLink="/admin/resign-history"
+          routerLinkActive="active"
+          >Resign History</a
+        >
       </li>
-      <li class="nav-item" *ngIf="auth.user?.role === 'HO'"> 
-        <a class="nav-link" routerLink="/admin/kpi-mapping" routerLinkActive="active">KPI Mapping</a>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a class="nav-link" routerLink="/admin/report" routerLinkActive="active"
+          >Generate Report</a
+        >
       </li>
-       <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
-        <a class="nav-link" routerLink="/admin/entries-master" routerLinkActive="active">Manage Entries</a>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a
+          class="nav-link"
+          routerLink="/admin/kpi-master"
+          routerLinkActive="active"
+          >KPI Master</a
+        >
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a
+          class="nav-link"
+          routerLink="/admin/kpi-mapping"
+          routerLinkActive="active"
+          >KPI Mapping</a
+        >
+      </li>
+      <li class="nav-item" *ngIf="auth.user?.role === 'HO'">
+        <a
+          class="nav-link"
+          routerLink="/admin/entries-master"
+          routerLinkActive="active"
+          >Manage Entries</a
+        >
       </li>
       <li class="nav-item" *ngIf="auth.user?.role === 'INSURANCE'">
-        <a class="nav-link" routerLink="/insurance" routerLinkActive="active">Upload Insurance Targets</a>
+        <a class="nav-link" routerLink="/insurance" routerLinkActive="active"
+          >Upload Insurance Targets</a
+        >
       </li>
 
-       <!-- <li class="nav-item" *ngIf="auth.user?.role === 'HOD'  || auth.user?.role === 'HO_STAFF' || auth.user?.role === 'AGM'">
+      <!-- <li class="nav-item" *ngIf="auth.user?.role === 'HOD'  || auth.user?.role === 'HO_STAFF' || auth.user?.role === 'AGM'">
         <a class="nav-link" routerLink="/hod_performance/weightage-HoStaff" routerLinkActive="active">Weightage & Increment</a>
       </li> -->
-      <li class="nav-item" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE'">
-        <a class="nav-link" routerLink="/all-performnace/dashboard-AGM" routerLinkActive="active">Dashboard</a>
+      <li
+        class="nav-item"
+        *ngIf="
+          auth.user?.role === 'AGM' ||
+          auth.user?.role === 'DGM' ||
+          auth.user?.role === 'AGM_AUDIT' ||
+          auth.user?.role === 'AGM_IT' ||
+          auth.user?.role === 'AGM_INSURANCE'
+        "
+      >
+        <a
+          class="nav-link"
+          routerLink="/all-performnace/dashboard-AGM"
+          routerLinkActive="active"
+          >Dashboard</a
+        >
       </li>
-      <li class="nav-item" *ngIf="auth.user?.role === 'AGM' || auth.user?.role === 'HO_STAFF' || auth.user?.role === 'DGM' || auth.user?.role === 'AGM_AUDIT' || auth.user?.role === 'AGM_IT' || auth.user?.role === 'AGM_INSURANCE' || auth.user?.role === 'GM'">
-        <a class="nav-link" routerLink="/all-performnace/weightage-all" routerLinkActive="active">Weightage & Increment</a>
+      <li
+        class="nav-item"
+        *ngIf="
+          auth.user?.role === 'AGM' ||
+          auth.user?.role === 'HO_STAFF' ||
+          auth.user?.role === 'DGM' ||
+          auth.user?.role === 'AGM_AUDIT' ||
+          auth.user?.role === 'AGM_IT' ||
+          auth.user?.role === 'AGM_INSURANCE' ||
+          auth.user?.role === 'GM'
+        "
+      >
+        <a
+          class="nav-link"
+          routerLink="/all-performnace/weightage-all"
+          routerLinkActive="active"
+          >Weightage & Increment</a
+        >
       </li>
-       <li class="nav-item" *ngIf="auth.user?.role === 'BM' || auth.user?.role === 'GM'">
-        <a class="nav-link" routerLink="/branch-manager/attender-kpis" routerLinkActive="active">Attender Evaluation</a>
+      <li
+        class="nav-item"
+        *ngIf="auth.user?.role === 'BM' || auth.user?.role === 'GM'"
+      >
+        <a
+          class="nav-link"
+          routerLink="/branch-manager/attender-kpis"
+          routerLinkActive="active"
+          >Attender Evaluation</a
+        >
       </li>
-      
+
       <li class="nav-item">
         <a class="nav-link" (click)="logout()" href="#">Logout</a>
       </li>
     </ul>
-  </div>  
+  </div>
 </nav>

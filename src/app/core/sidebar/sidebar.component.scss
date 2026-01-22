@@ -33,3 +33,13 @@
 .nav {
   padding-top: 20px;
 }
+.sidebar {
+  overflow-y: auto;     
+}
+
+.sidebar::-webkit-scrollbar {
+  display: none;
+}
+.sidebar {
+  scrollbar-width: none;
+}

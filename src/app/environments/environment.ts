@@ -6,7 +6,7 @@ export const environment = {
    * application to a different environment.
    */
   
-        // apiBaseUrl: 'https://kpibackend.kredpool.in/api'
-         apiBaseUrl: 'http://localhost:3000/api'
+      //  apiBaseUrl: 'https://kpibackend.kredpool.in/api'
+           apiBaseUrl: 'http://localhost:3000/api'
 
 };

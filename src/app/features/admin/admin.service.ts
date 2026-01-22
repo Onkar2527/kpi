@@ -185,4 +185,31 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
   deputationStaffReport(data:any){
      return this.http.post(`${environment.apiBaseUrl}/performnceMaster/deputation-report`,data);
   }
+   allBranchReport(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/getAllBranchesScore`,data);
+  }
+    allUsersReport(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/getAllUserReport`,data);
+  }
+   usersBM(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersBM`,data);
+  }
+  usersClerk(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk`,data);
+  }
+  usersHOStaff(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersHOStaff`,data);
+  }
+  usersAttender(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersAttender`,data);
+  }
+  usersAgmGm(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersAgmGm`,data);
+  }
+
+  
+
+  allSectionWiseReport(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/getAllBranchesScoreSectionsWise`,data);
+  }
 }

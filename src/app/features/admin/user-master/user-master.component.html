@@ -59,7 +59,7 @@
           <div class="mb-3">
           <label for="AGMS" class="form-label">DGM/AGM</label>
           <select id="AGMS" class="form-select" [(ngModel)]="user.hod_id" name="hod_id">
-            <option *ngFor="let agm of AGMS" [value]="agm.id">{{ agm.username }}</option>
+            <option *ngFor="let agm of AGMS" [value]="agm.id">{{ agm.name }}</option>
           </select>
         </div>
         </div>

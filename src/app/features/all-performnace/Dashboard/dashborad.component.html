@@ -4,33 +4,33 @@
     <i class="bi bi-speedometer2"></i> Performance Dashboard
   </h3>
 
- 
+
   <div class="row g-4">
 
-    
+
     <div class="col-md-4" (click)="openHOStaffModal()" style="cursor:pointer;">
-    <div class="card shadow-lg border-0 rounded-4 hover-card bg-gradient" style="background: #007bff;">
+      <div class="card shadow-lg border-0 rounded-4 hover-card bg-gradient" style="background: #007bff;">
         <div class="card-body text-white">
-        <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center">
             <div class="me-3">
-            <i class="bi bi-people-fill fs-1"></i>
+              <i class="bi bi-people-fill fs-1"></i>
             </div>
             <div>
-            <h5 class="card-title fw-bold mb-1">Total HO Staff</h5>
-           <h2 class="fw-bolder">
-            <ng-container *ngIf="!isDashboardLoading; else countLoader">
-              {{ totalHOStaffCount }}
-            </ng-container>
-          </h2>
+              <h5 class="card-title fw-bold mb-1">Total HO Staff</h5>
+              <h2 class="fw-bolder">
+                <ng-container *ngIf="!isDashboardLoading; else countLoader">
+                  {{ totalHOStaffCount }}
+                </ng-container>
+              </h2>
 
             </div>
+          </div>
         </div>
-        </div>
-    </div>
+      </div>
     </div>
 
 
-  
+
     <div class="col-md-4" (click)="openBranchesModal()" style="cursor:pointer;">
       <div class="card shadow-lg border-0 rounded-4 hover-card bg-success">
         <div class="card-body text-white">
@@ -41,17 +41,17 @@
             <div>
               <h5 class="card-title fw-bold mb-1">Total Branches</h5>
               <h2 class="fw-bolder">
-              <ng-container *ngIf="!isDashboardLoading; else countLoader">
-                {{ totalBranchesCount }}
-              </ng-container>
-            </h2>
-           </div>
+                <ng-container *ngIf="!isDashboardLoading; else countLoader">
+                  {{ totalBranchesCount }}
+                </ng-container>
+              </h2>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-  
+
     <div class="col-md-4" (click)="openAGMDGMModal()" style="cursor:pointer;">
       <div class="card shadow-lg border-0 rounded-4 hover-card bg-warning">
         <div class="card-body text-dark">
@@ -62,17 +62,17 @@
             <div>
               <h5 class="card-title fw-bold mb-1">AGM / DGM</h5>
               <h2 class="fw-bolder">
-              <ng-container *ngIf="!isDashboardLoading; else countLoader">
-                {{ totalAGMDGMCount }}
-              </ng-container>
-            </h2>
+                <ng-container *ngIf="!isDashboardLoading; else countLoader">
+                  {{ totalAGMDGMCount }}
+                </ng-container>
+              </h2>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-  </div> 
+  </div>
 
 </div>
 
@@ -132,11 +132,12 @@
               <th>Branch Code</th>
               <th>Branch Name</th>
               <th>Branch Score</th>
+
             </tr>
           </thead>
 
           <tbody>
-            <tr *ngFor="let branch of totalBranches">
+            <tr *ngFor="let branch of totalBranches" (click)="reviewBranch(branch)">
               <td>{{ branch.code }}</td>
               <td>{{ branch.name }}</td>
               <td>{{ branch.bmTotalScore | number:'1.2-2' }}</td>
@@ -189,6 +190,59 @@
         <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="branchReportModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <!-- HEADER -->
+      <div class="modal-header bg-primary text-white d-flex align-items-center">
+        <h5>
+          Branch code:{{selectedBranch?.code}}
+        </h5>
+        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal">
+        </button>
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body" id="bmReportContent">
+
+
+        <div *ngIf="bmScores" class="bm-summary">
+
+
+          <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+              <tr>
+                <th>KPI</th>
+                <th>Weightage</th>
+                <th>Target</th>
+                <th>Achieved</th>
+                <th>Score</th>
+                <th>Weightage Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let kpi of ['deposit','loan_gen','loan_amulya','recovery','audit','insurance']">
+                <td>{{ kpi | titlecase }}</td>
+                <td>{{ bmScores[kpi]?.weightage }}</td>
+                <td>{{ bmScores[kpi]?.target | number }}</td>
+                <td>{{ bmScores[kpi]?.achieved | number }}</td>
+                <td>{{ bmScores[kpi]?.score | number:'1.2-2' }}</td>
+                <td>{{ bmScores[kpi]?.weightageScore | number:'1.2-2' }}</td>
+              </tr>
+              <tr class="table-info fw-bold">
+                <td colspan="5">Total</td>
+                <td>{{ bmScores.total | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
     </div>
   </div>
 </div>

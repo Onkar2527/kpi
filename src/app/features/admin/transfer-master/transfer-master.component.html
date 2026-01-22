@@ -31,13 +31,25 @@
             <option *ngFor="let branch of branches" [value]="branch.code">{{ branch.name }}</option>
           </select>
         </div>
-        
-        <div class="mb-3">
-          <label for="newBranch" class="form-label">New Branch</label>
-          <select id="newBranch" class="form-select" [(ngModel)]="transfer.new_branch_id" name="newbranch_id">
-            <option *ngFor="let branch of branches" [value]="branch.code">{{ branch.name }}</option>
-          </select>
+
+        <div class="mb-3 position-relative">
+          <label class="form-label">New Branch</label>
+
+          <!-- Search Input -->
+          <input type="text" class="form-control" placeholder="Type branch name..." [(ngModel)]="branchSearch"
+            [ngModelOptions]="{ standalone: true }" (input)="filterBranches($event)" (focus)="showDropdown = true" />
+
+
+          <!-- Dropdown -->
+          <ul class="list-group position-absolute w-100" *ngIf="showDropdown && filteredBranches.length"
+            style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+            <li class="list-group-item list-group-item-action" *ngFor="let branch of filteredBranches"
+              (click)="selectBranch(branch)">
+              {{ branch.name }}
+            </li>
+          </ul>
         </div>
+
 
         <div class="mb-3">
           <label for="role" class="form-label">Role</label>
@@ -53,7 +65,7 @@
             <option value="GM">GM</option>
           </select>
         </div>
-         <!-- <div class="mb-3">
+        <!-- <div class="mb-3">
           <label for="date" class="form-label">Date of Transfered </label>
           <input type="date" class="form-control" id="date" [(ngModel)]="transfer.transfer_date" name="date"  value="">
         </div> -->

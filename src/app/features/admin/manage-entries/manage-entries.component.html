@@ -1,51 +1,35 @@
 <div class="container mt-4">
-    <h2>Manage KPI Entries</h2>
+  <h2>Manage KPI Entries</h2>
 
   <div class="mb-3">
-    <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Search..."
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearch()"
+    />
+  </div>
+  <div *ngIf="loading" class="d-flex justify-content-center my-5">
+    <div
+      class="spinner-border text-primary"
+      role="status"
+      style="width: 3rem; height: 3rem"
+    >
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
 
-   <!-- <div class="card mb-4" *ngIf="entriesData?.id">
-    <div class="card-header">
-      <h4>Edit Entries</h4>
-    </div>
-    <div class="card-body">
-      <form (ngSubmit)="editEntries()">
-       
-        <div class="mb-3">
-          <label for="account_no" class="form-label">Account Number</label>
-          <input type="text" class="form-control" id="account_no" [(ngModel)]="entriesData.account_no" name="account_no">
-        </div>
-
-        <div class="mb-3">
-          <label for="date" class="form-label">Date</label>
-          <input type="date" class="form-control" id="date" [(ngModel)]="entriesData.date" name="date">
-        </div>
-
-        <div class="mb-3">
-          <label for="kpi" class="form-label">KPI NAME</label>
-          <input type="text" class="form-control" id="kpi" [(ngModel)]="entriesData.kpi" name="kpi">
-        </div>
-
-        <div class="mb-3">
-          <label for="value" class="form-label">Value</label>
-          <input type="text" class="form-control" id="value" [(ngModel)]="entriesData.value" name="value">
-        </div>
-
-        <button type="submit" class="btn btn-primary">Save</button>
-      </form>
-    </div>
-  </div> -->
-
-  
-  <table class="table table-bordered table-striped">
+  <table class="table table-bordered table-striped" *ngIf="!loading">
     <thead class="table-dark">
       <tr>
         <th>Period</th>
         <th>PF No</th>
+        <th>Branch Name</th>
         <th>KPI</th>
         <th>Account No</th>
         <th>Value</th>
+        <th>Type</th>
         <th>Date</th>
         <th>Status</th>
         <th>Actions</th>
@@ -54,84 +38,145 @@
     <tbody>
       <tr *ngFor="let entry of paginatedEntries">
         <td>{{ entry.period }}</td>
-        <td>{{entry.PF_NO}}</td>
+        <td>{{ entry.PF_NO }}</td>
+        <td>{{ entry.branchName }}</td>
         <td>{{ entry.kpi }}</td>
         <td>{{ entry.account_no }}</td>
         <td>{{ entry.value }}</td>
-        <td>{{ entry.date | date:'dd-MM-yyyy' }}</td>
+        <td>{{ entry.type }}</td>
+        <td>{{ entry.date | date: "dd-MM-yyyy" }}</td>
         <td>{{ entry.status }}</td>
         <td>
-           <button class="btn btn-primary btn-sm me-2" (click)="editEntry(entry)">Edit</button>
-          <button class="btn btn-danger btn-sm" (click)="deleteEntry(entry.id)">Delete</button>
+          <button
+            class="btn btn-primary btn-sm me-2"
+            (click)="editEntry(entry)"
+          >
+            Edit
+          </button>
+          <button class="btn btn-danger btn-sm" (click)="deleteEntry(entry.id)">
+            Delete
+          </button>
         </td>
       </tr>
     </tbody>
   </table>
 
- <nav *ngIf="totalPages > 1">
-  <ul class="pagination justify-content-center">
-    <li class="page-item" [class.disabled]="currentPage === 1">
-      <a class="page-link" href="#" (click)="goToPage($event, currentPage - 1)">Previous</a>
-    </li>
+  <nav *ngIf="totalPages > 1">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a
+          class="page-link"
+          href="#"
+          (click)="goToPage($event, currentPage - 1)"
+          >Previous</a
+        >
+      </li>
 
-    <li
-      class="page-item"
-      *ngFor="let page of visiblePages"
-      [class.active]="currentPage === page"
-    >  
-      <a class="page-link" href="#" (click)="goToPage($event, page)">{{ page }}</a>
-    </li>
+      <li
+        class="page-item"
+        *ngFor="let page of visiblePages"
+        [class.active]="currentPage === page"
+      >
+        <a class="page-link" href="#" (click)="goToPage($event, page)">{{
+          page
+        }}</a>
+      </li>
 
-    <li class="page-item" [class.disabled]="currentPage === totalPages">
-      <a class="page-link" href="#" (click)="goToPage($event, currentPage + 1)">Next</a>
-    </li>
-  </ul>
-</nav>
-
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a
+          class="page-link"
+          href="#"
+          (click)="goToPage($event, currentPage + 1)"
+          >Next</a
+        >
+      </li>
+    </ul>
+  </nav>
 </div>
 
 <div class="modal fade" id="editEntriesModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-
       <div class="modal-header">
         <h5 class="modal-title">Edit Entries</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
       </div>
 
       <div class="modal-body">
-
-         <div class="mb-3">
+        <div class="mb-3">
           <label for="account_no" class="form-label">Account Number</label>
-          <input type="text" class="form-control" id="account_no" [(ngModel)]="entriesData.account_no" name="account_no" minlength="14" maxlength="14">
+          <ng-container
+            *ngIf="
+              entriesData.kpi === 'deposit' || entriesData.kpi === 'loan_gen';
+              else otherKpi
+            "
+          >
+            <input
+              type="text"
+              class="form-control"
+              id="account_no"
+              [(ngModel)]="entriesData.account_no"
+              name="account_no"
+              minlength="14"
+              maxlength="14"
+            />
+          </ng-container>
+          <ng-template #otherKpi>
+            <input
+              type="text"
+              class="form-control"
+              id="account_no"
+              [(ngModel)]="entriesData.account_no"
+              name="account_no"
+            />
+          </ng-template>
         </div>
 
         <div class="mb-3">
           <label for="date" class="form-label">Date</label>
-          <input type="date" class="form-control" id="date" [(ngModel)]="entriesData.date" name="date">
+          <input
+            type="date"
+            class="form-control"
+            id="date"
+            [(ngModel)]="entriesData.date"
+            name="date"
+          />
         </div>
 
         <div class="mb-3">
           <label for="kpi" class="form-label">KPI NAME</label>
-          <input type="text" class="form-control" id="kpi" [(ngModel)]="entriesData.kpi" name="kpi">
+          <input
+            type="text"
+            class="form-control"
+            id="kpi"
+            [(ngModel)]="entriesData.kpi"
+            name="kpi"
+          />
         </div>
 
         <div class="mb-3">
           <label for="value" class="form-label">Value</label>
-          <input type="text" class="form-control" id="value" [(ngModel)]="entriesData.value" name="value">
+          <input
+            type="text"
+            class="form-control"
+            id="value"
+            [(ngModel)]="entriesData.value"
+            name="value"
+          />
         </div>
-
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-
-        <button class="btn btn-primary"  (click)="editEntries()">
-          Update
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
         </button>
 
+        <button class="btn btn-primary" (click)="editEntries()">Update</button>
       </div>
-
     </div>
   </div>
 </div>

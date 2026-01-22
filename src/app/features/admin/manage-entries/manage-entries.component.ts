@@ -26,6 +26,7 @@ export class manageEntriesComponent implements OnInit {
   modal: any;
   toastMessage: string = '';
   entriesData={ id:'', kpi:'', account_no:'', value:'', date:''  };
+  loading: boolean = false;
   constructor(
     private adminService: AdminService,
     private searchService: SearchService,
@@ -37,7 +38,7 @@ export class manageEntriesComponent implements OnInit {
     this.getPeriod();
   }
   editEntries() {
-    if(this.entriesData.account_no.length < 14){
+    if(this.entriesData.account_no.length !== 14 && (this.entriesData.kpi==='deposit' || this.entriesData.kpi==='loan_gen')){
       this.showToast('Account Number must be 14 digits long');
       return;
     }
@@ -54,21 +55,23 @@ export class manageEntriesComponent implements OnInit {
       if (this.period) {
         this.loadEntries();
       }
-    });
+    }); 
   }
 
   loadEntries() {
+    this.loading = true;
     this.adminService.getMonthEntries(this.period).subscribe((response: any) => {
       const data = response as any[];
       data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       this.entries = data;
       this.onSearch();
+      this.loading = false;
     });
   }
 
   onSearch(): void {
-    this.filteredEntries = this.searchService.filterData(this.entries, this.searchTerm);
-    this.totalPages = this.paginationService.getTotalPages(this.filteredEntries, this.pageSize);
+    this.filteredEntries = this.searchService.filterByBranchSearch(this.entries, this.searchTerm);    
+   this.totalPages = this.paginationService.getTotalPages(this.filteredEntries, this.pageSize);
     this.updatePaginatedEntries();
     this.updateVisiblePages(); 
   }

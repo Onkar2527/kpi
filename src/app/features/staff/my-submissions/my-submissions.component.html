@@ -39,6 +39,7 @@
         <th>KPI</th>
         <th>Account Number</th>
         <th>Value</th>
+        <th>Type</th>
         <th>Date</th>
         <th>Status</th>
       </tr>
@@ -48,6 +49,7 @@
         <td>{{ sub.kpi }}</td>
         <td>{{ sub.account_no }}</td>
         <td>{{ sub.value }}</td>
+        <td>{{ sub.type }}</td>
         <td>{{ sub.date | date:'dd-MM-yyyy' }}</td>
         <td>
           <span class="badge" [ngClass]="{

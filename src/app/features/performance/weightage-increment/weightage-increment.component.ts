@@ -31,6 +31,7 @@ export class WeightageIncrementComponent implements OnInit {
   history1: any;
   transferBmScores: any;
   attenderScores:any;
+  bmtransferSum:any;
   constructor(
     private performanceService: PerformanceService,
     public auth: AuthService,
@@ -78,8 +79,8 @@ export class WeightageIncrementComponent implements OnInit {
  
   getSalary(period: any, PF_NO: any) {
     this.performanceService.getSalary(period, PF_NO).subscribe((data: any) => {
-      this.BMsalary = data[0].salary || 0;
-      this.BMincrementAmt = data[0].increment || 0;
+      this.BMsalary = data[0]?.salary || 0;
+      this.BMincrementAmt = data[0]?.increment || 0;
     });
   }
   gettrasferBMScore(period: string, branchId: string){
@@ -114,7 +115,13 @@ export class WeightageIncrementComponent implements OnInit {
     if (!this.bmScores) {
       return 0;
     }
-    const score = this.bmScores.total || 8;
+    const bmSum = this.bmtransferSum?.sum ?? 0;
+    const transferTotal = this.transferBmScores?.total ?? 0;
+    const transferCount=this.bmtransferSum?.count?? 0;
+    const score = (bmSum + transferTotal) / (transferCount + 1) || 0;
+
+    console.log(score);
+    
     if (score < 5) {
       return 0;
     }
@@ -140,6 +147,20 @@ export class WeightageIncrementComponent implements OnInit {
       .subscribe((data: any) => {
         if (Array.isArray(data) && data.length > 0) {
           this.history = data[0];
+         this.bmtransferSum = data.reduce(
+            (acc: any, staff: any) => {
+              staff.transfers?.forEach((t: any) => {
+                const score = Number(t.total_weightage_score);
+                if (!isNaN(score)) {
+                  acc.sum += score;
+                  acc.count++;
+                }
+              });
+              return acc;
+            },
+            { sum: 0, count: 0 }
+          );
+          
         } else {
           this.history = null;
         }
