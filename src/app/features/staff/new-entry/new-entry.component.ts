@@ -99,7 +99,7 @@ isSubmitted = false;
       date: this.date,
 
     };
-    console.log('Submitting entry:', entry);
+    
     this.staffService.submitNewEntry(entry).subscribe({
     next: () => {
       this.sharedService.notifyEntryVerified();

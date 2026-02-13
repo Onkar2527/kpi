@@ -35,11 +35,15 @@ export class AllPerformanceService {
   getAllKpiRoleWise(role:any){
     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/getKpiRoleWise`, role);
   }
-   getSpecificALLScores(period: string, ho_staff_id: string, role: string) {
-    return this.http.get(`${environment.apiBaseUrl}/performnceMaster/specfic-ALLstaff-scores?period=${period}&ho_staff_id=${ho_staff_id}&role=${role}`);
+   getSpecificALLScores(period: string, ho_staff_id: string, role: string,hod_id:any) {
+    return this.http.get(`${environment.apiBaseUrl}/performnceMaster/specfic-ALLstaff-scores?period=${period}&ho_staff_id=${ho_staff_id}&role=${role}&hod_id=${hod_id}`);
   }
   getDashbroadCount(hod_id:any,period:any){
      return this.http.post(`${environment.apiBaseUrl}/performnceMaster/get-Total-Ho_staff-details`,{hod_id,period});
 
   }
+  getHoStaffHistory(period: string, ho_staff_id: string) {
+    return this.http.get(`${environment.apiBaseUrl}/performnceMaster/ho_staff_transfer_history?period=${period}&ho_staff_id=${ho_staff_id}`);
+  }
+  
 }

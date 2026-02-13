@@ -34,7 +34,12 @@ export class PerformanceService {
         return this.http.get(`${environment.apiBaseUrl}/summary/get-salary-all-staff?period=${period}&branch_id=${branch_id}`);
   }
   getAttenderScores(period: string, branchId: string,hod_id:String){
-        return this.http.get(`${environment.apiBaseUrl}/summary/branch-attenders?period=${period}&branchId=${branchId}&hod_id=${hod_id}`);
+        return this.http.get(`${environment.apiBaseUrl}/summary/branch-attenders?period=${period}&branchId=${branchId}&hod_id=${hod_id}&staff_id=${null}`);
   }
-  
+   getAttenderScore(period: string, staff_id:string){
+        return this.http.get(`${environment.apiBaseUrl}/summary/branch-attenders?period=${period}&branchId=${null}&hod_id=${null}&staff_id=${staff_id}`);
+  }
+  getAttenderTransferScore(period: string, staff_id:string){
+        return this.http.get(`${environment.apiBaseUrl}/performnceMaster/attender_transfer_history?period=${period}&staff_id=${staff_id}`);
+  }
 }

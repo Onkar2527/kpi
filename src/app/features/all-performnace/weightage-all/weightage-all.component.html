@@ -29,11 +29,44 @@
           <tr>
             <td><strong>Total</strong></td>
             <td colspan="3"></td>
-            <td><strong>{{ hostaffScores.total | number:'1.2-2' }}</strong></td>
+            <td><strong>{{
+                getAverageKpi() === 0 ?
+               (hostaffScores.total | number:'1.2-2')
+               : (getAverageKpi() | number:'1.2-2')
+               }}</strong></td>
           </tr>
         </tbody>
       </table>
     </div>
+     <div class="card " *ngIf="hasBranchData(selectedEmployee?.branch_name)">
+
+    <div class="card-header">
+      <h4> Transfer Branch History</h4>
+    </div>
+
+    <div class="card-body">
+
+      <div *ngFor="let item of selectedEmployee.branch_name | keyvalue">
+        <b>{{ item.key }}</b> :
+        {{ +$any(item.value).avg_kpi | number:'1.2-2' }}
+        ({{ $any(item.value).months }} months)
+      </div>
+
+      <div class="mt-2">
+        <b>Total Average KPI Score:</b>
+        (
+        <ng-container *ngFor="let item of selectedEmployee.branch_name | keyvalue">
+          {{ +$any(item.value).avg_kpi | number:'1.2-2' }} +
+        </ng-container>
+        {{ hostaffScores.total | number:'1.2-2' }}
+        )
+        /
+        {{ (selectedEmployee.branch_name | keyvalue).length + 1 }}
+        = <b>{{ getAverageKpi() | number:'1.2-2' }}</b>
+      </div>
+     
+    </div>
+  </div>
   </div>
   <div class="card mt-4" *ngIf="auth.user?.role === 'HO_STAFF' && !hostaffScores">
     <div class="card-header bg-info text-white">
@@ -95,7 +128,8 @@
             <td colspan="3"></td>
             <td><strong> <ng-container *ngIf="!isHodScoreLoading; else textLoader">
                   {{ hodTotalScore | number:'1.2-2' }}
-                </ng-container></strong></td>
+                </ng-container></strong>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -187,7 +221,11 @@
             <tr>
               <td><strong>Total</strong></td>
               <td colspan="3"></td>
-              <td><strong>{{ selectedEmployee.total | number : '1.2-2' }}</strong></td>
+              <td><strong>{{
+                  getAverageKpi() === 0 ?
+                  (selectedEmployee.total | number : '1.2-2')
+                  : (getAverageKpi() | number : '1.2-2')
+                 }}</strong></td>
             </tr>
           </tbody>
         </table>
@@ -198,7 +236,36 @@
         </div>
       </form>
     </div>
+    <div class="card" *ngIf="hasBranchData(selectedEmployee?.branch_name)">
 
+    <div class="card-header">
+      <h4>{{ selectedEmployee.name }} Transfer Branch History</h4>
+    </div>
+
+    <div class="card-body">
+
+      <div *ngFor="let item of selectedEmployee.branch_name | keyvalue">
+        <b>{{ item.key }}</b> :
+        {{ +$any(item.value).avg_kpi | number:'1.2-2' }}
+        ({{ $any(item.value).months }} months)
+      </div>
+
+      <div class="mt-2">
+        <b>Total Average KPI Score:</b>
+        (
+        <ng-container *ngFor="let item of selectedEmployee.branch_name | keyvalue">
+          {{ +$any(item.value).avg_kpi | number:'1.2-2' }} +
+        </ng-container>
+        {{ selectedEmployee.total | number:'1.2-2' }}
+        )
+        /
+        {{ (selectedEmployee.branch_name | keyvalue).length + 1 }}
+        = <b>{{ getAverageKpi() | number:'1.2-2' }}</b>
+      </div>
+     
+    </div>
+  </div>
+     
     <div class="card mt-4">
       <div class="card-header">
         <h4>Salary Details</h4>
@@ -232,178 +299,96 @@
     </div>
 
   </div>
+ 
+<div class="card mt-4" *ngIf="clerkHistory || hostaffScores1?.transfers?.length > 0">
 
-  <!-- GM KPI VIEW -->
-  <!-- <div class="card mt-4" *ngIf="auth.user?.role === 'GM' && AGMArray ">
-    <div class="card-header bg-info text-white">
-      <h4>{{auth.user?.role}} KPI Scores</h4>
-    </div>
-    <div class="card-body">
-      <table class="table table-bordered table-striped">
+  <div class="card-header">
+    <h4>KPI Transfer History</h4>
+  </div>
+
+  <div class="card-body">
+
+    <small>
+      <strong>Staff:</strong> {{ mergeHistoryed?.name }} |
+      <strong>Period:</strong> {{ mergeHistoryed?.period }} |
+      <!-- <strong>Total Months:</strong> {{ mergeHistoryed.total_months }} -->
+    </small>
+
+    <!-- TRANSFER LOOP -->
+    <div *ngFor="let transfer of mergeHistoryed?.transfers; let i = index"
+         class="border rounded p-3 mb-4 shadow-sm mt-3">
+
+      <h5 class="text-primary mb-3">
+        Transfer {{ i + 1 }} —
+        <span class="text-secondary">
+          {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
+        </span>
+      </h5>
+      <p *ngIf="transfer.hod_name" class="mb-2 text-muted">
+        Approved by HOD:
+        <strong>{{ transfer.hod_name }}</strong>
+      </p>
+      <!-- Branch Info (only if exists) -->
+      <p *ngIf="transfer.old_branch_name">
+        <strong>Old Branch:</strong>
+        {{ transfer.old_branch_name }} |
+        <strong>Old Designation:</strong>
+        {{ transfer.old_designation }}
+      </p>
+
+      <p *ngIf="transfer.new_branch_name">
+        <strong>New Branch:</strong>
+        {{ transfer.new_branch_name }} |
+        <strong>New Designation:</strong>
+        {{ transfer.new_designation }}
+      </p>
+
+      <!-- KPI TABLE -->
+      <table class="table table-bordered table-striped mt-3">
         <thead class="table-dark">
-        <tr>
-          <th>AGM/DGM Name</th>
-          <th>Weightage</th>
-          <th>Total Score</th>
-          <th>Weightage Score</th>
-        </tr>
+          <tr>
+            <th>KPI</th>
+            <th>Weightage</th>
+            <th>Target</th>
+            <th>Achieved</th>
+            <th>Score</th>
+            <th>Weightage Score</th>
+          </tr>
         </thead>
+
         <tbody>
-          <tr *ngFor="let agm of AGMArray">
-          <td>{{ agm.name }}</td>
-          <td>{{ agm.weightage | number:'1.2-2' }}</td>
-          <td>{{ agm.total_score | number:'1.2-2' }}</td>
-          <td>{{ agm.weightageScore | number:'1.2-2' }}</td>
-        </tr>
-           <tr>
+
+        <ng-container *ngFor="let kpi of getKpis(transfer)">
+          <tr *ngIf="kpi !== 'hod_name' && kpi!=='old_hod_name'">
+            <td>{{ kpi | titlecase }}</td>
+            <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+            <td>{{ transfer[kpi]?.target || '-' }}</td>
+            <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+            <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+            <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+          </tr>
+        </ng-container>
+
+
+          <tr class="table-info">
             <td><strong>Total</strong></td>
-            <td colspan="1"></td>
-            <td>{{ totalAGMsScore | number:'1.2-2' }}</td>
-            <td><strong>{{ gmFinalTotal | number:'1.2-2' }}</strong></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div> -->
-  <!-- <div class="card mt-4" *ngIf="auth.user?.role === 'GM'">
-    <div class="card-header">
-      <h4>Salary Details</h4>
-    </div>
-    <div class="card-body">
-      <table class="table table-bordered">
-        <thead class="table-info">
-          <tr>
-            <th>Designation</th>
-            <th>Basic Inc.</th>
-            <th>Increment Basic.</th>
-            <th>KPI Based</th>
-            <th>Tot. Basic</th>
-            <th>DA</th>
-            <th>Tot. Salary</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{{auth.user?.role}}</td>
-            <td>{{ GMsalary | number : '1.2-2' }}</td>
-            <td>{{ GMincrementAmt | number : '1.2-2' }}</td>
-            <td>{{ calculateGMKpiBasedIncrement() | number : '1.2-2' }}</td>
-            <td>{{ calculateGMTotalSalary() | number : '1.2-2' }}</td>
-            <td>25%</td>
-            <td>{{finalGmSalary() | number:'1.2-2'}}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div> -->
-
-  <!-- All AGM-DGM KPIS-->
-  <!-- <div class="card mt-4" *ngIf="auth.user?.role === 'GM' && agmScore">
-    <div class="card-header">
-      <h4>AGM/DGM KPI Scores (out of 10)</h4>
-      <div class="d-flex flex-wrap">
-        <div *ngFor="let score of agmScore" class="chip" [class.selected]="score === selectedEmployee"
-          (click)="selectEmployee(score)">
-          {{ score.name }}
-        </div>
-      </div>
-    </div>
-<div class="card-body" *ngIf="selectedEmployee">
-  <form (ngSubmit)="submitScores()">
-    <table class="table table-bordered table-striped">
-      <thead class="table-dark">
-        <tr>
-          <th>KPI</th>
-          <th>Weightage</th>
-          <th>Achieved</th>
-          <th>Out of 10</th>
-          <th>Weightage Score</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let kpi of kpiListAGM">
-          <td>{{ kpi.kpi_name }}</td>
-          <td>{{ selectedEmployee.kpis[kpi.kpi_name]?.weightage ?? 0 }}</td>
-          <td
-            *ngIf="
-              kpi.kpi_name === 'Insurance' ||
-              kpi.kpi_name === 'Section Work Efficiency' ||
-              kpi.kpi_name === 'Incharge Branch Performance & Visits';
-              else normalInput
-            "
-           
-          >
-            {{ selectedEmployee.kpis[kpi.kpi_name]?.achieved ?? 0 | number:'1.2-2' }}
-          </td>
-          <ng-template #normalInput>
+            <td colspan="4"></td>
             <td>
-              <input
-                type="number"
-                class="form-control"
-                [(ngModel)]="selectedEmployee.kpis[kpi.kpi_name].achieved"
-                [ngModelOptions]="{ standalone: true }"
-                min="0"
-                max="999999"
-              />
+              <strong>
+                {{ transfer.total_weightage_score | number:'1.2-2' }}
+              </strong>
             </td>
-          </ng-template>
-          <td>{{ selectedEmployee.kpis[kpi.kpi_name]?.score ?? 0 | number:'1.2-2' }}</td>
-          <td>{{ selectedEmployee.kpis[kpi.kpi_name]?.weightageScore ?? 0 | number:'1.2-2' }}</td>
-        </tr>
-        <tr>
-          <td><strong>Total</strong></td>
-          <td colspan="3"></td>
-          <td>
-            <strong>{{ selectedEmployee.total ?? 0 | number:'1.2-2' }}</strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </tr>
 
-    <div class="text-end mt-3">
-      <button class="btn text-white bg-primary" type="submit">
-        {{ selectedEmployee?.achieved === 0 ? 'Save' : 'Update' }}
-      </button>
+        </tbody>
+      </table>
+
     </div>
-  </form>
+
+   
+
+  </div>
 </div>
-
-
-    <div class="card mt-4">
-      <div class="card-header">
-        <h4>Salary Details</h4>
-      </div>
-      <div class="card-body">
-        <table class="table table-bordered">
-          <thead class="table-info">
-            <tr>
-              <th>Designation</th>
-              <th>Basic Inc.</th>
-              <th>Increment Basic.</th>
-              <th>KPI Based</th>
-              <th>Tot. Basic</th>
-              <th>DA</th>
-              <th>Tot. Salary</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{{selectedEmployee?.role}}</td>
-              <td>{{ HOsalary | number : '1.2-2' }}</td>
-              <td>{{ HOincrementAmt | number : '1.2-2' }}</td>
-              <td>{{ calculateKpiBasedIncrement() | number : '1.2-2' }}</td>
-              <td>{{ calculateTotalSalary() | number : '1.2-2' }}</td>
-              <td>25%</td>
-              <td>{{finalSalary() | number:'1.2-2'}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </div> -->
-
 
   <ng-container *ngIf="auth.user?.role === 'GM'">
 

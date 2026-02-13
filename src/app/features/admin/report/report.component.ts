@@ -128,15 +128,15 @@ export class ReportsComponent implements OnInit {
   ];
 
   periods = ['2025-26', '2026-27', '2027-28'];
-sortAllUsers() {
-  this.ALLTotalUser.sort((a: any, b: any) => {
-    const roleA = this.roleOrder[a.role] ?? 99;
-    const roleB = this.roleOrder[b.role] ?? 99;
-    return roleA - roleB;
-  });
-}
-loadingStageText :any;
-          loadingPercent :any;
+  sortAllUsers() {
+    this.ALLTotalUser.sort((a: any, b: any) => {
+      const roleA = this.roleOrder[a.role] ?? 99;
+      const roleB = this.roleOrder[b.role] ?? 99;
+      return roleA - roleB;
+    });
+  }
+  loadingStageText: any;
+  loadingPercent: any;
   selectedRow: any = null;
   selectedPf = '';
   selectedPeriod = '';
@@ -166,13 +166,13 @@ loadingStageText :any;
   branchdepartment = [
     { id: '1', department: 'deposit' },
     { id: '2', department: 'loan_gen' },
-    { id: '3', department: 'loan_amulya'},
+    { id: '3', department: 'loan_amulya' },
     { id: '4', department: 'recovery' },
     { id: '5', department: 'audit' },
     { id: '6', department: 'insurance' },
   ];
 
-   deputationStaffDepartmentList = [
+  deputationStaffDepartmentList = [
     { id: '1', department: 'All' },
     { id: '2', department: 'JES School' },
     { id: '3', department: 'Jyoti Society' },
@@ -200,28 +200,25 @@ loadingStageText :any;
   constructor(
     private adminService: AdminService,
     private performanceService: PerformanceService,
-    private all_performanceService: AllPerformanceService
+    private all_performanceService: AllPerformanceService,
   ) {}
 
- ngAfterViewInit() {
-  const modals = document.querySelectorAll('.modal');
+  ngAfterViewInit() {
+    const modals = document.querySelectorAll('.modal');
 
-  modals.forEach((modal: any) => {
-    const modalId = modal.getAttribute('id');
+    modals.forEach((modal: any) => {
+      const modalId = modal.getAttribute('id');
 
-    if (modalId !== 'pfModal') {
-      modal.addEventListener('hidden.bs.modal', () => {
-        location.reload();
-      });
-    }
-  });
-}
-
-
+      if (modalId !== 'pfModal') {
+        modal.addEventListener('hidden.bs.modal', () => {
+          location.reload();
+        });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.loadUsers();
-
   }
   isSaveDisabled(): boolean {
     if (!this.selectedPeriod) {
@@ -235,7 +232,10 @@ loadingStageText :any;
       return false;
     }
 
-    if (this.selectedRow?.type === 'deputation_staff' || this.selectedRow?.type === 'Department_Wise') {
+    if (
+      this.selectedRow?.type === 'deputation_staff' ||
+      this.selectedRow?.type === 'Department_Wise'
+    ) {
       return !this.selectedDepartment;
     }
 
@@ -280,7 +280,10 @@ loadingStageText :any;
     if (this.selectedRow) {
       this.selectedRow.pf = this.selectedPf;
       this.selectedRow.period = this.selectedPeriod;
-      if (this.selectedRow.type === 'deputation_staff' || this.selectedRow.type === 'Department_Wise') {
+      if (
+        this.selectedRow.type === 'deputation_staff' ||
+        this.selectedRow.type === 'Department_Wise'
+      ) {
         this.selectedRow.department = this.selectedDepartment;
       }
     }
@@ -295,22 +298,31 @@ loadingStageText :any;
     });
   }
 
-serachBranchID(pfNo: any) {
-  if (!Array.isArray(this.users)) {
-    return null;
+  serachBranchID(pfNo: any) {
+    if (!Array.isArray(this.users)) {
+      return null;
+    }
+
+    return (
+      this.users.find((u: any) => String(u.PF_NO) === String(pfNo)) || null
+    );
   }
+  serachBranchID1(branchCode: any) {
+    if (!Array.isArray(this.users)) {
+      return null;
+    }
 
-  return this.users.find(
-    (u: any) => String(u.PF_NO) === String(pfNo)
-  ) || null;
-}
-
+    return (
+      this.users.find((u: any) => String(u.branch_id) === String(branchCode) && u.role === 'BM') ||
+      null
+    );
+  }
 
   AGMDGMFunction(
     hodRole: 'AGM' | 'AGM_IT' | 'AGM_AUDIT' | 'AGM_INSURANCE' | 'DGM' | 'GM',
     staffRole: 'HO_STAFF',
     period: string,
-    hodId: string
+    hodId: string,
   ) {
     return Promise.all([
       this.all_performanceService
@@ -330,15 +342,15 @@ serachBranchID(pfNo: any) {
         .toPromise(),
     ]);
   }
-isAllUsersLoading = false;
-isGMLoading = false;
+  isAllUsersLoading = false;
+  isGMLoading = false;
   generateReport(row: any) {
-    this.entredUserData = this.serachBranchID(row.pf);
+    this.entredUserData = this.serachBranchID1(row.pf);
+
     if (row.type === 'BM') {
-      console.log(this.entredUserData.role);
-      
-      if(this.entredUserData.role!=='BM'){
-        this.showToast('Enter valid PF No Number');
+    
+      if (this.entredUserData.role !== 'BM') {
+        this.showToast('Enter valid branch code ');
         return;
       }
       this.performanceService
@@ -353,13 +365,13 @@ isGMLoading = false;
         });
 
       const modal = new bootstrap.Modal(
-        document.getElementById('bmReportModal')
+        document.getElementById('bmReportModal'),
       );
       modal.show();
     } else if (row.type === 'AGM') {
       this.entredUserData = this.serachBranchID(row.pf);
-      
-      if(this.entredUserData.role!=='AGM'){
+
+      if (this.entredUserData.role !== 'AGM') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -373,19 +385,17 @@ isGMLoading = false;
         'AGM',
         'HO_STAFF',
         this.selectedPeriod,
-        this.entredUserData.id
+        this.entredUserData.id,
       )
         .then(([agmRes, staffRes, agmKpis, hoStaffKpis]: any[]) => {
           this.agmScores = agmRes?.kpis;
           this.agmtotal = agmRes?.total ?? 0;
-      
-          
-          this.hoStaffScore = staffRes ;
+
+          this.hoStaffScore = staffRes;
 
           this.agmkpiList = agmKpis?.data || [];
           this.hostaffKpiList = hoStaffKpis?.data || [];
 
-      
           const modalEl = document.getElementById('agmReportModal');
           if (modalEl) {
             new bootstrap.Modal(modalEl).show();
@@ -396,7 +406,7 @@ isGMLoading = false;
         });
     } else if (row.type === 'AGM_IT') {
       this.entredUserData = this.serachBranchID(row.pf);
-      if(this.entredUserData.role!=='AGM_IT'){
+      if (this.entredUserData.role !== 'AGM_IT') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -405,7 +415,7 @@ isGMLoading = false;
         'AGM_IT',
         'HO_STAFF',
         this.selectedPeriod,
-        this.entredUserData.id
+        this.entredUserData.id,
       ).then(([agmRes, staffRes, agmKpis, hoStaffKpis]: any) => {
         this.agmScores = agmRes.kpis;
         this.agmtotal = agmRes.total;
@@ -420,7 +430,7 @@ isGMLoading = false;
       });
     } else if (row.type === 'AGM_AUDIT') {
       this.entredUserData = this.serachBranchID(row.pf);
-      if(this.entredUserData.role!=='AGM_AUDIT'){
+      if (this.entredUserData.role !== 'AGM_AUDIT') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -429,7 +439,7 @@ isGMLoading = false;
         'AGM_AUDIT',
         'HO_STAFF',
         this.selectedPeriod,
-        this.entredUserData.id
+        this.entredUserData.id,
       ).then(([agmRes, staffRes, agmKpis, hoStaffKpis]: any) => {
         this.agmScores = agmRes.kpis;
         this.agmtotal = agmRes.total;
@@ -445,11 +455,16 @@ isGMLoading = false;
     } else if (row.type === 'AGM_INSURANCE') {
       this.entredUserData = this.serachBranchID(row.pf);
 
+      if (this.entredUserData.role !== 'AGM_INSURANCE') {
+        this.showToast('Enter valid PF No Number');
+        return;
+      }
+
       this.AGMDGMFunction(
         'AGM_INSURANCE',
         'HO_STAFF',
         this.selectedPeriod,
-        this.entredUserData.id
+        this.entredUserData.id,
       ).then(([agmRes, staffRes, agmKpis, hoStaffKpis]: any) => {
         this.agmScores = agmRes.kpis;
         this.agmtotal = agmRes.total;
@@ -464,7 +479,7 @@ isGMLoading = false;
       });
     } else if (row.type === 'DGM') {
       this.entredUserData = this.serachBranchID(row.pf);
-      if(this.entredUserData.role!=='DGM'){
+      if (this.entredUserData.role !== 'DGM') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -473,7 +488,7 @@ isGMLoading = false;
         'DGM',
         'HO_STAFF',
         this.selectedPeriod,
-        this.entredUserData.id
+        this.entredUserData.id,
       ).then(([agmRes, staffRes, agmKpis, hoStaffKpis]: any) => {
         this.agmScores = agmRes.kpis;
         this.agmtotal = agmRes.total;
@@ -488,7 +503,7 @@ isGMLoading = false;
       });
     } else if (row.type === 'GM') {
       this.entredUserData = this.serachBranchID(row.pf);
-      if(this.entredUserData.role!=='GM'){
+      if (this.entredUserData?.role !== 'GM') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -518,12 +533,12 @@ isGMLoading = false;
 
             this.totalAGMsScore = data.reduce(
               (acc: number, x: any) => acc + x.total,
-              0
+              0,
             );
 
             this.gmFinalTotal = this.AGMArray.reduce(
               (acc: number, x: any) => acc + x.weightageScore,
-              0
+              0,
             );
 
             this.isGMLoading = false;
@@ -540,7 +555,7 @@ isGMLoading = false;
       }
     } else if (row.type === 'HO') {
       this.entredUserData = this.serachBranchID(row.pf);
-      if(this.entredUserData.role!=='HO_STAFF'){
+      if (this.entredUserData.role !== 'HO_STAFF') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -549,7 +564,8 @@ isGMLoading = false;
         .getSpecificALLScores(
           this.selectedPeriod,
           this.entredUserData.id,
-          'HO_STAFF'
+          'HO_STAFF',
+          this.entredUserData.hod_id,
         )
         .subscribe((data: any) => {
           this.singleHoStaffScore = data;
@@ -561,7 +577,14 @@ isGMLoading = false;
       }
     } else if (row.type === 'In_charge') {
       this.entredUserData = this.serachBranchID(row.pf);
-      if(this.entredUserData.role!=='AGM' && this.entredUserData.role!=='DGM' && this.entredUserData.role!=='GM' && this.entredUserData.role!=='AGM_AUDIT' && this.entredUserData.role!=='AGM_IT' && this.entredUserData.role!=='AGM_INSURANCE'){
+      if (
+        this.entredUserData.role !== 'AGM' &&
+        this.entredUserData.role !== 'DGM' &&
+        this.entredUserData.role !== 'GM' &&
+        this.entredUserData.role !== 'AGM_AUDIT' &&
+        this.entredUserData.role !== 'AGM_IT' &&
+        this.entredUserData.role !== 'AGM_INSURANCE'
+      ) {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -583,125 +606,149 @@ isGMLoading = false;
         new bootstrap.Modal(modalEl).show();
       }
     } else if (row.type === 'all_branch') {
+      const data = { period: this.selectedPeriod };
 
-  const data = { period: this.selectedPeriod };
+      this.isAllBranchLoading = true;
 
-  this.isAllBranchLoading = true; 
+      this.adminService.allBranchReport(data).subscribe({
+        next: (data: any) => {
+          this.ALLtotalBranches = data.totalBranches;
+          this.ALLtotalBranchesCount = data.totalBranchesCount;
 
-  this.adminService.allBranchReport(data).subscribe({
-    next: (data: any) => {
-      this.ALLtotalBranches = data.totalBranches;
-      this.ALLtotalBranchesCount = data.totalBranchesCount;
+          this.isAllBranchLoading = false;
+        },
+        error: (err) => {
+          console.error('load failed', err);
+          this.totalBranchesCount = 0;
 
-      this.isAllBranchLoading = false;  
-    },
-    error: (err) => {
-      console.error('load failed', err);
-      this.totalBranchesCount = 0;
+          this.isAllBranchLoading = false;
+        },
+      });
 
-      this.isAllBranchLoading = false; 
-    },
-  });
-  
+      const modalEl = document.getElementById('allBranchReportModal');
+      if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+      }
+    } else if (row.type === 'all_users') {
+      const data = { period: this.selectedPeriod };
 
-  const modalEl = document.getElementById('allBranchReportModal');
-  if (modalEl) {
-    new bootstrap.Modal(modalEl).show();
-  }
-}
-else if (row.type === 'all_users') {
+      this.isAllUsersLoading = true;
+      this.ALLTotalUser = [];
+      this.loadingPercent = 5;
+      this.loadingStageText = 'Loading BM...';
 
-  const data = { period: this.selectedPeriod };
+      const modalEl = document.getElementById('allusersReportModal');
+      if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+      }
 
-  this.isAllUsersLoading = true;
-  this.ALLTotalUser = [];
-  this.loadingPercent = 0;
-  this.loadingStageText = 'Loading BM...';
-
-  /* ---------- OPEN MODAL ---------- */
-  const modalEl = document.getElementById('allusersReportModal');
-  if (modalEl) {
-    new bootstrap.Modal(modalEl).show();
-  }
-
-  /* ---------- BM ---------- */
-  this.adminService.usersBM(data).subscribe({
-    next: (r1: any) => {
-      this.ALLTotalUser.push(...(r1.users || []));
-      this.sortAllUsers();
-      this.loadingPercent = 20;
-      this.loadingStageText = 'Loading Clerks...';
-
-      /* ---------- CLERK ---------- */
-      this.adminService.usersClerk(data).subscribe({
-        next: (r2: any) => {
-          this.ALLTotalUser.push(...(r2.users || []));
+      this.adminService.usersBM(data).subscribe({
+        next: (r1: any) => {
+          this.ALLTotalUser.push(...(r1.users || []));
           this.sortAllUsers();
-          this.loadingPercent = 40;
-          this.loadingStageText = 'Loading HO Staff...';
+          this.loadingPercent = 20;
+          this.loadingStageText = 'Loading Clerks...';
 
-          /* ---------- HO STAFF ---------- */
-          this.adminService.usersHOStaff(data).subscribe({
-            next: (r3: any) => {
-              this.ALLTotalUser.push(...(r3.users || []));
+          this.adminService.usersClerk(data).subscribe({
+            next: (r2: any) => {
+              this.ALLTotalUser.push(...(r2.users || []));
               this.sortAllUsers();
-              this.loadingPercent = 60;
-              this.loadingStageText = 'Loading Attenders...';
-
-              /* ---------- ATTENDER ---------- */
-              this.adminService.usersAttender(data).subscribe({
-                next: (r4: any) => {
-                  this.ALLTotalUser.push(...(r4.users || []));
+              this.loadingPercent = 30;
+              this.loadingStageText = 'Loading HO Staff...';
+              this.adminService.usersClerk1(data).subscribe({
+                next: (r3: any) => {
+                  this.ALLTotalUser.push(...(r3.users || []));
                   this.sortAllUsers();
-                  this.loadingPercent = 80;
-                  this.loadingStageText = 'Loading AGM & GM...';
-
-                  /* ---------- AGM + GM ---------- */
-                  this.adminService.usersAgmGm(data).subscribe({
-                    next: (r5: any) => {
-                      this.ALLTotalUser.push(...(r5.users || []));
+                  this.loadingPercent = 40;
+                  this.loadingStageText = 'Loading HO Staff...';
+                  this.adminService.usersClerk2(data).subscribe({
+                    next: (r4: any) => {
+                      this.ALLTotalUser.push(...(r4.users || []));
                       this.sortAllUsers();
-                      this.loadingPercent = 100;
-                      this.isAllUsersLoading = false;
+                      this.loadingPercent = 50;
+                      this.loadingStageText = 'Loading HO Staff...';
+                      this.adminService.usersClerk3(data).subscribe({
+                        next: (r5: any) => {
+                          this.ALLTotalUser.push(...(r5.users || []));
+                          this.sortAllUsers();
+                          this.loadingPercent = 50;
+                          this.loadingStageText = 'Loading HO Staff...';
+
+                          this.adminService.usersHOStaff(data).subscribe({
+                            next: (r6: any) => {
+                              this.ALLTotalUser.push(...(r6.users || []));
+                              this.sortAllUsers();
+                              this.loadingPercent = 60;
+                              this.loadingStageText = 'Loading Attenders...';
+
+                              this.adminService.usersAttender(data).subscribe({
+                                next: (r7: any) => {
+                                  this.ALLTotalUser.push(...(r7.users || []));
+                                  this.sortAllUsers();
+                                  this.loadingPercent = 80;
+                                  this.loadingStageText = 'Loading AGM & GM...';
+
+                                  this.adminService.usersAgmGm(data).subscribe({
+                                    next: (r8: any) => {
+                                      this.ALLTotalUser.push(
+                                        ...(r8.users || []),
+                                      );
+                                      this.sortAllUsers();
+                                      this.loadingPercent = 100;
+                                      this.isAllUsersLoading = false;
+                                    },
+                                    error: (err: any) => {
+                                      console.error('AGM/GM API failed', err);
+                                      this.isAllUsersLoading = false;
+                                    },
+                                  });
+                                },
+                                error: (err: any) => {
+                                  console.error('Attender API failed', err);
+                                  this.isAllUsersLoading = false;
+                                },
+                              });
+                            },
+                            error: (err: any) => {
+                              console.error('HO Staff API failed', err);
+                              this.isAllUsersLoading = false;
+                            },
+                          });
+                        },
+                        error: (err: any) => {
+                          console.error('Clerk API failed', err);
+                          this.isAllUsersLoading = false;
+                        },
+                      });
                     },
                     error: (err: any) => {
-                      console.error('AGM/GM API failed', err);
+                      console.error('Clerk API failed', err);
                       this.isAllUsersLoading = false;
-                    }
+                    },
                   });
                 },
                 error: (err: any) => {
-                  console.error('Attender API failed', err);
+                  console.error('Clerk API failed', err);
                   this.isAllUsersLoading = false;
-                }
+                },
               });
             },
             error: (err: any) => {
-              console.error('HO Staff API failed', err);
+              console.error('Clerk API failed', err);
               this.isAllUsersLoading = false;
-            }
+            },
           });
         },
         error: (err: any) => {
-          console.error('Clerk API failed', err);
+          console.error('BM API failed', err);
+          this.ALLTotalUser = [];
           this.isAllUsersLoading = false;
-        }
+        },
       });
-    },
-    error: (err: any) => {
-      console.error('BM API failed', err);
-      this.ALLTotalUser = [];
-      this.isAllUsersLoading = false;
-    }
-  });
-}
-
-
- else if (row.type === 'STAFF') {
+    } else if (row.type === 'STAFF') {
       this.entredUserData = this.serachBranchID(row.pf);
-      console.log(this.entredUserData);
-      
-      if(this.entredUserData.role!=='Clerk'){
+
+      if (this.entredUserData.role !== 'Clerk') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -710,7 +757,7 @@ else if (row.type === 'all_users') {
         .getStaffScores(
           this.selectedPeriod,
           this.entredUserData.id,
-          this.entredUserData.branch_id
+          this.entredUserData.branch_id,
         )
         .subscribe((data: any) => {
           this.singlStaffScore = data;
@@ -734,34 +781,33 @@ else if (row.type === 'all_users') {
         new bootstrap.Modal(modalEl).show();
       }
     } else if (row.type === 'Department_Wise') {
+      const data = {
+        period: this.selectedPeriod,
+        department: this.selectedDepartment,
+      };
 
-  const data = { period: this.selectedPeriod ,department:this.selectedDepartment};
+      this.isAllBranchLoading = true;
 
-  this.isAllBranchLoading = true; 
+      this.adminService.allSectionWiseReport(data).subscribe({
+        next: (data: any) => {
+          this.ALLtotalBranches = data.totalBranches;
+          this.ALLtotalBranchesCount = data.totalBranchesCount;
 
-  this.adminService.allSectionWiseReport(data).subscribe({
-    next: (data: any) => {
-      this.ALLtotalBranches = data.totalBranches;
-      this.ALLtotalBranchesCount = data.totalBranchesCount;
+          this.isAllBranchLoading = false;
+        },
+        error: (err) => {
+          console.error('load failed', err);
+          this.totalBranchesCount = 0;
 
-      
-      this.isAllBranchLoading = false;  
-    },
-    error: (err) => {
-      console.error('load failed', err);
-      this.totalBranchesCount = 0;
+          this.isAllBranchLoading = false;
+        },
+      });
 
-      this.isAllBranchLoading = false; 
-    },
-  });
- 
-
-  const modalEl = document.getElementById('allDeparmentWiseReportModal');
-  if (modalEl) {
-    new bootstrap.Modal(modalEl).show();
-  }
-}
-
+      const modalEl = document.getElementById('allDeparmentWiseReportModal');
+      if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+      }
+    }
   }
   isPdfDownloading = false;
 
@@ -817,321 +863,683 @@ else if (row.type === 'all_users') {
         this.isPdfDownloading = false;
       });
   }
- 
-exportExcel() {
-  if (!this.ALLTotalUser || this.ALLTotalUser.length === 0) return;
 
-  const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+  exportExcel() {
+    if (!this.ALLTotalUser || this.ALLTotalUser.length === 0) return;
 
- 
-  const combinedRoles = ['GM', 'AGM', 'DGM','AGM_IT','AGM_AUDIT','AGM_INSURANCE'];
-  const combinedData: any[] = [];
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
 
-
-  const grouped: { [key: string]: any[] } = {};
-
-  this.ALLTotalUser.forEach((u: any) => {
-    if (combinedRoles.includes(u.role)) {
-      combinedData.push(u);
-    } else {
-      if (!grouped[u.role]) grouped[u.role] = [];
-      grouped[u.role].push(u);
-    }
-  });
-
- 
-  if (combinedData.length > 0) {
-    const data = combinedData.map((u: any, index: number) => ({
-      'Sr. No': index + 1,
-      'EMP Code': u.username,
-      'Name': u.name,
-      'Designation': u.role,
-      'Branch Name': u.branch_name,
-      'Total Weightage Score': Number(u.bmTotalScore || 0).toFixed(2)
-    }));
-
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
-
-    worksheet['!cols'] = [
-      { wch: 8 },
-      { wch: 15 },
-      { wch: 22 },
-      { wch: 18 },
-      { wch: 25 },
-      { wch: 22 }
+    const combinedRoles = [
+      'GM',
+      'AGM',
+      'DGM',
+      'AGM_IT',
+      'AGM_AUDIT',
+      'AGM_INSURANCE',
     ];
+    const combinedData: any[] = [];
 
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      'Senior_Management' 
-    );
-  }
+    const grouped: { [key: string]: any[] } = {};
 
- 
-  Object.keys(grouped).forEach((role) => {
-    const data = grouped[role].map((u: any, index: number) => ({
-      'Sr. No': index + 1,
-      'EMP Code': u.username,
-      'Name': u.name,
-      'Designation': u.role,
-      'Branch Name': u.branch_name,
-      'Total Weightage Score': Number(u.bmTotalScore || 0).toFixed(2)
-    }));
+    this.ALLTotalUser.forEach((u: any) => {
+      if (combinedRoles.includes(u.role)) {
+        combinedData.push(u);
+      } else {
+        if (!grouped[u.role]) grouped[u.role] = [];
+        grouped[u.role].push(u);
+      }
+    });
 
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
-
-    worksheet['!cols'] = [
-      { wch: 8 },
-      { wch: 15 },
-      { wch: 22 },
-      { wch: 18 },
-      { wch: 25 },
-      { wch: 22 }
-    ];
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      role.substring(0, 31)
-    );
-  });
-
-  XLSX.writeFile(
-    workbook,
-    `All_Users_Custom_Role_Wise_${new Date()
-      .toISOString()
-      .slice(0, 10)}.xlsx`
-  );
-}
-exportAllReportsExcel() {
-
-  const workbook = XLSX.utils.book_new();
-
-  /* -------- BM SUMMARY SHEET -------- */
-  if (this.bmScores && typeof this.bmScores === 'object') {
-
-    const summaryRows = Object.keys(this.bmScores)
-      .filter(k => k !== 'total')
-      .map((kpi: any) => ({
-        KPI: kpi.toUpperCase(),
-        Target: this.bmScores[kpi].target,
-        Achieved: this.bmScores[kpi].achieved,
-        Weightage: this.bmScores[kpi].weightage,
-        Score: this.bmScores[kpi].score,
-        WeightageScore: Number(this.bmScores[kpi].weightageScore || 0).toFixed(2)
+    if (combinedData.length > 0) {
+      const data = combinedData.map((u: any, index: number) => ({
+        'Sr. No': index + 1,
+        'EMP Code': u.username,
+        Name: u.name,
+        Designation: u.role,
+        'Branch Name': u.branch_name,
+        'Total Weightage Score': Number(u.bmTotalScore || 0).toFixed(2),
       }));
 
-    summaryRows.push({
-      KPI: 'TOTAL',
-      Target: '',
-      Achieved: '',
-      Weightage: '',
-      Score: '',
-      WeightageScore: Number(this.bmScores.total || 0).toFixed(2)
+      const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+
+      worksheet['!cols'] = [
+        { wch: 8 },
+        { wch: 15 },
+        { wch: 22 },
+        { wch: 18 },
+        { wch: 25 },
+        { wch: 22 },
+      ];
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Senior_Management');
+    }
+
+    Object.keys(grouped).forEach((role) => {
+      const data = grouped[role].map((u: any, index: number) => ({
+        'Sr. No': index + 1,
+        'EMP Code': u.username,
+        Name: u.name,
+        Designation: u.role,
+        'Branch Name': u.branch_name,
+        'Total Weightage Score': Number(u.bmTotalScore || 0).toFixed(2),
+      }));
+
+      const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+
+      worksheet['!cols'] = [
+        { wch: 8 },
+        { wch: 15 },
+        { wch: 22 },
+        { wch: 18 },
+        { wch: 25 },
+        { wch: 22 },
+      ];
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, role.substring(0, 31));
     });
 
-    const summarySheet = XLSX.utils.json_to_sheet(summaryRows);
-    XLSX.utils.book_append_sheet(workbook, summarySheet, 'BM Summary');
+    XLSX.writeFile(
+      workbook,
+      `All_Users_Custom_Role_Wise_${new Date()
+        .toISOString()
+        .slice(0, 10)}.xlsx`,
+    );
   }
+  exportAllReportsExcel() {
+    const workbook = XLSX.utils.book_new();
 
-  /* -------- BM STAFF KPI SHEET -------- */
-  const bmSheet = this.exportStaffKpiVertical('BM Staff KPI', this.bmStaffScore);
-  if (bmSheet) XLSX.utils.book_append_sheet(workbook, bmSheet, 'BM Staff');
+    if (this.bmScores && typeof this.bmScores === 'object') {
+      const summaryRows = Object.keys(this.bmScores)
+        .filter((k) => k !== 'total')
+        .map((kpi: any) => ({
+          KPI: kpi.toUpperCase(),
+          Target: this.bmScores[kpi].target,
+          Achieved: this.bmScores[kpi].achieved,
+          Weightage: this.bmScores[kpi].weightage,
+          Score: this.bmScores[kpi].score,
+          WeightageScore: Number(
+            this.bmScores[kpi].weightageScore || 0,
+          ).toFixed(2),
+        }));
 
-  /* -------- AGM STAFF KPI SHEET -------- */
-  const clerkSheet = this.exportStaffKpiVertical('Clerk Staff KPI', this.singlStaffScore);
-  if (clerkSheet) XLSX.utils.book_append_sheet(workbook, clerkSheet, 'Clerk Staff');
-
-
-  /* -------- HO STAFF KPI SHEET (NEW) -------- */
-  const hoSheet = this.exportHoStaffExcel('HO Staff KPI', this.hoStaffScore);
-  if (hoSheet) XLSX.utils.book_append_sheet(workbook, hoSheet, 'HO Staff');
-
-/* -------- BRANCH DEPARTMENT SHEET -------- */
-const branchDeptSheet = this.exportBranchDepartmentVertical(
-  `${this.ALLtotalBranches[0].department} Branch Report`,
-  this.ALLtotalBranches,
-  this.departmentName
-);
-
-if (branchDeptSheet) {
-  XLSX.utils.book_append_sheet(
-    workbook,
-    branchDeptSheet,
-    `${this.ALLtotalBranches[0].department} Branches`
-  );
-}
-
-
-  /* -------- AGM SUMMARY SHEET (NEW) -------- */
-  if (this.agmScores) {
-     const agmSummaryRows = Object.keys(this.agmScores).map((kpi: string) => ({
-      KPI: kpi,
-      Achieved: this.agmScores[kpi].achieved,
-      Weightage: this.agmScores[kpi].weightage,
-      Score: this.agmScores[kpi].score,
-      WeightageScore: this.agmScores[kpi].weightageScore
-    }));
-
-    agmSummaryRows.push({
-      KPI: 'TOTAL',
-      Achieved: '',
-      Weightage: '',
-      Score: '',
-      WeightageScore: Number(this.agmScores.total || 0).toFixed(2)
-    });
-
-    const agmSummarySheet = XLSX.utils.json_to_sheet(agmSummaryRows);
-    XLSX.utils.book_append_sheet(workbook, agmSummarySheet, 'AGM Summary');
-  }
-
-
-  /* -------- DOWNLOAD -------- */
-  XLSX.writeFile(workbook, `Vertical_Staff_KPI_${new Date().toISOString().slice(0,10)}.xlsx`);
-}
-
-
-
-
-exportStaffKpiVertical(title: string, staffArr: any[]) {
-
-  if (!Array.isArray(staffArr) || staffArr.length === 0) return;
-
-  const rows: any[] = [];
-  
-  
-  staffArr.forEach((staff: any) => {
-
-    rows.push({
-      'Staff Name': staff.staffName,
-      '': ''
-    });
-
-    this.kpiKeys.forEach((kpi: string) => {
-
-      if (!staff[kpi]) return;
-
-      rows.push({
-        KPI: kpi.toUpperCase(),
-        Target: staff[kpi].target,
-        Achieved: staff[kpi].achieved,
-        Weightage: staff[kpi].weightage,
-        WeightageScore: Number(staff[kpi].weightageScore || 0).toFixed(2)
+      summaryRows.push({
+        KPI: 'TOTAL',
+        Target: '',
+        Achieved: '',
+        Weightage: '',
+        Score: '',
+        WeightageScore: Number(this.bmScores.total || 0).toFixed(2),
       });
 
-    });
+      const summarySheet = XLSX.utils.aoa_to_sheet([]);
 
-    rows.push({
-      KPI: 'TOTAL',
-      WeightageScore: Number(staff.total || 0).toFixed(2)
-    });
+      XLSX.utils.sheet_add_aoa(
+        summarySheet,
+        [[`BM NAME: ${this.entredUserData?.name || ''}`]],
+        { origin: 'A1' },
+      );
 
-    rows.push({}); // Blank row after each staff
-  });
+      XLSX.utils.sheet_add_json(summarySheet, summaryRows, {
+        origin: 'A2',
+        skipHeader: false,
+      });
 
-  const ws = XLSX.utils.json_to_sheet(rows);
+      XLSX.utils.book_append_sheet(workbook, summarySheet, 'BM Summary');
+    }
 
-  ws['!cols'] = [
-    { wch: 10 },
-    { wch: 25 },
-    { wch: 18 },
-    { wch: 18 },
-    { wch: 15 },
-    { wch: 18 }
-  ];
+    /* -------- BM STAFF KPI SHEET -------- */
+    const bmSheet = this.exportStaffKpiVertical(
+      'BM Staff KPI',
+      this.bmStaffScore,
+    );
+    if (bmSheet) XLSX.utils.book_append_sheet(workbook, bmSheet, 'BM Staff');
 
-  return ws;
-}
-exportBranchDepartmentVertical(
-  title: string,
-  branches: any[],
-  departmentName: string
-) {
+    /* -------- AGM STAFF KPI SHEET -------- */
+    const clerkSheet = this.exportStaffKpiVerticalForSingle(
+      'Clerk Staff KPI',
+      this.singlStaffScore,
+    );
+    if (clerkSheet)
+      XLSX.utils.book_append_sheet(workbook, clerkSheet, 'Clerk Staff');
 
-  if (!Array.isArray(branches) || branches.length === 0) return;
+    /* -------- HO STAFF KPI SHEET (NEW) -------- */
+    const hoStaffSheet = this.exportHoStaffExcel(
+      'HO Staff KPI',
+      this.hoStaffScore,
+    );
+    if (hoStaffSheet)
+      XLSX.utils.book_append_sheet(workbook, hoStaffSheet, 'HO Staff');
 
-  const rows: any[] = [];
+    const hoSheet = this.exportHoStaffExcel(
+      'HO Staff KPI',
+      this.singleHoStaffScore,
+    );
+    if (hoSheet) XLSX.utils.book_append_sheet(workbook, hoSheet, 'HO Staff');
 
-  branches.forEach((branch: any, index: number) => {
+    /* -------- AGM + DGM SHEET -------- */
+    const agmDgmSheet = this.exportAgmDgmSheet(this.agmScores);
+    if (agmDgmSheet)
+      XLSX.utils.book_append_sheet(workbook, agmDgmSheet, 'AGM + DGM');
 
-    rows.push({
-      'Sr. No': index + 1,
-      'Branch Code': branch.code,
-      'Branch Name': branch.name,
-      'BM Name': branch.bmName,
-      [`${branch.department} Target`]: branch.departmentData?.target ?? 0,
-      [`${branch.department} Achieved`]: branch.departmentData?.achieved ?? 0,
-      'Total Weightage Score': Number(branch.departmentData?.score || 0).toFixed(2)
-    });
+    /* -------- Incharge wise report-------- */
+    const inchargeSheet = this.exportInChargeSheet(
+      this.totalBranches,
+      this.entredUserData?.name,
+      this.totalBranchesCount,
+    );
 
-  });
+    if (inchargeSheet)
+      XLSX.utils.book_append_sheet(workbook, inchargeSheet, 'In-Charge');
 
-  const ws = XLSX.utils.json_to_sheet(rows);
+    /* -------- GM SHEET -------- */
+    const gmSheet = this.exportGmSheet(this.AGMArray);
+    if (gmSheet) XLSX.utils.book_append_sheet(workbook, gmSheet, 'GM Summary');
 
-  ws['!cols'] = [
-    { wch: 8 },
-    { wch: 14 },
-    { wch: 22 },
-    { wch: 22 },
-    { wch: 18 },
-    { wch: 20 },
-    { wch: 22 }
-  ];
+    if (
+      this.selectedDepartment === '' &&
+      this.selectedDepartment === undefined
+    ) {
+      const ws = this.exportAllBranchSheet(
+        this.ALLtotalBranches,
+        this.ALLtotalBranchesCount,
+      );
+      if (ws) XLSX.utils.book_append_sheet(workbook, ws, 'All Branch Report');
+    }
 
-  return ws;
-}
+    const ws1 = this.exportDeputationStaffSheet(this.deputationStaffList);
+    if (ws1) XLSX.utils.book_append_sheet(workbook, ws1, 'Deputation Staff');
 
-exportHoStaffExcel(title: string, staffArr: any[]) {
+    if (
+      this.selectedDepartment !== '' &&
+      this.selectedDepartment !== undefined
+    ) {
+      /* -------- BRANCH DEPARTMENT SHEET -------- */
+      const firstDept = this.ALLtotalBranches?.[0]?.department ?? 'Branch';
+      const branchDeptSheet = this.exportBranchDepartmentVertical(
+        `${firstDept} Report`,
+        this.ALLtotalBranches || [],
+        this.departmentName,
+      );
 
-  if (!Array.isArray(staffArr) || !staffArr.length) return;
+      if (branchDeptSheet) {
+        XLSX.utils.book_append_sheet(
+          workbook,
+          branchDeptSheet,
+          `${this.ALLtotalBranches[0].department} Branches`,
+        );
+      }
+    }
 
-  const rows: any[] = [];
-console.log(staffArr);
+    if (
+      this.agmScores &&
+      (this.entredUserData.role === 'AGM' ||
+        this.entredUserData.role === 'DGM' ||
+        this.entredUserData.role === 'AGM_IT' ||
+        this.entredUserData.role === 'AGM_AUDIT' ||
+        this.entredUserData.role === 'AGM_INSURANCE')
+    ) {
+      const agmSummaryRows = Object.keys(this.agmScores)
+        .filter((k) => k !== 'total')
+        .map((kpi: string) => ({
+          KPI: kpi,
+          Achieved: this.agmScores[kpi].achieved,
+          Weightage: this.agmScores[kpi].weightage,
+          Score: this.agmScores[kpi].score,
+          WeightageScore: this.agmScores[kpi].weightageScore,
+        }));
 
-  staffArr.forEach((staff: any) => {
+      agmSummaryRows.push({
+        KPI: 'TOTAL',
+        Achieved: '',
+        Weightage: '',
+        Score: '',
+        WeightageScore: Number(this.agmScores.total || 0).toFixed(2),
+      });
 
-    rows.push({
-      'Staff ID': staff.staffId,
-      'Staff Name': staff.staffName
-    });
+      const agmSummarySheet = XLSX.utils.aoa_to_sheet([]);
 
-    Object.keys(staff)
-      .filter(k => !['staffId', 'staffName', 'total'].includes(k))
-      .forEach((kpi: string) => {
+      XLSX.utils.sheet_add_aoa(
+        agmSummarySheet,
+        [
+          [
+            `${this.entredUserData.role} NAME: ${this.entredUserData?.name || ''}`,
+          ],
+        ],
+        { origin: 'A1' },
+      );
+
+      XLSX.utils.sheet_add_json(agmSummarySheet, agmSummaryRows, {
+        origin: 'A2',
+        skipHeader: false,
+      });
+
+      XLSX.utils.book_append_sheet(workbook, agmSummarySheet, 'AGM Summary');
+    }
+
+    if (workbook.SheetNames.length === 0) {
+      console.warn('Workbook empty');
+      return;
+    }
+    /* ------- DOWNLOAD -------- */
+    XLSX.writeFile(
+      workbook,
+      `Vertical_Staff_KPI_${new Date().toISOString().slice(0, 10)}.xlsx`,
+    );
+  }
+
+  exportStaffKpiVertical(title: string, staffArr: any[]) {
+    
+
+    if (!Array.isArray(staffArr) || staffArr.length === 0) return;
+
+    const rows: any[] = [];
+
+    staffArr.forEach((staff: any) => {
+      rows.push({
+        'Staff Name': staff.staffName,
+        '': '',
+      });
+
+      this.kpiKeys.forEach((kpi: string) => {
+        if (!staff[kpi]) return;
 
         rows.push({
+          KPI: kpi.toUpperCase(),
+          Target: staff[kpi].target,
+          Achieved: staff[kpi].achieved,
+          Weightage: staff[kpi].weightage,
+          WeightageScore: Number(staff[kpi].weightageScore || 0).toFixed(2),
+        });
+      });
+
+      rows.push({
+        KPI: 'TOTAL',
+        WeightageScore: Number(staff.total || 0).toFixed(2),
+      });
+
+      rows.push({}); // Blank row after each staff
+    });
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+
+    ws['!cols'] = [
+      { wch: 10 },
+      { wch: 25 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 15 },
+      { wch: 18 },
+    ];
+
+    return ws;
+  }
+  exportStaffKpiVerticalForSingle(title: string, staffArr: any[]) {
+    const rows: any[][] = [];
+    const data = this.ensureArray(staffArr);
+    if (!data.length) return;
+
+    rows.push([`STAFF NAME: ${this.entredUserData?.name}`]);
+
+    rows.push([]);
+
+    rows.push(['KPI', 'Target', 'Achieved', 'Weightage', 'Score']);
+
+    data.forEach((k: any) => {
+      if (k.KPI === 'total') {
+        rows.push(['TOTAL', '', '', '', Number(k.value || 0).toFixed(2)]);
+        return;
+      }
+
+      rows.push([
+        k.KPI.toUpperCase(),
+        k.target,
+        k.achieved,
+        k.weightage,
+        Number(k.weightageScore || 0).toFixed(2),
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+
+    ws['!cols'] = [
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 15 },
+      { wch: 15 },
+    ];
+
+    return ws;
+  }
+
+  exportBranchDepartmentVertical(
+    title: string,
+    branches: any[],
+    departmentName: string,
+  ) {
+    if (!Array.isArray(branches) || branches.length === 0) return;
+
+    const rows: any[] = [];
+
+    branches.forEach((branch: any, index: number) => {
+      rows.push({
+        'Sr. No': index + 1,
+        'Branch Code': branch.code,
+        'Branch Name': branch.name,
+        'BM Name': branch.bmName,
+        [`${branch.department} Target`]: branch.departmentData?.target ?? 0,
+        [`${branch.department} Achieved`]: branch.departmentData?.achieved ?? 0,
+        'Total Weightage Score': Number(
+          branch.departmentData?.score || 0,
+        ).toFixed(2),
+      });
+    });
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+
+    ws['!cols'] = [
+      { wch: 8 },
+      { wch: 14 },
+      { wch: 22 },
+      { wch: 22 },
+      { wch: 18 },
+      { wch: 20 },
+      { wch: 22 },
+    ];
+
+    return ws;
+  }
+  exportDeputationStaffSheet(data: any[]) {
+    if (!Array.isArray(data) || !data.length) return;
+
+    const aoa: any[] = [];
+
+    const grouped = data.reduce((acc: any, item: any) => {
+      const dept = item.department || 'Unknown';
+      if (!acc[dept]) acc[dept] = [];
+      acc[dept].push(item);
+      return acc;
+    }, {});
+
+    const deptRows: number[] = [];
+
+    Object.keys(grouped).forEach((dept: string) => {
+      deptRows.push(aoa.length);
+
+      aoa.push([dept, '', '', '', '', '', '']);
+
+      aoa.push([]);
+
+      aoa.push([
+        'Emp ID',
+        'Name',
+        'Place',
+        'Design',
+        'Branch',
+        'Work At',
+        'Weightage Score',
+      ]);
+
+      grouped[dept].forEach((staff: any) => {
+        aoa.push([
+          staff.emp_id ?? '',
+          staff.name ?? '',
+          staff.place ?? '',
+          staff.design ?? '',
+          staff.branch ?? '',
+          staff.work_at ?? '',
+          Number(staff.weightage_score ?? 0).toFixed(2),
+        ]);
+      });
+
+      aoa.push([]);
+      aoa.push([]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+    ws['!merges'] = deptRows.map((r) => ({
+      s: { r, c: 0 },
+      e: { r, c: 6 },
+    }));
+
+    ws['!cols'] = [
+      { wch: 12 },
+      { wch: 25 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 18 },
+    ];
+
+    return ws;
+  }
+
+  exportHoStaffExcel(title: string, staffArr: any) {
+    if (!staffArr) return;
+
+    if (!Array.isArray(staffArr)) {
+      staffArr = [staffArr];
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet([]);
+
+    let rowIndex = 0;
+
+    staffArr.forEach((staff: any) => {
+      XLSX.utils.sheet_add_aoa(
+        ws,
+        [
+          [
+            `Staff Name: ${staff?.staffName || this.entredUserData?.name || ''}`,
+          ],
+        ],
+        { origin: `A${rowIndex + 1}` },
+      );
+
+      rowIndex += 1;
+
+      const rows = Object.keys(staff)
+        .filter((k) => k !== 'total' && k !== 'staffName' && k !== 'staffId')
+        .map((kpi: string) => ({
           KPI: kpi,
           Achieved: staff[kpi]?.achieved ?? '',
           Weightage: staff[kpi]?.weightage ?? '',
           Score: staff[kpi]?.score ?? '',
-          WeightageScore: staff[kpi]?.weightageScore ?? ''
-        });
+          WeightageScore: staff[kpi]?.weightageScore ?? '',
+        }));
 
+      rows.push({
+        KPI: 'TOTAL',
+        Achieved: '',
+        Weightage: '',
+        Score: '',
+        WeightageScore: staff.total,
       });
 
-    rows.push({
-      KPI: 'TOTAL',
-      WeightageScore: staff.total
+      XLSX.utils.sheet_add_json(ws, rows, {
+        origin: `A${rowIndex + 1}`,
+        skipHeader: false,
+      });
+
+      rowIndex += rows.length + 2;
     });
 
-    rows.push({});
-  });
+    return ws;
+  }
+  exportInChargeSheet(data: any[], inChargeName: string, branchCount: number) {
+    if (!Array.isArray(data) || data.length === 0) return;
 
-  const ws = XLSX.utils.json_to_sheet(rows);
-  return ws;
-}
+    const aoa: any[] = [];
 
+    aoa.push([`(Total Branch Count: ${branchCount})`]);
 
+    aoa.push([]);
 
+    aoa.push(['Sr. No', 'Branch Code', 'Branch Name', 'Branch Score']);
 
+    data.forEach((branch: any, i: number) => {
+      aoa.push([
+        i + 1,
+        branch.code ?? '',
+        branch.name ?? '',
+        Number(branch.bmTotalScore ?? 0).toFixed(2),
+      ]);
+    });
 
-showToast(msg: string) {
-  this.toastMessage = msg;
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
 
-  setTimeout(() => {
-    this.toastMessage = '';
-  }, 3000); 
-}
+    ws['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 15 }];
 
+    return ws;
+  }
+
+  exportAllBranchSheet(data: any[], totalCount: number) {
+    if (!Array.isArray(data) || data.length === 0) return;
+
+    const aoa: any[] = [];
+
+    // Title row
+    aoa.push([`Total Branch Count: ${totalCount}`]);
+
+    // Blank row
+    aoa.push([]);
+
+    // Header
+    aoa.push([
+      'Sr. No',
+      'Branch Code',
+      'Branch Name',
+      'BM Emp No.',
+      'BM Name',
+      'Total Weightage Score',
+    ]);
+
+    // Data rows
+    data.forEach((branch: any, i: number) => {
+      aoa.push([
+        i + 1,
+        branch.code ?? '',
+        branch.name ?? '',
+        branch.bmId ?? '',
+        branch.bmName ?? '',
+        Number(branch.bmTotalScore ?? 0).toFixed(2),
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+    ws['!cols'] = [
+      { wch: 8 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 20 },
+    ];
+
+    return ws;
+  }
+
+  //for gm all AGM/DGM report excel
+  exportAgmDgmSheet(data: any[]) {
+    if (!Array.isArray(data) || data.length === 0) return;
+
+    const rows: any[] = [];
+
+    data.forEach((hod: any) => {
+      // header block
+      rows.push({
+        KPI: `${hod.name || ''} (${hod.role || ''})`,
+      });
+
+      rows.push({
+        KPI: 'KPI',
+        Weightage: 'Weightage',
+        Achieved: 'Achieved',
+        Score: 'Score',
+        WeightageScore: 'Weightage Score',
+      });
+
+      // KPI rows
+      const kpis = hod.kpis || {};
+
+      Object.entries(kpis).forEach(([kpiName, kpiData]: any) => {
+        rows.push({
+          KPI: kpiName,
+          Weightage: kpiData.weightage ?? 0,
+          Achieved: kpiData.achieved ?? 0,
+          Score: kpiData.score ?? 0,
+          WeightageScore: kpiData.weightageScore ?? 0,
+        });
+      });
+
+      // total
+      rows.push({
+        KPI: 'TOTAL',
+        WeightageScore: Number(hod.total ?? 0).toFixed(2),
+      });
+
+      rows.push({});
+      rows.push({});
+    });
+
+    return XLSX.utils.json_to_sheet(rows);
+  }
+
+  //gm excel
+  exportGmSheet(data: any[]) {
+    if (!Array.isArray(data) || !data.length) return;
+
+    const rows = data.map((x: any) => ({
+      Name: x.name,
+      TotalScore: Number(x.total_score).toFixed(2),
+      Weightage: x.weightage,
+      WeightedScore: Number(x.weightageScore).toFixed(2),
+    }));
+
+    rows.push({
+      Name: 'TOTAL',
+      TotalScore: '',
+      Weightage: '',
+      WeightedScore: Number(this.gmFinalTotal).toFixed(2),
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet([]);
+
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      [[`GM NAME: ${this.entredUserData?.name || ''}`]],
+      { origin: 'A1' },
+    );
+
+    XLSX.utils.sheet_add_json(ws, rows, {
+      origin: 'A2',
+      skipHeader: false,
+    });
+
+    return ws;
+  }
+
+  ensureArray(data: any) {
+    if (Array.isArray(data)) return data;
+
+    if (typeof data === 'object' && data !== null) {
+      return Object.entries(data).map(([k, v]: any) => ({
+        KPI: k,
+        ...(typeof v === 'object' ? v : { value: v }),
+      }));
+    }
+
+    return [];
+  }
+
+  showToast(msg: string) {
+    this.toastMessage = msg;
+
+    setTimeout(() => {
+      this.toastMessage = '';
+    }, 3000);
+  }
 }

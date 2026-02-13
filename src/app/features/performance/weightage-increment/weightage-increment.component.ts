@@ -5,6 +5,7 @@ import { AuthService } from '../../../auth.service';
 import { PeriodService } from '../../../core/period.service';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../admin/admin.service';
+import { AllPerformanceService } from '../../all-performnace/all-performance.service';
 
 @Component({
   selector: 'app-weightage-increment',
@@ -21,6 +22,7 @@ export class WeightageIncrementComponent implements OnInit {
   staffTotalScore: any;
   staffScores: any;
   selectedEmployee: any;
+  selectedHOEmployee: any;
   BMsalary: any;
   staffSalary: any;
   BMincrementAmt: any;
@@ -30,29 +32,31 @@ export class WeightageIncrementComponent implements OnInit {
   allStaffSalaries: any;
   history1: any;
   transferBmScores: any;
-  attenderScores:any;
-  bmtransferSum:any;
+  attenderTransferScores: any;
+  bmtransferSum: any;
+  hostaffScores: any;
+  mergeHistoryed: any;
   constructor(
     private performanceService: PerformanceService,
+    private al: AllPerformanceService,
     public auth: AuthService,
     private periodService: PeriodService,
-    private adminService: AdminService
+    private adminService: AdminService,
   ) {}
 
   ngOnInit(): void {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
 
-      if (this.branchId) {
+      if (this.branchId && this.period) {
+      
         if (this.auth.user?.role === 'BM') {
           this.performanceService
             .getBmScores(this.period, this.branchId)
             .subscribe((data) => {
               this.bmScores = data;
             });
-        } else if (
-          this.auth.user?.role === 'Clerk' 
-        ) {
+        } else if (this.auth.user?.role === 'Clerk') {
           this.performanceService
             .getStaffScores(this.period, this.auth.user.id, this.branchId)
             .subscribe((data) => {
@@ -73,24 +77,44 @@ export class WeightageIncrementComponent implements OnInit {
       this.getSalary(this.period, this.auth.user?.username);
       this.gettrasferBMScore(this.period, this.branchId!);
       this.transferHistory();
-      
+      this.transferHOStaffHistory();
     });
   }
- 
+ getAverageKpi(): number {
+  if (!this.selectedEmployee?.branch_name) return 0;
+
+  const values = Object.entries(this.selectedEmployee.branch_name)
+    .map(([_, v]: any) => v);
+
+  let total = 0;
+  values.forEach((v: any) => {
+    total += +v.avg_kpi;
+  });
+
+  total += +this.selectedEmployee.originalTotal;
+
+  const count = values.length + 1;
+
+  return total / count;
+}
+
   getSalary(period: any, PF_NO: any) {
+    if (!this.period){
     this.performanceService.getSalary(period, PF_NO).subscribe((data: any) => {
       this.BMsalary = data[0]?.salary || 0;
       this.BMincrementAmt = data[0]?.increment || 0;
     });
   }
-  gettrasferBMScore(period: string, branchId: string){
+  }
+  gettrasferBMScore(period: string, branchId: string) {
+    if(!this.period) return;
     this.performanceService
       .getBmTransferScores(period, branchId)
       .subscribe((data) => {
         this.transferBmScores = data;
       });
   }
- 
+
   getAllStaffSalary(period: string, branch_id: string) {
     this.performanceService
       .getAllStaffSalary(period, branch_id)
@@ -98,17 +122,31 @@ export class WeightageIncrementComponent implements OnInit {
         this.allStaffSalaries = data;
 
         const staff = this.allStaffSalaries.find(
-          (s: any) => s.id === this.selectedEmployee.staffId
+          (s: any) => s.id === this.selectedEmployee.staffId,
         );
         if (staff === undefined) {
           this.staffSalary = 0;
           this.staffIncrementAmt = 0;
           return;
         } else {
-          this.staffSalary = staff.salary || 0;
-          this.staffIncrementAmt = staff.increment || 0;
+          this.staffSalary = staff?.salary || 0;
+          this.staffIncrementAmt = staff?.increment || 0;
         }
       });
+  }
+  getKpis(transfer: any): string[] {
+    if (!transfer) return [];
+
+    const ignore = [
+      'transfer_date',
+      'total_weightage_score',
+      'old_branch_name',
+      'new_branch_name',
+      'old_designation',
+      'new_designation',
+    ];
+
+    return Object.keys(transfer).filter((k) => !ignore.includes(k));
   }
 
   calculateKpiBasedIncrement() {
@@ -117,11 +155,9 @@ export class WeightageIncrementComponent implements OnInit {
     }
     const bmSum = this.bmtransferSum?.sum ?? 0;
     const transferTotal = this.transferBmScores?.total ?? 0;
-    const transferCount=this.bmtransferSum?.count?? 0;
+    const transferCount = this.bmtransferSum?.count ?? 0;
     const score = (bmSum + transferTotal) / (transferCount + 1) || 0;
 
-    console.log(score);
-    
     if (score < 5) {
       return 0;
     }
@@ -147,7 +183,7 @@ export class WeightageIncrementComponent implements OnInit {
       .subscribe((data: any) => {
         if (Array.isArray(data) && data.length > 0) {
           this.history = data[0];
-         this.bmtransferSum = data.reduce(
+          this.bmtransferSum = data.reduce(
             (acc: any, staff: any) => {
               staff.transfers?.forEach((t: any) => {
                 const score = Number(t.total_weightage_score);
@@ -158,9 +194,8 @@ export class WeightageIncrementComponent implements OnInit {
               });
               return acc;
             },
-            { sum: 0, count: 0 }
+            { sum: 0, count: 0 },
           );
-          
         } else {
           this.history = null;
         }
@@ -172,11 +207,75 @@ export class WeightageIncrementComponent implements OnInit {
       .subscribe((data: any) => {
         if (Array.isArray(data) && data.length > 0) {
           this.history1 = data[0];
+          this.mergeHistory();
         } else {
           this.history1 = null;
         }
       });
   }
+  transferHOStaffHistory() {
+    this.al
+      .getHoStaffHistory(this.period, this.selectedEmployee.staffId)
+      .subscribe((data: any) => {
+        this.hostaffScores =
+          Array.isArray(data) && data.length > 0 ? data[0] : null;
+        this.mergeHistory();
+      });
+  }
+  transferAttenderHistory() {
+    if (this.selectedEmployee?.staffId) {
+      this.performanceService
+        .getAttenderTransferScore(this.period, this.selectedEmployee?.staffId)
+        .subscribe((data: any) => {
+          this.attenderTransferScores =
+            Array.isArray(data) && data.length > 0 ? data[0] : null;
+          this.mergeHistory();
+        });
+    }
+  }
+  mergeHistory() {
+
+
+    const h1 = this.history1;
+    const h2 = this.hostaffScores;
+    const h3 = this.attenderTransferScores;
+
+    if (!h1 && !h2 && !h3) {
+      this.mergeHistoryed = null;
+      return;
+    }
+
+    const transfers = [...(h1?.transfers || []), ...(h2?.transfers || []), ...(h3?.transfers || [])];
+
+    transfers.sort(
+      (a: any, b: any) =>
+        new Date(a.transfer_date || 0).getTime() -
+        new Date(b.transfer_date || 0).getTime(),
+    ); 
+     const branch = this.history1?.branch_avg_kpi || this.history1?.branch_name || {};
+    const ho = this.hostaffScores?.branch_avg_kpi || {};
+    const attender = this.attenderTransferScores?.branch_avg_kpi || {};
+  
+  
+  
+  this.selectedEmployee.branch_name = {
+    ...branch,
+    ...ho,
+    ...attender,
+  };
+
+    this.mergeHistoryed = {
+      staff_id: h1?.staff_id ?? h2?.staff_id,
+      name: h1?.name ?? h2?.name,
+      period: h1?.period ?? h2?.period,
+      resigned: h1?.resigned ?? h2?.resigned,
+      transfers,
+      total_months: (h1?.total_months || 0) + (h2?.total_months || 0),
+    };
+
+    
+  }
+
   calculateStaffKpiBasedIncrement(score: number) {
     if (score < 5) {
       return 0;
@@ -198,7 +297,7 @@ export class WeightageIncrementComponent implements OnInit {
     this.selectedEmployee = employee;
     this.getAllStaffSalary(this.period, this.branchId!);
     this.transferStaffHistory();
-    console.log(this.selectedEmployee);
+    this.transferHOStaffHistory();
   }
 
   submitScores() {
@@ -215,15 +314,12 @@ export class WeightageIncrementComponent implements OnInit {
       status: 'Verified',
       kpi: 'audit',
     };
-    console.log('Submitting audit score:', payload);
 
     this.performanceService.submitAuditScore(payload).subscribe(
-      (response: any) => {
-        console.log('Response:', response);
-      },
+      (response: any) => {},
       (error: any) => {
         console.error('Error:', error);
-      }
+      },
     );
   }
 

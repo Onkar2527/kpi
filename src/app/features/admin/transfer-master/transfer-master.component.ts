@@ -10,6 +10,7 @@ import { PerformanceService } from '../../performance/performance.service';
 import { HoPerformanceService } from '../../hod_performance/hod_performance.service';
 import { BranchManagerService } from '../../branch-manager/branch-manager.service';
 import { lastValueFrom } from 'rxjs';
+import { AllPerformanceService } from '../../all-performnace/all-performance.service';
 
 @Component({
   selector: 'app-transfer-master',
@@ -45,6 +46,8 @@ export class TransferMasterComponent implements OnInit {
     recovery_achieved: string;
     insurance_target: string;
     insurance_achieved: string;
+    hod_id: string;
+    old_hod_id: string;
   } = {
     id: '',
     staff_id: '',
@@ -67,6 +70,8 @@ export class TransferMasterComponent implements OnInit {
     recovery_achieved: '',
     insurance_target: '',
     insurance_achieved: '',
+    hod_id: ''  ,
+    old_hod_id:''
   };
 
   searchTerm = '';
@@ -83,6 +88,7 @@ export class TransferMasterComponent implements OnInit {
   staffScores: any;
   selectedUserRole: string = '';
   hostaffScores: any;
+  attenderScores: any;
   bmScores: any;
   hodScores: any;
   selectedUser: any;
@@ -91,6 +97,9 @@ export class TransferMasterComponent implements OnInit {
   branchSearch: string = '';
   filteredBranches: any[] = [];
   showDropdown = false;
+  hod_id: any;
+  AGMS: any;
+  toastMessage: string = '';
 
   constructor(
     private adminService: AdminService,
@@ -99,6 +108,7 @@ export class TransferMasterComponent implements OnInit {
     private staffService: StaffService,
     private periodService: PeriodService,
     private performanceService: PerformanceService,
+    private allperformanceService: AllPerformanceService,
     private hoPerformanceService: HoPerformanceService,
     private branchManagerService: BranchManagerService
   ) {}
@@ -111,6 +121,7 @@ export class TransferMasterComponent implements OnInit {
     this.loadTrasferedStaff();
     this.loadUsers();
     this.loadBranches();
+    this.adminService.getAGMS().subscribe((data) => (this.AGMS = data));
   }
   loadUsers() {
     this.adminService.getUsers().subscribe((data: any) => {
@@ -146,6 +157,10 @@ export class TransferMasterComponent implements OnInit {
     if (user) {
       this.transfer.staff_id = user.id;
       this.selectedUserRole = user.role;
+      this.transfer.old_designation = user.role;
+      this.hod_id=user.hod_id;
+      
+      
 
       const branch_id = this.branches.find(
         (b: any) => b.name === user.branch_name
@@ -166,19 +181,18 @@ export class TransferMasterComponent implements OnInit {
 
   filterBranches(event: any) {
     const value = event.target.value.toLowerCase();
-    console.log('input value:', value);
+   
 
     this.filteredBranches = this.branches.filter((branch: any) =>
       branch.name.toLowerCase().includes(value)
     );
 
-    console.log('filter', this.filteredBranches);
   }
 
   selectBranch(branch: any) {
     this.branchSearch = '';
     this.branchSearch = branch.name;
-    console.log('patch', this.branchSearch);
+    
 
     this.transfer.new_branch_id = branch.code;
     this.showDropdown = false;
@@ -230,7 +244,13 @@ export class TransferMasterComponent implements OnInit {
     ];
 
     // Call branchstaff AFTER you select or fill the staff fields
-    if (this.transfer.staff_id && this.transfer.old_branch_id) {
+    const isHO =
+      this.transfer.new_designation === 'HO_STAFF' ||
+      this.transfer.old_designation === 'HO_STAFF';
+
+    const hasBranch = !!this.transfer.old_branch_id;
+
+    if (this.transfer.staff_id && (isHO || hasBranch)) {
       const newBranchId = this.transfer.new_branch_id;
       const oldBranchId = this.transfer.old_branch_id;
       const staff_id = this.transfer.staff_id;
@@ -239,11 +259,11 @@ export class TransferMasterComponent implements OnInit {
           .getStaffScores(
             this.period,
             this.transfer.staff_id,
-            this.transfer.old_branch_id
+            this.transfer.old_branch_id,
           )
           .subscribe((data: any) => {
             this.staffScores = data;
-            console.log;
+
             this.transfer.kpi_total = this.staffScores.total || 0;
             this.transfer.old_designation = this.selectedUserRole || '';
             this.transfer.period = this.period;
@@ -262,23 +282,81 @@ export class TransferMasterComponent implements OnInit {
             this.saveOrUpdateTransfer();
           });
       } else if (this.selectedUserRole === 'HO_STAFF') {
-        this.hoPerformanceService
-          .getStaffScores(
+        this.allperformanceService
+          .getSpecificALLScores(
             this.period,
             this.transfer.staff_id,
-            this.transfer.old_branch_id
+            this.selectedUserRole,
+            this.hod_id,
           )
           .subscribe(
-            (data) => {
+            (data: any) => {
               this.hostaffScores = data;
-              this.transfer.kpi_total = this.hostaffScores.total || 0;
+
+              const kpi = data || {};
+
+              this.transfer.kpi_total = kpi.total || 0;
+              this.transfer.old_designation = this.selectedUserRole || '';
+              this.transfer.period = this.period;
+              this.transfer.old_hod_id = this.hod_id;
+
+              const map: any = {
+                'Alloted Work': 'deposit',
+                'Discipline & Time Management': 'loan_gen',
+                'General Work Performance': 'loan_amulya',
+                'Branch Communication': 'audit',
+                Insurance: 'insurance',
+              };
+
+              Object.keys(map).forEach((key) => {
+                const field = map[key];
+                const score = kpi[key]?.achieved || 0;
+
+                this.transfer[`${field}_target`] = score;
+                this.transfer[`${field}_achieved`] = score;
+              });
 
               this.saveOrUpdateTransfer();
-              this.deleteHostaffAndTransfer(staff_id, oldBranchId);
             },
             (error: any) => {
               alert(error.error.error);
-            }
+            },
+          );
+      } else if (this.selectedUserRole === 'Attender') {
+        this.performanceService
+          .getAttenderScore(
+            this.period,
+            this.transfer.staff_id,
+          )
+          .subscribe(
+            (data: any) => {
+              this.attenderScores = data;
+             
+              const kpi = data[0]?.kpis || {};
+
+              this.transfer.kpi_total = data[0].total || 0;
+              this.transfer.old_designation = this.selectedUserRole || '';
+              this.transfer.period = this.period;
+              this.transfer.old_hod_id = this.hod_id;
+
+              const map: any = {
+                'Cleanliness': 'deposit',
+                'Attitude, Behavior & Discipline': 'loan_gen',
+              };
+
+              Object.keys(map).forEach((key) => {
+                const field = map[key];
+                const score = kpi[key]?.achieved || 0;
+
+                this.transfer[`${field}_target`] = score;
+                this.transfer[`${field}_achieved`] = score;
+              });
+
+              this.saveOrUpdateTransfer();
+            },
+            (error: any) => {
+              alert(error.error.error);
+            },
           );
       } else if (this.selectedUserRole === 'BM') {
         this.performanceService
@@ -306,7 +384,7 @@ export class TransferMasterComponent implements OnInit {
           .getHoScores(
             this.period,
             this.transfer.staff_id,
-            this.transfer.old_branch_id
+            this.transfer.old_branch_id,
           )
           .subscribe((data) => {
             this.hodScores = data;
@@ -331,35 +409,46 @@ export class TransferMasterComponent implements OnInit {
     const oldBranchId = this.transfer.old_branch_id;
     const role = this.transfer.new_designation;
     const staff_id = this.transfer.staff_id;
+    const hod_id = this.transfer.hod_id;
     const confirmed = confirm('Do you want to Transfer the Staff?');
     if (!confirmed) return;
+    
+if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender') {
+  const invalidFields = [];
+  console.log(this.transfer);
+  
 
+  if (Number(this.transfer.deposit_achieved) === 0)
+    invalidFields.push('Deposit');
+
+  if (Number(this.transfer.loan_gen_achieved) === 0)
+    invalidFields.push('Loan Gen');
+
+
+  if (this.selectedUserRole === 'HO_STAFF') {
+    if (Number(this.transfer.loan_amulya_achieved) === 0)
+      invalidFields.push('Loan Amulya');
+
+    if (Number(this.transfer.audit_achieved) === 0)
+      invalidFields.push('Audit');
+  }
+
+  if (invalidFields.length > 0) {
+    const roleSpecificMessage = this.selectedUserRole === 'HO_STAFF' 
+      ? 'Found Zero KPI' 
+      : 'Compulsory fields have zero values';
+    
+    this.showToast(
+      `${roleSpecificMessage}: ${invalidFields.join(', ')} - Please review the Score.`
+    );
+    return;
+  }
+}
     try {
-      // await  this.giveTransferDate(staff_id).toPromise();
-
-      // await this.autoDistributeOldBranch(oldBranchId).toPromise();
 
       if (this.transfer.id) {
-        // await this.adminService
-        //   .updateTrasferedStaff(this.transfer.id, this.transfer)
-        //   .toPromise();
-
-        // await this.delay(5000);
-        // if (this.selectedUserRole === 'BM') {
-        //   await this.updateEmployee_Trasnfer_table_BM(
-        //     staff_id,
-        //     this.period,
-        //     oldBranchId,
-        //     newBranchId
-
-        //   ).toPromise();
-        // } else {
-        //   await this.updateEmploye_Trasfer_table(
-        //     this.period,
-        //     oldBranchId,
-        //     staff_id
-        //   ).toPromise();
-        // }
+        
+        
         await this.adminService
           .transferMasterUpdate({
             staff_id: this.transfer.staff_id,
@@ -367,25 +456,14 @@ export class TransferMasterComponent implements OnInit {
             old_branchId: this.transfer.old_branch_id,
             new_branchId: this.transfer.new_branch_id,
             role: this.selectedUserRole,
+            selectedRole: role,
             transferData: this.transfer,
           })
           .toPromise();
+        
       } else {
-        // await this.adminService.addTrasferedStaff(this.transfer).toPromise();
-        // await this.delay(3000);
-        // if (this.selectedUserRole === 'BM') {
-        //   await this.updateEmployee_Trasnfer_table_BM(
-        //     staff_id,
-        //     this.period
-        //     ,oldBranchId, newBranchId
-        //   ).toPromise();
-        // } else {
-        //   await this.updateEmploye_Trasfer_table(
-        //     this.period,
-        //     oldBranchId,
-        //     staff_id
-        //   ).toPromise();
-        // }
+
+        if (this.transfer.old_branch_id !== '1212'){
         await this.adminService
           .transferMaster({
             staff_id: this.transfer.staff_id,
@@ -393,19 +471,34 @@ export class TransferMasterComponent implements OnInit {
             old_branchId: this.transfer.old_branch_id,
             new_branchId: this.transfer.new_branch_id,
             role: this.selectedUserRole,
+            selectedRole: role,
             transferData: this.transfer,
           })
           .toPromise();
-
+       }
         console.log('Transfer completed successfully');
       }
 
-      await this.adminService
-        .transferUser(staff_id, newBranchId, role)
-        .toPromise();
+      if ( 
+        this.transfer.new_designation === 'HO_STAFF'
+      ) {
+        await this.adminService
+          .transferUser(staff_id, newBranchId, 'HO_STAFF', hod_id)
+          .toPromise();
+      } else if ( 
+        this.transfer.new_designation === 'Attender'
+      ) {
+        await this.adminService
+          .transferUser(staff_id, newBranchId, 'Attender', hod_id)
+          .toPromise();
+      } else {
+        await this.adminService
+          .transferUser(staff_id, newBranchId, role, hod_id)
+          .toPromise();
+      }
 
       this.loadTrasferedStaff();
-
+      if (this.transfer.new_branch_id !== '1212') {
       if (
         this.transfer.new_designation === 'BM' &&
         this.selectedUserRole === 'Clerk'
@@ -419,7 +512,7 @@ export class TransferMasterComponent implements OnInit {
       }
 
       console.log('Transfer Completed Successfully');
-
+    }
       this.resetTransferForm();
     } catch (err) {
       console.error(err);
@@ -448,6 +541,8 @@ export class TransferMasterComponent implements OnInit {
       recovery_achieved: '',
       insurance_target: '',
       insurance_achieved: '',
+      hod_id: '' ,
+      old_hod_id:''
     };
   }
 
@@ -504,7 +599,7 @@ export class TransferMasterComponent implements OnInit {
   }
   editBranch(branch: any) {
     this.transfer = { ...branch };
-    console.log(this.transfer);
+   
   }
 
   deleteBranch(id: string) {
@@ -579,5 +674,12 @@ export class TransferMasterComponent implements OnInit {
       ) || 0;
     this.grandTotalWeightageScore =
       this.personalTotalWeightageScore + this.branchTotalWeightageScore;
+  }
+  showToast(msg: string) {
+    this.toastMessage = msg;
+
+    setTimeout(() => {
+      this.toastMessage = '';
+    }, 3000);
   }
 }

@@ -48,11 +48,22 @@
               </select>
         </div>
         <div *ngIf="user.role === 'BM' || user.role === 'Clerk' || user.role === 'Attender'">
-        <div class="mb-3">
-          <label for="branch" class="form-label">Branch</label>
-          <select id="branch" class="form-select" [(ngModel)]="user.branch_id" name="branch_id">
-            <option *ngFor="let branch of branches" [value]="branch.code">{{ branch.name }}</option>
-          </select>
+          <div class="mb-3 position-relative">
+          <label class="form-label">New Branch</label>
+
+          <!-- Search Input -->
+          <input type="text" class="form-control" placeholder="Type branch name..." [(ngModel)]="branchSearch"
+            [ngModelOptions]="{ standalone: true }" (input)="filterBranches($event)" (focus)="showDropdown = true" />
+
+
+          <!-- Dropdown -->
+          <ul class="list-group position-absolute w-100" *ngIf="showDropdown && filteredBranches.length"
+            style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+            <li class="list-group-item list-group-item-action" *ngFor="let branch of filteredBranches"
+              (click)="selectBranch(branch)">
+              {{ branch.name }}
+            </li>
+          </ul>
         </div>
         </div>
         <div *ngIf="user.role === 'HO_STAFF'">

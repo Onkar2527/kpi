@@ -45,8 +45,8 @@ export class AdminService {
     return this.http.put(`${environment.apiBaseUrl}/masters/users/${id}`, user);
   }
 
-  transferUser(id: string, branch_id:string,role:string) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_user/${id}`, { branch_id ,role });
+  transferUser(id: string, branch_id:string,role:string,hod_id:string) {
+    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_user/${id}`, { branch_id ,role,hod_id});
   }
   transferDate(id:string){
     return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_date/${id}`, {});
@@ -195,7 +195,16 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
      return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersBM`,data);
   }
   usersClerk(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk`,data);
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk/part1`,data);
+  }
+   usersClerk1(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk/part2`,data);
+  }
+   usersClerk2(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk/part3`,data);
+  }
+   usersClerk3(data:any){
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk/part4`,data);
   }
   usersHOStaff(data:any){
      return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersHOStaff`,data);
@@ -206,7 +215,9 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
   usersAgmGm(data:any){
      return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersAgmGm`,data);
   }
-
+  hoStaffTransfer(transferData:any){
+     return this.http.post(`${environment.apiBaseUrl}/trans/ho_transfer`,transferData);
+  }
   
 
   allSectionWiseReport(data:any){

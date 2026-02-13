@@ -115,23 +115,27 @@
           </select>
         </div>
 
-        <div
-          class="mb-3"
-          *ngIf="
+        <div class="mb-3" *ngIf="
             selectedRow?.type !== 'deputation_staff' &&
             selectedRow?.type !== 'all_branch' &&
             selectedRow?.type !== 'all_users' &&
             selectedRow?.type !== 'Department_Wise'
-          "
-        >
-          <label class="form-label">PF Number</label>
-          <input
-            type="text"
-            class="form-control"
-            [(ngModel)]="selectedPf"
-            placeholder="Enter PF Number"
-          />
+          ">
+        
+          <!-- BM → Branch Code -->
+          <ng-container *ngIf="selectedRow?.type === 'BM'; else pfBlock">
+            <label class="form-label">Enter Branch Code</label>
+            <input type="text" class="form-control" [(ngModel)]="selectedPf" placeholder="Enter Branch Code" />
+          </ng-container>
+        
+          <!-- Others → PF -->
+          <ng-template #pfBlock>
+            <label class="form-label">PF Number</label>
+            <input type="text" class="form-control" [(ngModel)]="selectedPf" placeholder="Enter PF Number" />
+          </ng-template>
+        
         </div>
+
       </div>
 
       <div class="modal-footer">
@@ -545,23 +549,39 @@
   >
     <div class="modal-content">
       <!-- HEADER -->
-      <div
+       <div
         class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
       >
-        <h5 class="modal-title mb-0">AGM Performance Report</h5>
+        <h5 class="modal-title mb-0 fw-bold">📊 AGM_AUDIT Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
+          <!-- Excel Button -->
           <button
-            class="btn btn-light btn-sm d-flex align-items-center gap-2"
+            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()"
+          >
+            <i class="bi bi-file-earmark-excel"></i>
+            <span>Excel</span>
+          </button>
+
+          <!-- PDF Button -->
+          <button
+            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
             [disabled]="isPdfDownloading"
             (click)="downloadPdf('auditAgmReportModal')"
           >
-            <span *ngIf="!isPdfDownloading">⬇ Download PDF</span>
-            <span
-              *ngIf="isPdfDownloading"
-              class="spinner-border spinner-border-sm"
-            ></span>
+            <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
+              <i class="bi bi-file-earmark-pdf text-danger"></i>
+              <span>PDF</span>
+            </ng-container>
+
+            <ng-template #pdfLoading>
+              <span class="spinner-border spinner-border-sm"></span>
+              <span>Generating...</span>
+            </ng-template>
           </button>
+
+          <!-- Close Button -->
           <button
             type="button"
             class="btn-close btn-close-white"
@@ -655,20 +675,36 @@
       <div
         class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
       >
-        <h5 class="modal-title mb-0">AGM Performance Report</h5>
+        <h5 class="modal-title mb-0 fw-bold">📊 AGM_INSURNCE Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
+          <!-- Excel Button -->
           <button
-            class="btn btn-light btn-sm d-flex align-items-center gap-2"
+            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()"
+          >
+            <i class="bi bi-file-earmark-excel"></i>
+            <span>Excel</span>
+          </button>
+
+          <!-- PDF Button -->
+          <button
+            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
             [disabled]="isPdfDownloading"
             (click)="downloadPdf('inAgmReportModal')"
           >
-            <span *ngIf="!isPdfDownloading">⬇ Download PDF</span>
-            <span
-              *ngIf="isPdfDownloading"
-              class="spinner-border spinner-border-sm"
-            ></span>
+            <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
+              <i class="bi bi-file-earmark-pdf text-danger"></i>
+              <span>PDF</span>
+            </ng-container>
+
+            <ng-template #pdfLoading>
+              <span class="spinner-border spinner-border-sm"></span>
+              <span>Generating...</span>
+            </ng-template>
           </button>
+
+          <!-- Close Button -->
           <button
             type="button"
             class="btn-close btn-close-white"
@@ -759,23 +795,39 @@
   >
     <div class="modal-content">
       <!-- HEADER -->
-      <div
+         <div
         class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
       >
-        <h5 class="modal-title mb-0">DGM Performance Report</h5>
+        <h5 class="modal-title mb-0 fw-bold">📊 DGM Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
+          <!-- Excel Button -->
           <button
-            class="btn btn-light btn-sm d-flex align-items-center gap-2"
+            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()"
+          >
+            <i class="bi bi-file-earmark-excel"></i>
+            <span>Excel</span>
+          </button>
+
+          <!-- PDF Button -->
+          <button
+            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
             [disabled]="isPdfDownloading"
             (click)="downloadPdf('dgmReportModal')"
           >
-            <span *ngIf="!isPdfDownloading">⬇ Download PDF</span>
-            <span
-              *ngIf="isPdfDownloading"
-              class="spinner-border spinner-border-sm"
-            ></span>
+            <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
+              <i class="bi bi-file-earmark-pdf text-danger"></i>
+              <span>PDF</span>
+            </ng-container>
+
+            <ng-template #pdfLoading>
+              <span class="spinner-border spinner-border-sm"></span>
+              <span>Generating...</span>
+            </ng-template>
           </button>
+
+          <!-- Close Button -->
           <button
             type="button"
             class="btn-close btn-close-white"
@@ -866,24 +918,39 @@
   >
     <div class="modal-content">
       <!-- HEADER -->
-      <div
+        <div
         class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
       >
-        <h5 class="modal-title mb-0">GM Performance Report</h5>
+        <h5 class="modal-title mb-0 fw-bold">📊 GM Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
+          <!-- Excel Button -->
           <button
-            class="btn btn-light btn-sm d-flex align-items-center gap-2"
+            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()"
+          >
+            <i class="bi bi-file-earmark-excel"></i>
+            <span>Excel</span>
+          </button>
+
+          <!-- PDF Button -->
+          <button
+            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
             [disabled]="isPdfDownloading"
             (click)="downloadPdf('gmReportModal')"
           >
-            <span *ngIf="!isPdfDownloading">⬇ Download PDF</span>
-            <span
-              *ngIf="isPdfDownloading"
-              class="spinner-border spinner-border-sm"
-            ></span>
+            <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
+              <i class="bi bi-file-earmark-pdf text-danger"></i>
+              <span>PDF</span>
+            </ng-container>
+
+            <ng-template #pdfLoading>
+              <span class="spinner-border spinner-border-sm"></span>
+              <span>Generating...</span>
+            </ng-template>
           </button>
 
+          <!-- Close Button -->
           <button
             type="button"
             class="btn-close btn-close-white"
@@ -971,24 +1038,39 @@
   >
     <div class="modal-content">
       <!-- HEADER -->
-      <div
+    <div
         class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
       >
-        <h5 class="modal-title mb-0">HO Staff Performance Report</h5>
+        <h5 class="modal-title mb-0 fw-bold">📊 HO_STAFF Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
+          <!-- Excel Button -->
           <button
-            class="btn btn-light btn-sm d-flex align-items-center gap-2"
+            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()"
+          >
+            <i class="bi bi-file-earmark-excel"></i>
+            <span>Excel</span>
+          </button>
+
+          <!-- PDF Button -->
+          <button
+            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
             [disabled]="isPdfDownloading"
             (click)="downloadPdf('hoStaffReportModal')"
           >
-            <span *ngIf="!isPdfDownloading">⬇ Download PDF</span>
-            <span
-              *ngIf="isPdfDownloading"
-              class="spinner-border spinner-border-sm"
-            ></span>
+            <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
+              <i class="bi bi-file-earmark-pdf text-danger"></i>
+              <span>PDF</span>
+            </ng-container>
+
+            <ng-template #pdfLoading>
+              <span class="spinner-border spinner-border-sm"></span>
+              <span>Generating...</span>
+            </ng-template>
           </button>
 
+          <!-- Close Button -->
           <button
             type="button"
             class="btn-close btn-close-white"
@@ -1041,24 +1123,39 @@
   >
     <div class="modal-content">
       <!-- HEADER -->
-      <div
+     <div
         class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
       >
-        <h5 class="modal-title mb-0">Clerk Performance Report</h5>
+        <h5 class="modal-title mb-0 fw-bold">📊 Clerk Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
+          <!-- Excel Button -->
           <button
-            class="btn btn-light btn-sm d-flex align-items-center gap-2"
+            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()"
+          >
+            <i class="bi bi-file-earmark-excel"></i>
+            <span>Excel</span>
+          </button>
+
+          <!-- PDF Button -->
+          <button
+            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
             [disabled]="isPdfDownloading"
             (click)="downloadPdf('staffReportModal')"
           >
-            <span *ngIf="!isPdfDownloading">⬇ Download PDF</span>
-            <span
-              *ngIf="isPdfDownloading"
-              class="spinner-border spinner-border-sm"
-            ></span>
+            <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
+              <i class="bi bi-file-earmark-pdf text-danger"></i>
+              <span>PDF</span>
+            </ng-container>
+
+            <ng-template #pdfLoading>
+              <span class="spinner-border spinner-border-sm"></span>
+              <span>Generating...</span>
+            </ng-template>
           </button>
 
+          <!-- Close Button -->
           <button
             type="button"
             class="btn-close btn-close-white"
@@ -1122,24 +1219,39 @@
   >
     <div class="modal-content">
       <!-- HEADER -->
-      <div
+     <div
         class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
       >
-        <h5 class="modal-title mb-0">Deputation Staff Performance Report</h5>
+        <h5 class="modal-title mb-0 fw-bold">📊 Deputational Staff Report</h5>
 
         <div class="d-flex align-items-center gap-2">
+          <!-- Excel Button -->
           <button
-            class="btn btn-light btn-sm d-flex align-items-center gap-2"
+            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()"
+          >
+            <i class="bi bi-file-earmark-excel"></i>
+            <span>Excel</span>
+          </button>
+
+          <!-- PDF Button -->
+          <button
+            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
             [disabled]="isPdfDownloading"
             (click)="downloadPdf('deputationstaffReportModal')"
           >
-            <span *ngIf="!isPdfDownloading">⬇ Download PDF</span>
-            <span
-              *ngIf="isPdfDownloading"
-              class="spinner-border spinner-border-sm"
-            ></span>
+            <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
+              <i class="bi bi-file-earmark-pdf text-danger"></i>
+              <span>PDF</span>
+            </ng-container>
+
+            <ng-template #pdfLoading>
+              <span class="spinner-border spinner-border-sm"></span>
+              <span>Generating...</span>
+            </ng-template>
           </button>
 
+          <!-- Close Button -->
           <button
             type="button"
             class="btn-close btn-close-white"
@@ -1207,24 +1319,39 @@
   >
     <div class="modal-content">
       <!-- HEADER -->
-      <div
+     <div
         class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
       >
-        <h5 class="modal-title mb-0">In-Charge wise Report</h5>
+        <h5 class="modal-title mb-0 fw-bold">📊 In-Charge Wise Report</h5>
 
         <div class="d-flex align-items-center gap-2">
+          <!-- Excel Button -->
           <button
-            class="btn btn-light btn-sm d-flex align-items-center gap-2"
+            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()"
+          >
+            <i class="bi bi-file-earmark-excel"></i>
+            <span>Excel</span>
+          </button>
+
+          <!-- PDF Button -->
+          <button
+            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
             [disabled]="isPdfDownloading"
             (click)="downloadPdf('inChargeReportModal')"
           >
-            <span *ngIf="!isPdfDownloading">⬇ Download PDF</span>
-            <span
-              *ngIf="isPdfDownloading"
-              class="spinner-border spinner-border-sm"
-            ></span>
+            <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
+              <i class="bi bi-file-earmark-pdf text-danger"></i>
+              <span>PDF</span>
+            </ng-container>
+
+            <ng-template #pdfLoading>
+              <span class="spinner-border spinner-border-sm"></span>
+              <span>Generating...</span>
+            </ng-template>
           </button>
 
+          <!-- Close Button -->
           <button
             type="button"
             class="btn-close btn-close-white"
@@ -1285,21 +1412,36 @@
       <div
         class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
       >
-        <h5 class="modal-title mb-0">All Branches at once Report</h5>
+        <h5 class="modal-title mb-0 fw-bold">📊 All Branch Report</h5>
 
         <div class="d-flex align-items-center gap-2">
+          <!-- Excel Button -->
           <button
-            class="btn btn-light btn-sm d-flex align-items-center gap-2"
+            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()"
+          >
+            <i class="bi bi-file-earmark-excel"></i>
+            <span>Excel</span>
+          </button>
+
+          <!-- PDF Button -->
+          <button
+            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
             [disabled]="isPdfDownloading"
             (click)="downloadPdf('allBranchReportModal')"
           >
-            <span *ngIf="!isPdfDownloading">⬇ Download PDF</span>
-            <span
-              *ngIf="isPdfDownloading"
-              class="spinner-border spinner-border-sm"
-            ></span>
+            <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
+              <i class="bi bi-file-earmark-pdf text-danger"></i>
+              <span>PDF</span>
+            </ng-container>
+
+            <ng-template #pdfLoading>
+              <span class="spinner-border spinner-border-sm"></span>
+              <span>Generating...</span>
+            </ng-template>
           </button>
 
+          <!-- Close Button -->
           <button
             type="button"
             class="btn-close btn-close-white"
@@ -1530,8 +1672,8 @@
                 <td>{{ branch.code }}</td>
                 <td>{{ branch.name }}</td>
                 <td>{{ branch.bmName }}</td>
-                <td>{{branch.departmentData.target}}</td>
-                 <td>{{branch.departmentData.achieved}}</td>
+                <td>{{branch.departmentData?.target}}</td>
+                 <td>{{branch.departmentData?.achieved}}</td>
                 <td
                   [ngClass]="{
                     'text-danger': branch.departmentData.score < 0,

@@ -20,52 +20,61 @@ export class AttenderKpisComponent implements OnInit {
   branchId = this.auth.user?.branchId;
   scores: any;
   history: any;
-  history1: any; 
-  attenderScores:any;
+  history1: any;
+  attenderScores: any;
   allStaffSalaries: any;
   selectedEmployee: any;
-  staffSalary=0;
-  staffIncrementAmt=0;
+  staffSalary = 0;
+  staffIncrementAmt = 0;
   staffTotalScore: any;
   kpiList: any;
-  originalScores: any;      
+  originalScores: any;
+  hostaffScores: any;
+  mergeHistoryed: any;
   constructor(
     private performanceService: PerformanceService,
-    private performance_all:AllPerformanceService,
+    private performance_all: AllPerformanceService,
     public auth: AuthService,
     private periodService: PeriodService,
-    private adminService: AdminService
+    private adminService: AdminService,
   ) {}
 
   ngOnInit(): void {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
-       if (this.auth.user?.role === 'BM'|| this.auth.user?.role === 'GM') {
-            this.getAttenderScore(this.period, this.branchId!,this.auth.user!.id);
-        } 
-      if(this.auth.user?.role === 'BM'){
-      this.getAllStaffSalary(this.period, this.branchId!);
+      if (this.period) {
+        if (this.auth.user?.role === 'BM' || this.auth.user?.role === 'GM') {
+          this.getAttenderScore(
+            this.period,
+            this.branchId!,
+            this.auth.user!.id,
+          );
+        }
+        if (this.auth.user?.role === 'BM') {
+          this.getAllStaffSalary(this.period, this.branchId!);
+        }
+        this.getAGMSalary(this.period, this.auth.user!.id);
+        this.loadKpiroleWise();
+        this.transferStaffHistory();
+        this.transferHOStaffHistory();
+        this.transferAttenderHistory();
       }
-      this.getAGMSalary(this.period,this.auth.user!.id)
-      this.loadKpiroleWise()
-      this.transferHistory();
-      
     });
   }
- loadKpiroleWise() {
+  loadKpiroleWise() {
     const payload = { role: 'Attender' };
     this.performance_all.getAllKpiRoleWise(payload).subscribe((res: any) => {
       this.kpiList = res.data;
     });
   }
-  getAttenderScore(period: string, branchId: string,hod_id:string){
+  getAttenderScore(period: string, branchId: string, hod_id: string) {
     this.performanceService
-      .getAttenderScores(period, branchId,hod_id)
+      .getAttenderScores(period, branchId, hod_id)
       .subscribe((data) => {
         this.attenderScores = data;
         if (this.attenderScores.length > 0) {
-              this.selectEmployee(this.attenderScores[0]);
-            }
+          this.selectEmployee(this.attenderScores[0]);
+        }
       });
   }
   getAllStaffSalary(period: string, branch_id: string) {
@@ -75,105 +84,191 @@ export class AttenderKpisComponent implements OnInit {
         this.allStaffSalaries = data;
 
         const staff = this.allStaffSalaries.find(
-          (s: any) => s.id === this.selectedEmployee.staffId
+          (s: any) => s.id === this.selectedEmployee?.staffId,
         );
         if (staff === undefined) {
           this.staffSalary = 0;
           this.staffIncrementAmt = 0;
           return;
         } else {
-          this.staffSalary = staff.salary || 0;
-          this.staffIncrementAmt = staff.increment || 0;
+          this.staffSalary = staff?.salary || 0;
+          this.staffIncrementAmt = staff?.increment || 0;
         }
       });
   }
 
-    getAGMSalary(period: any, hod_id: any) {
+  getAGMSalary(period: any, hod_id: any) {
     this.performance_all
       .getAllAGMSalary(period, hod_id)
       .subscribe((data: any) => {
-        this.staffSalary = data[0].salary || 0;
-        this.staffIncrementAmt = data[0].increment || 0;
-      });
-  }
-  transferHistory() {
-    this.adminService
-      .getTrafterKpiHistory(this.period, this.auth.user?.id)
-      .subscribe((data: any) => {
-        if (Array.isArray(data) && data.length > 0) {
-          this.history = data[0];
-        } else {
-          this.history = null;
-        }
+        this.staffSalary = data[0]?.salary || 0;
+        this.staffIncrementAmt = data[0]?.increment || 0;
       });
   }
   transferStaffHistory() {
     this.adminService
-      .getTrafterKpiHistory(this.period, this.selectedEmployee.staffId)
+      .getTrafterKpiHistory(this.period, this.selectedEmployee?.staffId)
       .subscribe((data: any) => {
         if (Array.isArray(data) && data.length > 0) {
           this.history1 = data[0];
+          this.mergeHistory();
         } else {
           this.history1 = null;
         }
       });
   }
-  
+  transferHOStaffHistory() {
+    if (this.selectedEmployee?.staffId) {
+      this.performance_all
+        .getHoStaffHistory(this.period, this.selectedEmployee?.staffId)
+        .subscribe((data: any) => {
+          this.hostaffScores =
+            Array.isArray(data) && data.length > 0 ? data[0] : null;
+          this.mergeHistory();
+        });
+    }
+  }
+  transferAttenderHistory() {
+    if (this.selectedEmployee?.staffId) {
+      this.performanceService
+        .getAttenderTransferScore(this.period, this.selectedEmployee?.staffId)
+        .subscribe((data: any) => {
+          this.history =
+            Array.isArray(data) && data.length > 0 ? data[0] : null;
+          this.mergeHistory();
+        });
+    }
+  }
+  mergeHistory() {
+    const h1 = this.history1;
+    const h2 = this.hostaffScores;
+    const h3 = this.history;
 
+    if (!h1 && !h2 && !h3) {
+      this.mergeHistoryed = null;
+      return;
+    }
+
+    const transfers = [
+      ...(h1?.transfers || []),
+      ...(h2?.transfers || []),
+      ...(h3?.transfers || []),
+    ];
+
+    transfers.sort(
+      (a: any, b: any) =>
+        new Date(a.transfer_date || 0).getTime() -
+        new Date(b.transfer_date || 0).getTime(),
+    );
+    const branch =
+      this.history1?.branch_avg_kpi || this.history1?.branch_name || {};
+    const ho = this.hostaffScores?.branch_avg_kpi || {};
+    const attender = this.history?.branch_avg_kpi || {};
+
+    this.selectedEmployee.branch_name = {
+      ...branch,
+      ...ho,
+      ...attender,
+    };
+
+    this.mergeHistoryed = {
+      staff_id: h1?.staff_id ?? h2?.staff_id ?? h3?.staff_id,
+      name: h1?.name ?? h2?.name ?? h3?.name,
+      period: h1?.period ?? h2?.period ?? h3?.period,
+      resigned: h1?.resigned ?? h2?.resigned ?? h3?.resigned,
+      transfers,
+      total_months:
+        (h1?.total_months || 0) +
+        (h2?.total_months || 0) +
+        (h3?.total_months || 0),
+    };
+  }
+  getAverageKpi(): number {
+    if (!this.selectedEmployee?.branch_name) return 0;
+
+    const values = Object.entries(this.selectedEmployee.branch_name).map(
+      ([_, v]: any) => v,
+    );
+
+    let total = 0;
+    values.forEach((v: any) => {
+      total += +v.avg_kpi;
+    });
+
+    total += +this.selectedEmployee.total;
+
+    const count = values.length + 1;
+
+    return total / count;
+  }
+  getKpis(transfer: any): string[] {
+    if (!transfer) return [];
+
+    const ignore = [
+      'transfer_date',
+      'total_weightage_score',
+      'old_branch_name',
+      'new_branch_name',
+      'old_designation',
+      'new_designation',
+    ];
+
+    return Object.keys(transfer).filter((k) => !ignore.includes(k));
+  }
   selectEmployee(employee: any) {
     this.selectedEmployee = employee;
-    if(this.auth.user?.role === 'BM'){
-    this.getAllStaffSalary(this.period, this.branchId!);
+    if (this.auth.user?.role === 'BM') {
+      this.getAllStaffSalary(this.period, this.branchId!);
     }
-    this.getAGMSalary(this.period,this.auth.user!.id)
+    this.getAGMSalary(this.period, this.auth.user!.id);
     this.originalScores = JSON.parse(JSON.stringify(this.selectedEmployee));
-   
+
     this.transferStaffHistory();
+    this.transferAttenderHistory();
+    this.transferHOStaffHistory();
   }
 
- submitScores() {
-  if (!this.selectedEmployee || !this.kpiList) return;
+  submitScores() {
+    if (!this.selectedEmployee || !this.kpiList) return;
 
+    const kpiListToUse = this.kpiList;
 
-  const kpiListToUse = this.kpiList;
+    const changedScores = kpiListToUse
+      .filter((k: any) => k.kpi_name.toLowerCase() !== 'insurance target')
+      .filter((k: any) => {
+        const newVal = this.selectedEmployee.kpis[k.kpi_name]?.achieved;
+        const oldVal = this.originalScores.kpis[k.kpi_name]?.achieved;
+        return newVal !== undefined && newVal !== oldVal;
+      })
+      .map((k: any) => ({
+        kpi_name: k.kpi_name,
+        role_kpi_mapping_id: k.id,
+        value: this.selectedEmployee.kpis[k.kpi_name].achieved,
+      }));
 
-  const changedScores = kpiListToUse
-    .filter((k: any) => k.kpi_name.toLowerCase() !== 'insurance target')
-    .filter((k: any) => {
-      const newVal = this.selectedEmployee.kpis[k.kpi_name]?.achieved;
-      const oldVal = this.originalScores.kpis[k.kpi_name]?.achieved;
-      return newVal !== undefined && newVal !== oldVal;
-    })
-    .map((k: any) => ({
-      kpi_name: k.kpi_name,
-      role_kpi_mapping_id: k.id,
-      value: this.selectedEmployee.kpis[k.kpi_name].achieved,
-    }));
+    if (changedScores.length === 0) {
+      alert('No changes detected');
+      return;
+    }
 
-  if (changedScores.length === 0) {
-    alert("No changes detected");
-    return;
+    const payload = {
+      user_id: this.selectedEmployee.staffId,
+      period: this.period,
+      master_user_id: this.auth.user?.id,
+      scores: changedScores,
+    };
+
+    this.performance_all.createHoStaffScores(payload).subscribe({
+      next: (res: any) => {
+        alert(res.message || 'Scores saved successfully');
+        this.getAttenderScore(this.period, this.branchId!, this.auth.user!.id);
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Failed to save scores');
+      },
+    });
   }
-
-  const payload = {
-    user_id: this.selectedEmployee.staffId,
-    period: this.period,
-    master_user_id: this.auth.user?.id,
-    scores: changedScores,
-  };
-
-  this.performance_all.createHoStaffScores(payload).subscribe({
-    next: (res: any) => {
-      alert(res.message || "Scores saved successfully");
-      this.getAttenderScore(this.period, this.branchId!,this.auth.user!.id);
-    },
-    error: (err) => {
-      console.error(err);
-      alert("Failed to save scores");
-    },
-  });
-}
-
 
   calculateKpiBasedIncrementStaff() {
     if (!this.staffTotalScore) {

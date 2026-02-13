@@ -20,11 +20,11 @@
         </thead>
         <tbody>
           <tr *ngFor="let kpi of kpiList">
-            <td>{{ kpi }}</td>
-            <td>{{ hostaffScores[kpi]?.weightage }}</td>
-            <td>{{ hostaffScores[kpi]?.achieved | number:'1.2-2' }}</td>
-            <td>{{ hostaffScores[kpi]?.score | number:'1.2-2' }}</td>
-            <td>{{ hostaffScores[kpi]?.weightageScore | number:'1.2-2' }}</td>
+            <td>{{ kpi.kpi_name }}</td>
+            <td>{{ hostaffScores[kpi.kpi_name]?.weightage }}</td>
+            <td>{{ hostaffScores[kpi.kpi_name]?.achieved | number:'1.2-2' }}</td>
+            <td>{{ hostaffScores[kpi.kpi_name]?.score | number:'1.2-2' }}</td>
+            <td>{{ hostaffScores[kpi.kpi_name]?.weightageScore | number:'1.2-2' }}</td>
           </tr>
           <tr>
             <td><strong>Total</strong></td>

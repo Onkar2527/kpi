@@ -85,7 +85,7 @@ export class ResignHistoryComponent implements OnInit {
 
   editUser(user: any) {
     this.selectedEmployee = user;
-    console.log(this.selectedEmployee);
+   
       
     this.adminService
       .getTrafterKpiHistory(this.period, user.staff_id)

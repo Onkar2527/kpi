@@ -5,6 +5,7 @@ import { PerformanceService } from '../../performance/performance.service';
 import { AuthService } from '../../../auth.service';
 import { PeriodService } from '../../../core/period.service';
 import { HoPerformanceService } from '../hod_performance.service';
+import { AllPerformanceService } from '../../all-performnace/all-performance.service';
 
 @Component({
   selector: 'app-weightage-HoStaff',
@@ -24,16 +25,11 @@ export class WeightageHoStaffComponent implements OnInit {
   salary = 35000;
   incrementAmt = 1000;
 
-  kpiList = [
-    'allocated_work',
-    'discipline_time',
-    'work_performance',
-    'branch_communication',
-    'insurance',
-  ];
+  kpiList: any[] = [];
 
   constructor(
     private performanceService: HoPerformanceService,
+    private allPerformanceService: AllPerformanceService,
     public auth: AuthService,
     private periodService: PeriodService
   ) {}
@@ -61,7 +57,14 @@ export class WeightageHoStaffComponent implements OnInit {
         }
 
         this.loadScores();
+        this.loadKpiroleWise();
       }
+    });
+  }
+   loadKpiroleWise() {
+    const payload = { role: this.auth.user?.role };
+    this.allPerformanceService.getAllKpiRoleWise(payload).subscribe((res: any) => {
+      this.kpiList = res.data;
     });
   }
   loadScores() {

@@ -24,36 +24,45 @@
             </option>
           </select>
         </div>
+        <!-- BRANCH SECTION -->
+        <div >
 
-        <div class="mb-3">
-          <label for="oldBranch" class="form-label">Old Branch</label>
-          <select id="oldBranch" class="form-select" [(ngModel)]="transfer.old_branch_id" name="oldbranch_id">
-            <option *ngFor="let branch of branches" [value]="branch.code">{{ branch.name }}</option>
-          </select>
+          <div class="mb-3" *ngIf="selectedUserRole !== 'HO_STAFF'">
+            <label for="oldBranch" class="form-label">Old Branch</label>
+            <select id="oldBranch" class="form-select" [(ngModel)]="transfer.old_branch_id" name="oldbranch_id">
+
+              <option *ngFor="let branch of branches" [value]="branch.code">
+                {{ branch.name }}
+              </option>
+
+            </select>
+          </div>
+
+          <div class="mb-3 position-relative">
+            <label class="form-label">New Branch</label>
+
+            <input type="text" class="form-control" placeholder="Type branch name..." [(ngModel)]="branchSearch"
+              [ngModelOptions]="{ standalone: true }" (input)="filterBranches($event)" (focus)="showDropdown = true" />
+
+            <ul class="list-group position-absolute w-100" *ngIf="showDropdown && filteredBranches.length"
+              style="z-index:1050; max-height:200px; overflow-y:auto;">
+
+              <li class="list-group-item list-group-item-action" *ngFor="let branch of filteredBranches"
+                (click)="selectBranch(branch)">
+                {{ branch.name }}
+              </li>
+
+            </ul>
+          </div>
+
         </div>
 
-        <div class="mb-3 position-relative">
-          <label class="form-label">New Branch</label>
 
-          <!-- Search Input -->
-          <input type="text" class="form-control" placeholder="Type branch name..." [(ngModel)]="branchSearch"
-            [ngModelOptions]="{ standalone: true }" (input)="filterBranches($event)" (focus)="showDropdown = true" />
-
-
-          <!-- Dropdown -->
-          <ul class="list-group position-absolute w-100" *ngIf="showDropdown && filteredBranches.length"
-            style="z-index: 1050; max-height: 200px; overflow-y: auto;">
-            <li class="list-group-item list-group-item-action" *ngFor="let branch of filteredBranches"
-              (click)="selectBranch(branch)">
-              {{ branch.name }}
-            </li>
-          </ul>
-        </div>
-
-
+        <!-- ROLE (same position as yours) -->
         <div class="mb-3">
           <label for="role" class="form-label">Role</label>
           <select id="role" class="form-select" [(ngModel)]="transfer.new_designation" name="role">
+
             <option value="HO">HO</option>
             <option value="INSURANCE">INSURANCE</option>
             <option value="BM">BM</option>
@@ -63,8 +72,24 @@
             <option value="AGM">AGM</option>
             <option value="DGM">DGM</option>
             <option value="GM">GM</option>
+
           </select>
         </div>
+
+
+        <!-- AGM / DGM (after role like yours) -->
+        <div class="mb-3" *ngIf="transfer.new_designation === 'HO_STAFF' || transfer.new_designation === 'Attender'">
+          <label for="AGMS" class="form-label">DGM / AGM</label>
+
+          <select id="AGMS" class="form-select" [(ngModel)]="transfer.hod_id" name="hod_id">
+
+            <option *ngFor="let agm of AGMS" [value]="agm.id">
+              {{ agm.name }}
+            </option>
+
+          </select>
+        </div>
+
         <!-- <div class="mb-3">
           <label for="date" class="form-label">Date of Transfered </label>
           <input type="date" class="form-control" id="date" [(ngModel)]="transfer.transfer_date" name="date"  value="">
@@ -112,4 +137,7 @@
       </li>
     </ul>
   </nav>
+</div>
+<div class="toast-message" *ngIf="toastMessage">
+  {{ toastMessage }}
 </div>

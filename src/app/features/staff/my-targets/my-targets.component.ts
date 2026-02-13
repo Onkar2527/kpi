@@ -11,6 +11,7 @@ import { PeriodService } from '../../../core/period.service';
 import { LoginComponent } from '../../login/login.component';
 import { PerformanceService } from '../../performance/performance.service';
 import { AdminService } from '../../admin/admin.service';
+import { AllPerformanceService } from '../../all-performnace/all-performance.service';
 
 @Component({
   selector: 'app-my-targets',
@@ -43,6 +44,10 @@ export class MyTargetsComponent implements OnInit {
   "audit",
   "insurance"
 ];
+  hostaffScores: any;
+  mergeHistoryed: any;
+ hoKpiTotal: number = 0;
+hoKpiAvg: number = 0;
   constructor(
     private staffService: StaffService,
     public auth: AuthService,
@@ -51,7 +56,8 @@ export class MyTargetsComponent implements OnInit {
     private kpisService: KpisService,
     private periodService: PeriodService,
     private performanceService: PerformanceService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private al:AllPerformanceService
   ) { }
 
   ngOnInit(): void {
@@ -61,7 +67,8 @@ export class MyTargetsComponent implements OnInit {
       this.period = period;
       this.loadTargets();
       this.getSalary(this.period, this.auth.user?.username);
-      this.transferHistory();
+      this.transferStaffHistory();
+      this.transferHOStaffHistory();
     });
 
     this.sharedService.entryVerified$.subscribe(() => {
@@ -73,8 +80,8 @@ export class MyTargetsComponent implements OnInit {
 
   getSalary(period: any, PF_NO: any) {
     this.performanceService.getSalary(period, PF_NO).subscribe((data: any) => {
-      this.salary = data[0].salary || 0;
-      this.incrementAmt = data[0].increment || 0;
+      this.salary = data[0]?.salary || 0;
+      this.incrementAmt = data[0]?.increment || 0;
       
     });
   }
@@ -82,7 +89,7 @@ export class MyTargetsComponent implements OnInit {
     if (!this.grandTotalWeightageScore) {
       return 0;
     }
-    const score = this.grandTotalWeightageScore;
+    const score = this.getTransferAverage() || this.grandTotalWeightageScore || 0;
     if (score < 5) {
       return 0;
     }
@@ -173,8 +180,7 @@ sortKpis(list: any[]) {
         this.staffService.getMyTargets(this.period, this.employeeId, this.branchId).subscribe((data: any) => {
           this.personalTargets = this.calculateScores(data.personal);
           this.branchTargets = this.calculateScores(data.branch);
-          console.log(this.personalTargets);
-          console.log('branch',this.branchTargets);
+          
           
           this.staffAll=this.sortKpis([...this.personalTargets,...this.branchTargets]);
           
@@ -269,38 +275,99 @@ calculateScores(targets: any[]): any[] {
     
   }
 
-   transferHistory() {
+  transferStaffHistory() {
     this.adminService
       .getTrafterKpiHistory(this.period, this.auth.user?.id)
       .subscribe((data: any) => {
         if (Array.isArray(data) && data.length > 0) {
           this.history = data[0];
-          this.calculateBranchKpiTotals();
-          
+          this.mergeHistory();
         } else {
           this.history = null;
         }
       });
-  } 
-  calculateBranchKpiTotals() {
-  if (!this.history || !this.history.transfers) {
-    this.branchKpiTotal = 0;
-    return;
+  }
+  transferHOStaffHistory() {
+    this.al
+      .getHoStaffHistory(this.period, this.auth.user!.id)
+      .subscribe((data: any) => {
+        this.hostaffScores =
+          Array.isArray(data) && data.length > 0 ? data[0] : null;
+  
+        
+        this.mergeHistory();
+      });
+  }
+  mergeHistory() {
+
+
+    const h1 = this.history;
+    const h2 = this.hostaffScores;
+
+    if (!h1 && !h2) {
+      this.mergeHistoryed = null;
+      return;
+    }
+
+    const transfers = [...(h1?.transfers || []), ...(h2?.transfers || [])];
+
+    transfers.sort(
+      (a: any, b: any) =>
+        new Date(a.transfer_date || 0).getTime() -
+        new Date(b.transfer_date || 0).getTime(),
+    );
+
+    this.mergeHistoryed = {
+      staff_id: h1?.staff_id ?? h2?.staff_id,
+      name: h1?.name ?? h2?.name,
+      period: h1?.period ?? h2?.period,
+      resigned: h1?.resigned ?? h2?.resigned,
+      transfers,
+      total_months: (h1?.total_months || 0) + (h2?.total_months || 0),
+    };
+
+
+  }
+  getKpis(transfer: any): string[] {
+    if (!transfer) return [];
+
+    const ignore = [
+      'transfer_date',
+      'total_weightage_score',
+      'old_branch_name',
+      'new_branch_name',
+      'old_designation',
+      'new_designation',
+    ];
+
+    return Object.keys(transfer).filter((k) => !ignore.includes(k));
   }
 
+getAllTransferValues(): number[] {
+  const branch =
+  this.history?.transfers
+    .map((t: any) => +t.total_weightage_score || 0) || [];
 
-  const branchTotals = this.history.transfers.map(
-    (t: any) => t.total_weightage_score || 0
-  );
+  const ho =
+    this.hostaffScores?.transfers?.map((t: any) => +t.total_weightage_score || 0) || [];
 
- 
-  this.branchKpiTotal = branchTotals.reduce((acc: number, val: number) => acc + val, 0);
+  const current = this.grandTotalWeightageScore
+    ? [this.grandTotalWeightageScore]
+    : [];
 
-  
-  this.branchKpiAvg = 
-    branchTotals.length > 0 
-      ? this.branchKpiTotal / branchTotals.length 
-      : 0;
+  return [...branch, ...ho, ...current];
 }
+
+getTransferTotal(): number {
+  const values = this.getAllTransferValues();
+  return values.reduce((a, b) => a + b, 0);
+}
+
+getTransferAverage(): number {
+  const values = this.getAllTransferValues();
+  if (values.length === 0) return 0;
+  return this.getTransferTotal() / values.length;
+}
+
 
 }

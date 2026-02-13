@@ -86,7 +86,7 @@ loadPendingEntries() {
   verify(entryId: string) {
     this.branchManagerService.verifyEntry(entryId).subscribe(() => {
       this.loadPendingEntries();
-      this.sharedService.notifyEntryVerified();
+     this.sharedService.notifyEntryVerified();
     });
   }
 

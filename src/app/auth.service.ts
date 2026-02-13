@@ -11,6 +11,7 @@ export interface UserProfile {
   username: string | null;
   branchName: string | null;
   PF_NO: string | null;
+  hod_id: string | null;
 }
 
 @Injectable({

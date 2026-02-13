@@ -37,18 +37,41 @@ export class manageEntriesComponent implements OnInit {
   ngOnInit(): void {
     this.getPeriod();
   }
-  editEntries() {
-    if(this.entriesData.account_no.length !== 14 && (this.entriesData.kpi==='deposit' || this.entriesData.kpi==='loan_gen')){
+editEntries() {
+
+  const kpi = this.entriesData.kpi;
+  let accountNo = (this.entriesData.account_no || '').trim();
+  this.entriesData.account_no = accountNo; // 
+
+  const needsAccountValidation =
+    kpi === 'deposit' || kpi === 'loan_gen';
+
+  if (needsAccountValidation) {
+
+    if (!accountNo) {
+      this.showToast('Account Number is required');
+      return;
+    }
+
+    if (!/^\d+$/.test(accountNo)) {
+      this.showToast('Account Number must contain only digits');
+      return;
+    }
+
+    if (accountNo.length !== 14) {
       this.showToast('Account Number must be 14 digits long');
       return;
     }
-    this.adminService.updateEntries(this.entriesData.id, this.entriesData).subscribe(() => {
-      this.loadEntries();
-      this.entriesData={ id:'', kpi:'', account_no:'', value:'', date:''  };
-      this.showToast('Entry updated successfully!');
-      this.modal.hide();
-    });
   }
+
+  this.adminService.updateEntries(this.entriesData.id, this.entriesData).subscribe(() => {
+    this.loadEntries();
+    this.entriesData = { id:'', kpi:'', account_no:'', value:'', date:'' };
+    this.showToast('Entry updated successfully!');
+    this.modal.hide();
+  });
+}
+
   getPeriod() {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
@@ -115,7 +138,7 @@ export class manageEntriesComponent implements OnInit {
 }
 
   editEntry(entry: any) {
-    console.log(entry);
+    
  
     entry.date = this.formatDate(entry.date);
 

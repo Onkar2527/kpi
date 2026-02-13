@@ -5,6 +5,7 @@ import { PerformanceService } from '../../performance/performance.service';
 import { AuthService } from '../../../auth.service';
 import { PeriodService } from '../../../core/period.service';
 import { AllPerformanceService } from '../all-performance.service';
+import { AdminService } from '../../admin/admin.service';
 
 @Component({
   selector: 'app-weightage-all',
@@ -18,6 +19,7 @@ export class WeightageAllComponent implements OnInit {
   branchId = this.auth.user?.branchId ?? '';
   scores: any;
   HODId = this.auth.user?.id ?? '';
+  hod_id=this.auth.user?.hod_id ?? '';
   hodScores: any;
   hostaffScores: any;
   selectedEmployee: any;
@@ -42,17 +44,21 @@ export class WeightageAllComponent implements OnInit {
  originalScores: any = {};
  isGmScoreLoading = false;
  isHodScoreLoading = true;
+  hostaffScores1: any;
+  clerkHistory: any;
+  mergeHistoryed: any;
   constructor(
     private performanceService: AllPerformanceService,
     public auth: AuthService,
     private periodService: PeriodService,
-    private performanceServicestaff: PerformanceService
+    private performanceServicestaff: PerformanceService,
+    private adminService:AdminService
   ) {}
 
   ngOnInit(): void {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
-      if (this.HODId) {
+      if (this.HODId && this.period) {
         if (
           this.auth.user?.role === 'AGM' ||
           this.auth.user?.role === 'DGM' ||
@@ -70,16 +76,20 @@ export class WeightageAllComponent implements OnInit {
             .getSpecificALLScores(
               this.period,
               this.auth.user?.id,
-              this.auth.user?.role
+              this.auth.user?.role,
+              this.hod_id
             )
             .subscribe((data: any) => {
               this.hostaffScores = data;
             });
+             this.transferStaffHistory();
+             this.transferHOStaffHistory();
         } else if (this.auth.user?.role === 'GM') {
           this.loadAGMScores();
         }
         this.getSalary(this.period, this.auth.user?.PF_NO);
         this.getGMSalary(this.period, this.auth.user?.PF_NO);
+        
         if (
           this.auth.user?.role === 'AGM' ||
           this.auth.user?.role === 'DGM' ||
@@ -92,12 +102,29 @@ export class WeightageAllComponent implements OnInit {
           this.loadKpiroleWiseStaff();
         } else if (this.auth.user?.role === 'GM') {
           this.loadKpiroleWiseAGM(this.selectedEmployee.role);
+        }else{
+          this.loadKpiroleWise();
         }
       }
+      
     });
+    
   }
   
+ getKpis(transfer: any): string[] {
+    if (!transfer) return [];
 
+    const ignore = [
+      'transfer_date',
+      'total_weightage_score',
+      'old_branch_name',
+      'new_branch_name',
+      'old_designation',
+      'new_designation',
+    ];
+
+    return Object.keys(transfer).filter((k) => !ignore.includes(k));
+  }
 loadHodScores() {
   this.isHodScoreLoading = true;
 
@@ -179,24 +206,24 @@ loadAGMScores() {
     this.performanceServicestaff
       .getSalary(period, PF_NO)
       .subscribe((data: any) => {
-        this.AGMsalary = data[0].salary || 0;
-        this.AGMincrementAmt = data[0].increment || 0;
+        this.AGMsalary = data[0]?.salary || 0;
+        this.AGMincrementAmt = data[0]?.increment || 0;
       });
   }
   getGMSalary(period: any, PF_NO: any) {
     this.performanceServicestaff
       .getSalary(period, PF_NO)
       .subscribe((data: any) => {
-        this.GMsalary = data[0].salary || 0;
-        this.GMincrementAmt = data[0].increment || 0;
+        this.GMsalary = data[0]?.salary || 0;
+        this.GMincrementAmt = data[0]?.increment || 0;
       });
   }
    getAGMSalary(period: any, hod_id: any) {
     this.performanceService
       .getAllAGMSalary(period, hod_id)
       .subscribe((data: any) => {
-        this.HOsalary = data[0].salary || 0;
-        this.HOincrementAmt = data[0].increment || 0;
+        this.HOsalary = data[0]?.salary || 0;
+        this.HOincrementAmt = data[0]?.increment || 0;
       });
   }
   getAllHOStaffSalary(period: string, branch_id: string) {
@@ -239,7 +266,7 @@ loadAGMScores() {
   selectEmployee(employee: any) {
     if (!employee) return;
     this.selectedEmployee = employee;
-    console.log(this.selectedEmployee);
+    
     
     if (this.selectedEmployee.kpis) {
       Object.keys(this.selectedEmployee.kpis).forEach((key) => {
@@ -257,6 +284,8 @@ loadAGMScores() {
     ) {
       this.loadKpiroleWiseStaff();
       this.getAllHOStaffSalary(this.period, this.branchId!);
+      this.transferStaffHistory();
+      this.transferHOStaffHistory();
     }
     if (this.auth.user?.role === 'GM') {
        if (this.selectedEmployee?.role)
@@ -265,6 +294,98 @@ loadAGMScores() {
     }
     
   }
+ transferStaffHistory() {
+
+    this.adminService
+      .getTrafterKpiHistory(this.period, this.selectedEmployee?.staffId || this.auth.user?.id)
+      .subscribe((data: any) => {
+        if (Array.isArray(data) && data.length > 0) {
+          this.clerkHistory = data[0];
+          this.mergeHistory();
+        } else {
+          this.clerkHistory= null;
+        }
+      });
+  }
+  transferHOStaffHistory() {
+    this.performanceService
+      .getHoStaffHistory(this.period, this.selectedEmployee?.staffId || this.auth.user?.id)
+      .subscribe((data: any) => {
+        this.hostaffScores1 =
+          Array.isArray(data) && data.length > 0 ? data[0] : null;
+         if (this.hostaffScores1?.length > 0) {
+          this.selectedEmployee = this.hostaffScores1[0];
+        }
+        
+        
+        this.mergeHistory();
+      });
+  }
+  mergeHistory() {
+
+  if (!this.selectedEmployee) {
+    this.selectedEmployee = {};
+  }
+    const h1 = this.clerkHistory;
+    const h2 = this.hostaffScores1;
+
+    if (!h1 && !h2) {
+      this.mergeHistoryed = null;
+      return;
+    }
+
+    const transfers = [...(h1?.transfers || []), ...(h2?.transfers || [])];
+
+    transfers.sort(
+      (a: any, b: any) =>
+        new Date(a.transfer_date || 0).getTime() -
+        new Date(b.transfer_date || 0).getTime(),
+    );
+      const branch =
+        this.clerkHistory?.branch_avg_kpi ||
+        this.clerkHistory?.branch_name ||
+        {};
+      const ho = this.hostaffScores1?.branch_avg_kpi || {};
+
+      this.selectedEmployee.branch_name = {
+        ...(branch || {}),
+        ...(ho || {}),
+      };
+
+    this.mergeHistoryed = {
+      staff_id: h1?.staff_id ?? h2?.staff_id,
+      name: h1?.name ?? h2?.name,
+      period: h1?.period ?? h2?.period,
+      resigned: h1?.resigned ?? h2?.resigned,
+      transfers,
+      total_months: (h1?.total_months || 0) + (h2?.total_months || 0),
+    };
+
+
+    
+  }
+  getAverageKpi(): number {
+
+  if (!this.selectedEmployee?.branch_name) return 0;
+
+ const values = Object.entries(this.selectedEmployee.branch_name)
+  .map(([_, v]: any) => +v.avg_kpi || 0);
+
+  let total = 0;
+  values.forEach(v => total += v);
+
+  total += +this.hostaffScores?.total ||
+           +this.selectedEmployee?.total ||
+           0;
+
+  const count = values.length + 1;
+
+  return count > 0 ? total / count : 0;
+}
+
+  hasBranchData(obj: any): boolean {
+  return obj && Object.keys(obj).length > 0;
+}
 
   submitScores() {
   if (!this.selectedEmployee) return;
@@ -287,7 +408,7 @@ loadAGMScores() {
     .filter((k: any) => {
       const newVal = this.selectedEmployee[k.kpi_name]?.achieved;
       const oldVal = this.originalScores[k.kpi_name]?.achieved;
-      console.log(newVal,oldVal);
+     
       
       return newVal !== undefined && newVal !== oldVal;
     })
