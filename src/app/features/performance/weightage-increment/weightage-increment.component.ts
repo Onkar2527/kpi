@@ -49,7 +49,6 @@ export class WeightageIncrementComponent implements OnInit {
       this.period = period;
 
       if (this.branchId && this.period) {
-      
         if (this.auth.user?.role === 'BM') {
           this.performanceService
             .getBmScores(this.period, this.branchId)
@@ -72,42 +71,46 @@ export class WeightageIncrementComponent implements OnInit {
             }
             this.getAllStaffSalary(this.period, this.branchId!);
             this.transferStaffHistory();
+            this.transferHOStaffHistory();
+            this.transferAttenderHistory();
           });
       }
       this.getSalary(this.period, this.auth.user?.username);
       this.gettrasferBMScore(this.period, this.branchId!);
       this.transferHistory();
-      this.transferHOStaffHistory();
     });
   }
- getAverageKpi(): number {
-  if (!this.selectedEmployee?.branch_name) return 0;
+  getAverageKpi(): number {
+    if (!this.selectedEmployee?.branch_name) return 0;
 
-  const values = Object.entries(this.selectedEmployee.branch_name)
-    .map(([_, v]: any) => v);
+    const values = Object.entries(this.selectedEmployee.branch_name).map(
+      ([_, v]: any) => v,
+    );
 
-  let total = 0;
-  values.forEach((v: any) => {
-    total += +v.avg_kpi;
-  });
+    let total = 0;
+    values.forEach((v: any) => {
+      total += +v.avg_kpi;
+    });
 
-  total += +this.selectedEmployee.originalTotal;
+    total += +this.selectedEmployee.originalTotal;
 
-  const count = values.length + 1;
+    const count = values.length + 1;
 
-  return total / count;
-}
+    return total / count;
+  }
 
   getSalary(period: any, PF_NO: any) {
-    if (!this.period){
-    this.performanceService.getSalary(period, PF_NO).subscribe((data: any) => {
-      this.BMsalary = data[0]?.salary || 0;
-      this.BMincrementAmt = data[0]?.increment || 0;
-    });
-  }
+    if (this.period) {
+      this.performanceService
+        .getSalary(period, PF_NO)
+        .subscribe((data: any) => {
+          this.BMsalary = data[0]?.salary || 0;
+          this.BMincrementAmt = data[0]?.increment || 0;
+        });
+    }
   }
   gettrasferBMScore(period: string, branchId: string) {
-    if(!this.period) return;
+    if (!this.period) return;
     this.performanceService
       .getBmTransferScores(period, branchId)
       .subscribe((data) => {
@@ -234,8 +237,6 @@ export class WeightageIncrementComponent implements OnInit {
     }
   }
   mergeHistory() {
-
-
     const h1 = this.history1;
     const h2 = this.hostaffScores;
     const h3 = this.attenderTransferScores;
@@ -245,35 +246,39 @@ export class WeightageIncrementComponent implements OnInit {
       return;
     }
 
-    const transfers = [...(h1?.transfers || []), ...(h2?.transfers || []), ...(h3?.transfers || [])];
+    const transfers = [
+      ...(h1?.transfers || []),
+      ...(h2?.transfers || []),
+      ...(h3?.transfers || []),
+    ];
 
     transfers.sort(
       (a: any, b: any) =>
         new Date(a.transfer_date || 0).getTime() -
         new Date(b.transfer_date || 0).getTime(),
-    ); 
-     const branch = this.history1?.branch_avg_kpi || this.history1?.branch_name || {};
+    );
+    const branch =
+      this.history1?.branch_avg_kpi || this.history1?.branch_name || {};
     const ho = this.hostaffScores?.branch_avg_kpi || {};
     const attender = this.attenderTransferScores?.branch_avg_kpi || {};
-  
-  
-  
-  this.selectedEmployee.branch_name = {
-    ...branch,
-    ...ho,
-    ...attender,
-  };
 
-    this.mergeHistoryed = {
-      staff_id: h1?.staff_id ?? h2?.staff_id,
-      name: h1?.name ?? h2?.name,
-      period: h1?.period ?? h2?.period,
-      resigned: h1?.resigned ?? h2?.resigned,
-      transfers,
-      total_months: (h1?.total_months || 0) + (h2?.total_months || 0),
+    this.selectedEmployee.branch_name = {
+      ...branch,
+      ...ho,
+      ...attender,
     };
 
-    
+    this.mergeHistoryed = {
+      staff_id: h1?.staff_id ?? h2?.staff_id ?? h3?.staff_id,
+      name: h1?.name ?? h2?.name ?? h3?.name,
+      period: h1?.period ?? h2?.period ?? h3?.period,
+      resigned: h1?.resigned ?? h2?.resigned ?? h3?.resigned,
+      transfers,
+      total_months:
+        (h1?.total_months || 0) +
+        (h2?.total_months || 0) +
+        (h3?.total_months || 0),
+    };
   }
 
   calculateStaffKpiBasedIncrement(score: number) {
@@ -298,6 +303,7 @@ export class WeightageIncrementComponent implements OnInit {
     this.getAllStaffSalary(this.period, this.branchId!);
     this.transferStaffHistory();
     this.transferHOStaffHistory();
+    this.transferAttenderHistory();
   }
 
   submitScores() {

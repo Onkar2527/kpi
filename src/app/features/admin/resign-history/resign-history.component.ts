@@ -5,6 +5,8 @@ import { AdminService } from '../admin.service';
 import { SearchService } from '../../../core/search.service';
 import { PaginationService } from '../../../core/pagination.service';
 import { PeriodService } from 'src/app/core/period.service';
+import { PerformanceService } from '../../performance/performance.service';
+import { AllPerformanceService } from '../../all-performnace/all-performance.service';
 
 @Component({
   selector: 'app-resign-history',
@@ -31,7 +33,9 @@ export class ResignHistoryComponent implements OnInit {
     private adminService: AdminService,
     private searchService: SearchService,
     private paginationService: PaginationService,
-    private periodService: PeriodService
+    private periodService: PeriodService,
+    private performanceServicestaff: PerformanceService,
+        private performanceService:AllPerformanceService
   ) {}
 
   ngOnInit(): void {
@@ -83,27 +87,68 @@ export class ResignHistoryComponent implements OnInit {
   }
 
 
-  editUser(user: any) {
-    this.selectedEmployee = user;
-   
-      
-    this.adminService
-      .getTrafterKpiHistory(this.period, user.staff_id)
-      .subscribe((data: any) => {
-        if (Array.isArray(data) && data.length > 0) {
-          this.history = data[0];
-        } else {
-          this.history = null;
+    getKpis(transfer: any): string[] {
+  if (!transfer) return [];
+
+  return Object.keys(transfer).filter(
+    key =>
+      key !== 'transfer_date' &&
+      key !== 'total_weightage_score' &&
+      key !== 'hod_name' &&
+      key !== 'old_hod_name' &&
+      key !== 'old_branch_name' &&
+      key !== 'new_branch_name' &&
+      key !== 'old_designation' &&
+      key !== 'new_designation'
+  );
+}
+
+
+ editUser(user: any) {
+  this.selectedEmployee = user;
+  if (!user.staff_id) return;
+
+  Promise.all([
+    this.adminService.getTrafterKpiHistory(this.period, user.staff_id).toPromise(),
+    this.performanceService.getHoStaffHistory(this.period, user.staff_id).toPromise(),
+    this.performanceServicestaff.getAttenderTransferScore(this.period, user.staff_id).toPromise()
+  ]).then(([emp, ho, att]: any[]) => {
+
+    const empData = emp?.[0] || null;
+    const hoData = ho?.[0] || null;
+    const attData = att?.[0] || null;
+
+    
+    const transfers = [
+      ...(empData?.transfers || []),
+      ...(hoData?.transfers || []),
+      ...(attData?.transfers || [])
+    ];
+
+    
+    const base = empData || hoData || attData;
+
+    this.history = base
+      ? {
+          name: base.name,
+          period: base.period,
+          resigned: base.resigned,
+          resign_date: base.resign_date,
+          transfers
         }
-        setTimeout(() => {
-          const modalEl = document.getElementById('historyModal');
-          if (modalEl && (window as any).bootstrap) {
-            const modal = new (window as any).bootstrap.Modal(modalEl);
-            modal.show();
-          }
-        }, 0);
-      });
-  }
+      : null;
+
+    setTimeout(() => {
+      const modalEl = document.getElementById('historyModal');
+      if (modalEl && (window as any).bootstrap) {
+        const modal = new (window as any).bootstrap.Modal(modalEl);
+        modal.show();
+      }
+    }, 0);
+
+  });
+}
+
   printHistory() {
   const printContents = document.querySelector('#historyModal .modal-body')?.innerHTML;
   const popupWin = window.open('', '_blank', 'width=1000,height=800');

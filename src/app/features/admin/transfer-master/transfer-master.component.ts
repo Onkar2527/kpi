@@ -117,7 +117,7 @@ export class TransferMasterComponent implements OnInit {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
     });
-    // this.transfer.transfer_date = this.formatDate(new Date());
+    
     this.loadTrasferedStaff();
     this.loadUsers();
     this.loadBranches();
@@ -243,7 +243,7 @@ export class TransferMasterComponent implements OnInit {
       'insurance',
     ];
 
-    // Call branchstaff AFTER you select or fill the staff fields
+    
     const isHO =
       this.transfer.new_designation === 'HO_STAFF' ||
       this.transfer.old_designation === 'HO_STAFF';

@@ -27,6 +27,7 @@ export class WeightageAllComponent implements OnInit {
   AGMincrementAmt = 0;
   ALLAGMsalary = 0;
   ALLAGMincrementAmt = 0;
+  attenderTransferScores: any;
   GMsalary = 0;
   GMincrementAmt = 0;
   HOsalary = 0;
@@ -285,6 +286,7 @@ loadAGMScores() {
       this.loadKpiroleWiseStaff();
       this.getAllHOStaffSalary(this.period, this.branchId!);
       this.transferStaffHistory();
+      this.transferAttenderHistory();
       this.transferHOStaffHistory();
     }
     if (this.auth.user?.role === 'GM') {
@@ -321,6 +323,17 @@ loadAGMScores() {
         this.mergeHistory();
       });
   }
+   transferAttenderHistory() {
+    if (this.selectedEmployee?.staffId) {
+      this.performanceServicestaff
+        .getAttenderTransferScore(this.period, this.selectedEmployee?.staffId)
+        .subscribe((data: any) => {
+          this.attenderTransferScores =
+            Array.isArray(data) && data.length > 0 ? data[0] : null;
+          this.mergeHistory();
+        });
+    }
+  }
   mergeHistory() {
 
   if (!this.selectedEmployee) {
@@ -328,13 +341,15 @@ loadAGMScores() {
   }
     const h1 = this.clerkHistory;
     const h2 = this.hostaffScores1;
+    const h3 = this.attenderTransferScores;
 
-    if (!h1 && !h2) {
+
+    if (!h1 && !h2 && !h3) {
       this.mergeHistoryed = null;
       return;
     }
 
-    const transfers = [...(h1?.transfers || []), ...(h2?.transfers || [])];
+    const transfers = [...(h1?.transfers || []), ...(h2?.transfers || []), ...(h3?.transfers || [])];
 
     transfers.sort(
       (a: any, b: any) =>
@@ -344,21 +359,23 @@ loadAGMScores() {
       const branch =
         this.clerkHistory?.branch_avg_kpi ||
         this.clerkHistory?.branch_name ||
-        {};
+        null;
       const ho = this.hostaffScores1?.branch_avg_kpi || {};
+      const attender = this.attenderTransferScores?.branch_avg_kpi || {};
 
       this.selectedEmployee.branch_name = {
+        ...(attender || {}),
         ...(branch || {}),
         ...(ho || {}),
       };
 
     this.mergeHistoryed = {
-      staff_id: h1?.staff_id ?? h2?.staff_id,
-      name: h1?.name ?? h2?.name,
-      period: h1?.period ?? h2?.period,
-      resigned: h1?.resigned ?? h2?.resigned,
+      staff_id: h1?.staff_id ?? h2?.staff_id ?? h3?.staff_id,
+      name: h1?.name ?? h2?.name ?? h3?.name,
+      period: h1?.period ?? h2?.period ?? h3?.period,
+      resigned: h1?.resigned ?? h2?.resigned ?? h3?.resigned,
       transfers,
-      total_months: (h1?.total_months || 0) + (h2?.total_months || 0),
+      total_months: (h1?.total_months || 0) + (h2?.total_months || 0) + (h3?.total_months || 0),
     };
 
 

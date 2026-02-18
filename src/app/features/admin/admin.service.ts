@@ -218,7 +218,9 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
   hoStaffTransfer(transferData:any){
      return this.http.post(`${environment.apiBaseUrl}/trans/ho_transfer`,transferData);
   }
-  
+   attenderTransfer(transferData:any){
+     return this.http.post(`${environment.apiBaseUrl}/trans/attender_transfer`,transferData);
+  }
 
   allSectionWiseReport(data:any){
      return this.http.post(`${environment.apiBaseUrl}/performnceMaster/getAllBranchesScoreSectionsWise`,data);

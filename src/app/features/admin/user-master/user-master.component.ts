@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +7,7 @@ import { PaginationService } from '../../../core/pagination.service';
 import { BranchManagerService } from '../../branch-manager/branch-manager.service';
 import { PeriodService } from 'src/app/core/period.service';
 import { PerformanceService } from '../../performance/performance.service';
+import { AllPerformanceService } from '../../all-performnace/all-performance.service';
 
 declare var bootstrap: any;
 
@@ -59,6 +59,9 @@ export class UserMasterComponent implements OnInit {
     recovery_achieved: '',
     insurance_target: '',
     insurance_achieved: '',
+    hod_id: '',
+    old_hod_id: '',
+    resiged:''
   };
 
   AGMS: any;
@@ -76,7 +79,9 @@ export class UserMasterComponent implements OnInit {
   user_role: any;
   filteredBranches: any;
   branchSearch: any;
- showDropdown = false;
+  showDropdown = false;
+  hostaffScores: any;
+  attenderScores: any;
 
   constructor(
     private adminService: AdminService,
@@ -84,7 +89,8 @@ export class UserMasterComponent implements OnInit {
     private paginationService: PaginationService,
     private branchManagerService: BranchManagerService,
     private periodService: PeriodService,
-    private performanceService: PerformanceService
+    private performanceService: PerformanceService,
+    private allperformanceService: AllPerformanceService,
   ) {}
 
   ngOnInit(): void {
@@ -107,23 +113,22 @@ export class UserMasterComponent implements OnInit {
     });
   }
   filterBranches(event: any) {
-  const value = event.target.value.toLowerCase();
+    const value = event.target.value.toLowerCase();
 
-  if (value.length === 0) {
-    this.filteredBranches = []; 
-    this.showDropdown = false;  
-  } else {
-    this.filteredBranches = this.branches.filter((branch: any) =>
-      branch.name.toLowerCase().includes(value)
-    );
-    this.showDropdown = true;
+    if (value.length === 0) {
+      this.filteredBranches = [];
+      this.showDropdown = false;
+    } else {
+      this.filteredBranches = this.branches.filter((branch: any) =>
+        branch.name.toLowerCase().includes(value),
+      );
+      this.showDropdown = true;
+    }
   }
-}
 
   selectBranch(branch: any) {
     this.branchSearch = '';
     this.branchSearch = branch.name;
-    
 
     this.transfer.new_branch_id = branch.code;
     this.showDropdown = false;
@@ -131,11 +136,11 @@ export class UserMasterComponent implements OnInit {
   onSearch(): void {
     this.filteredUsers = this.searchService.filterData(
       this.users,
-      this.searchTerm
+      this.searchTerm,
     );
     this.totalPages = this.paginationService.getTotalPages(
       this.filteredUsers,
-      this.pageSize
+      this.pageSize,
     );
     this.updatePaginatedUsers();
     this.updateVisiblePages();
@@ -145,7 +150,7 @@ export class UserMasterComponent implements OnInit {
     this.paginatedUsers = this.paginationService.getPaginatedData(
       this.filteredUsers,
       this.currentPage,
-      this.pageSize
+      this.pageSize,
     );
   }
 
@@ -212,7 +217,6 @@ export class UserMasterComponent implements OnInit {
   }
 
   //     RESIGNATION WORKFLOW
- 
 
   openResignPopup(user: any) {
     this.selectedUser = user;
@@ -232,7 +236,8 @@ export class UserMasterComponent implements OnInit {
     const modalEl = document.getElementById('resignModal')!;
     const modal = bootstrap.Modal.getInstance(modalEl);
     modal.hide();
-
+    
+    
     this.startResignProcess(this.selectedUser, this.resignedDate);
   }
 
@@ -244,7 +249,7 @@ export class UserMasterComponent implements OnInit {
     else if (user.old_branch_id) branchId = user.old_branch_id;
     else if (user.branch_name) {
       const branch = this.branches.find(
-        (b: any) => b.name === user.branch_name
+        (b: any) => b.name === user.branch_name,
       );
       branchId = branch ? branch.code : null;
     }
@@ -282,9 +287,91 @@ export class UserMasterComponent implements OnInit {
           this.populateKPIs(data, kpis);
           this.finalResign(user, branchId, resignedDate);
         });
+    } else if (this.selectedUserRole === 'HO_STAFF') {
+      this.allperformanceService
+        .getSpecificALLScores(
+          this.period,
+          this.transfer.staff_id,
+          this.selectedUserRole,
+          user.hod_id,
+        )
+        .subscribe(
+          (data: any) => {
+            this.hostaffScores = data;
+
+            const kpi = data || {};
+
+            this.transfer.kpi_total = kpi.total || 0;
+            this.transfer.old_designation = this.selectedUserRole || '';
+            this.transfer.period = this.period;
+            this.transfer.old_hod_id = user.hod_id;
+            this.transfer.resiged = 1;
+            
+
+            const map: any = {
+              'Alloted Work': 'deposit',
+              'Discipline & Time Management': 'loan_gen',
+              'General Work Performance': 'loan_amulya',
+              'Branch Communication': 'audit',
+              Insurance: 'insurance',
+            };
+
+            Object.keys(map).forEach((key) => {
+              const field = map[key];
+              const score = kpi[key]?.achieved || 0;
+
+              this.transfer[`${field}_target`] = score;
+              this.transfer[`${field}_achieved`] = score;
+            });
+
+          if(Number(this.transfer.deposit_achieved !==0) || Number(this.transfer.loan_gen_achieved !==0) || Number(this.transfer.loan_amulya_achieved !==0) || Number(this.transfer.audit_achieved !==0))
+           this.finalResignForHoStaff(user, this.transfer, resignedDate);
+          },
+          (error: any) => {
+            alert(error.error.error);
+          },
+        );
+    } else if (this.selectedUserRole === 'Attender') {
+      this.performanceService
+          .getAttenderScore(
+            this.period,
+            this.transfer.staff_id,
+          )
+          .subscribe(
+            (data: any) => {
+              this.attenderScores = data;
+             
+              const kpi = data[0]?.kpis || {};
+
+              this.transfer.kpi_total = data[0].total || 0;
+              this.transfer.old_designation = this.selectedUserRole || '';
+              this.transfer.period = this.period;
+              this.transfer.old_hod_id = this.user.hod_id;4
+              this.transfer.resiged = 1;
+
+              const map: any = {
+                'Cleanliness': 'deposit',
+                'Attitude, Behavior & Discipline': 'loan_gen',
+              };
+
+              Object.keys(map).forEach((key) => {
+                const field = map[key];
+                const score = kpi[key]?.achieved || 0;
+
+                this.transfer[`${field}_target`] = score;
+                this.transfer[`${field}_achieved`] = score;
+              });
+              console.log(this.transfer);
+              
+               if(Number(this.transfer.deposit_achieved !==0) || Number(this.transfer.loan_gen_achieved !==0) )
+               this.finalResignForAttender(user, this.transfer, resignedDate);
+            },
+            (error: any) => {
+              alert(error.error.error);
+            },
+          );
     } else {
       this.transfer.kpi_total = '0';
-      this.finalResign(user, branchId, resignedDate);
     }
   }
 
@@ -294,6 +381,24 @@ export class UserMasterComponent implements OnInit {
     kpis.forEach((k) => {
       this.transfer[`${k}_target`] = data[k]?.target || 0;
       this.transfer[`${k}_achieved`] = data[k]?.achieved || 0;
+    });
+  }
+  finalResignForAttender(user: any, transferData: any, resignDate: string) {
+    this.adminService.attenderTransfer({transferData:transferData}).subscribe(() => {
+      this.adminService.deleteUser(user.id, resignDate).subscribe(() => {
+        this.loadUsers();
+
+        this.resetTransfer();
+      });
+    });
+  }
+  finalResignForHoStaff(user: any, transferData: any, resignDate: string) {
+    this.adminService.hoStaffTransfer({transferData:transferData}).subscribe(() => {
+      this.adminService.deleteUser(user.id, resignDate).subscribe(() => {
+        this.loadUsers();
+
+        this.resetTransfer();
+      });
     });
   }
   finalResign(user: any, branchId: any, resignDate: string) {
@@ -334,6 +439,9 @@ export class UserMasterComponent implements OnInit {
       recovery_achieved: '',
       insurance_target: '',
       insurance_achieved: '',
+      hod_id: '',
+      old_hod_id: '',
+      resiged:''
     };
   }
 

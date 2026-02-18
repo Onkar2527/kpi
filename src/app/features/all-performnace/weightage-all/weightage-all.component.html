@@ -300,7 +300,7 @@
 
   </div>
  
-<div class="card mt-4" *ngIf="clerkHistory || hostaffScores1?.transfers?.length > 0">
+<div class="card mt-4" *ngIf="clerkHistory || hostaffScores1?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
 
   <div class="card-header">
     <h4>KPI Transfer History</h4>
@@ -311,7 +311,6 @@
     <small>
       <strong>Staff:</strong> {{ mergeHistoryed?.name }} |
       <strong>Period:</strong> {{ mergeHistoryed?.period }} |
-      <!-- <strong>Total Months:</strong> {{ mergeHistoryed.total_months }} -->
     </small>
 
     <!-- TRANSFER LOOP -->

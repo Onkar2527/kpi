@@ -35,6 +35,7 @@ export class MyTargetsComponent implements OnInit {
   history:any;
   branchKpiTotal: number = 0;
  branchKpiAvg: number = 0;
+ attenderTransferScores: any;
 
    kpiOrder = [
   "deposit",
@@ -68,7 +69,9 @@ hoKpiAvg: number = 0;
       this.loadTargets();
       this.getSalary(this.period, this.auth.user?.username);
       this.transferStaffHistory();
+      this.transferAttenderHistory();
       this.transferHOStaffHistory();
+      this.transferAttenderHistory();
     });
 
     this.sharedService.entryVerified$.subscribe(() => {
@@ -298,18 +301,31 @@ calculateScores(targets: any[]): any[] {
         this.mergeHistory();
       });
   }
+  transferAttenderHistory() {
+    
+      this.performanceService
+        .getAttenderTransferScore(this.period, this.auth.user!.id)
+        .subscribe((data: any) => {
+          this.attenderTransferScores =
+            Array.isArray(data) && data.length > 0 ? data[0] : null;
+          this.mergeHistory();
+        });
+    
+  }
   mergeHistory() {
 
 
     const h1 = this.history;
     const h2 = this.hostaffScores;
+    const h3 = this.attenderTransferScores;
 
-    if (!h1 && !h2) {
+
+    if (!h1 && !h2 && !h3 ) {
       this.mergeHistoryed = null;
       return;
     }
 
-    const transfers = [...(h1?.transfers || []), ...(h2?.transfers || [])];
+    const transfers = [...(h1?.transfers || []), ...(h2?.transfers || []), ...(h3?.transfers || [])];
 
     transfers.sort(
       (a: any, b: any) =>
@@ -318,12 +334,12 @@ calculateScores(targets: any[]): any[] {
     );
 
     this.mergeHistoryed = {
-      staff_id: h1?.staff_id ?? h2?.staff_id,
-      name: h1?.name ?? h2?.name,
-      period: h1?.period ?? h2?.period,
-      resigned: h1?.resigned ?? h2?.resigned,
-      transfers,
-      total_months: (h1?.total_months || 0) + (h2?.total_months || 0),
+      staff_id: h1?.staff_id ?? h2?.staff_id ?? h3?.staff_id,
+      name: h1?.name ?? h2?.name ?? h3?.name,
+      period: h1?.period ?? h2?.period ?? h3?.period,
+      resigned: h1?.resigned ?? h2?.resigned ?? h3?.resigned,
+      transfers: transfers || [],
+      total_months: (h1?.total_months || 0) + (h2?.total_months || 0) + (h3?.total_months || 0),
     };
 
 
@@ -351,11 +367,14 @@ getAllTransferValues(): number[] {
   const ho =
     this.hostaffScores?.transfers?.map((t: any) => +t.total_weightage_score || 0) || [];
 
+  const attender =
+    this.attenderTransferScores?.transfers?.map((t: any) => +t.total_weightage_score || 0) || [];
+
   const current = this.grandTotalWeightageScore
     ? [this.grandTotalWeightageScore]
     : [];
 
-  return [...branch, ...ho, ...current];
+  return [...branch, ...ho, ...attender, ...current];
 }
 
 getTransferTotal(): number {

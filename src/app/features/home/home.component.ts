@@ -14,7 +14,7 @@ import { AuthService } from '../../auth.service';
 export class HomeComponent {
   constructor(public auth: AuthService) {}
 
-  /** Log out the current user. */
+  
   logout() {
     this.auth.logout();
   }

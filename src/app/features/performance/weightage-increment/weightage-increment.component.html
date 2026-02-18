@@ -111,7 +111,7 @@
       </table>
     </div>
   </div>
-  <div class="card" *ngIf="auth.user?.role === 'BM' && transferBmScores">
+  <div class="card" *ngIf="auth.user?.role === 'BM' && transferBmScores?.transfers?.length > 0">
     <div class="card-header">
       <h4>Transfer Branch Manager KPI Scores ({{ transferBmScores.totalMonthsWorked }} Months)</h4>
     </div>
@@ -130,56 +130,56 @@
         <tbody>
           <tr>
             <td>Deposit</td>
-            <td>{{ transferBmScores.deposit.weightage }}</td>
-            <td>{{ transferBmScores.deposit.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.deposit.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.deposit.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.deposit.weightageScore | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.deposit?.weightage }}</td>
+            <td>{{ transferBmScores?.deposit?.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.deposit?.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.deposit?.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.deposit?.weightageScore | number:'1.2-2' }}</td>
           </tr>
           <tr>
             <td>Loan Gen</td>
-            <td>{{ transferBmScores.loan_gen.weightage }}</td>
-            <td>{{ transferBmScores.loan_gen.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.loan_gen.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.loan_gen.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.loan_gen.weightageScore | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.loan_gen?.weightage }}</td>
+            <td>{{ transferBmScores?.loan_gen?.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.loan_gen?.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.loan_gen?.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.loan_gen?.weightageScore | number:'1.2-2' }}</td>
           </tr>
           <tr>
             <td>Loan Amulya</td>
-            <td>{{ transferBmScores.loan_amulya.weightage }}</td>
-            <td>{{ transferBmScores.loan_amulya.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.loan_amulya.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.loan_amulya.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.loan_amulya.weightageScore | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.loan_amulya?.weightage }}</td>
+            <td>{{ transferBmScores?.loan_amulya?.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.loan_amulya?.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.loan_amulya?.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.loan_amulya?.weightageScore | number:'1.2-2' }}</td>
           </tr>
           <tr>
             <td>Recovery</td>
-            <td>{{ transferBmScores.recovery.weightage }}</td>
-            <td>{{ transferBmScores.recovery.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.recovery.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.recovery.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.recovery.weightageScore | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.recovery?.weightage }}</td>
+            <td>{{ transferBmScores?.recovery?.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.recovery?.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.recovery?.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.recovery?.weightageScore | number:'1.2-2' }}</td>
           </tr>
           <tr>
             <td>Audit</td>
-            <td>{{ transferBmScores.audit.weightage }}</td>
-            <td>{{ transferBmScores.audit.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.audit.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.audit.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.audit.weightageScore | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.audit?.weightage }}</td>
+            <td>{{ transferBmScores?.audit?.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.audit?.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.audit?.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.audit?.weightageScore | number:'1.2-2' }}</td>
           </tr>
           <tr>
             <td>Insurance</td>
-            <td>{{ transferBmScores.insurance.weightage }}</td>
-            <td>{{ transferBmScores.insurance.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.insurance.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.insurance.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores.insurance.weightageScore | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.insurance?.weightage }}</td>
+            <td>{{ transferBmScores?.insurance?.target | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.insurance?.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.insurance?.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores?.insurance?.weightageScore | number:'1.2-2' }}</td>
           </tr>
           <tr>
             <td><strong>Total</strong></td>
             <td colspan="4"></td>
-            <td><strong>{{ transferBmScores.total | number:'1.2-2' }}</strong></td>
+            <td><strong>{{ transferBmScores?.total | number:'1.2-2' }}</strong></td>
           </tr>
         </tbody>
       </table>
@@ -269,7 +269,7 @@
  
 
 <div class="card"
-     *ngIf="history1">
+     *ngIf="history1 || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
 
 
     <div class="card-header">
@@ -290,7 +290,7 @@
         <ng-container *ngFor="let item of selectedEmployee.branch_name | keyvalue">
           {{ +$any(item.value).avg_kpi | number:'1.2-2' }} +
         </ng-container>
-        {{ selectedEmployee.originalTotal | number:'1.2-2' }}
+        {{ selectedEmployee?.originalTotal | number:'1.2-2' }}
         )
         /
         {{ (selectedEmployee.branch_name | keyvalue).length + 1 }}
@@ -345,7 +345,7 @@
 </div>
 
 
-   <div class="card mt-4" *ngIf="history1 || hostaffScores?.transfers?.length > 0">
+   <div class="card mt-4" *ngIf="history1 || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
 
   <div class="card-header">
     <h4>KPI Transfer History</h4>

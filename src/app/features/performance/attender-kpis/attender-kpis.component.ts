@@ -21,7 +21,7 @@ export class AttenderKpisComponent implements OnInit {
   scores: any;
   history: any;
   history1: any;
-  attenderScores: any;
+  attenderScores: any; 
   allStaffSalaries: any;
   selectedEmployee: any;
   staffSalary = 0;
