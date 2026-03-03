@@ -132,7 +132,20 @@ export class ReportsComponent implements OnInit {
     this.ALLTotalUser.sort((a: any, b: any) => {
       const roleA = this.roleOrder[a.role] ?? 99;
       const roleB = this.roleOrder[b.role] ?? 99;
-      return roleA - roleB;
+
+      if (roleA !== roleB) {
+        return roleA - roleB;
+      }
+
+      if (a.role === 'BM' && b.role === 'BM') {
+        return Number(a.branch_id) - Number(b.branch_id);
+      }
+
+      if (a.role === 'Clerk' && b.role === 'Clerk') {
+        return Number(a.username) - Number(b.username);
+      }
+
+      return 0;
     });
   }
   loadingStageText: any;
@@ -307,15 +320,87 @@ export class ReportsComponent implements OnInit {
       this.users.find((u: any) => String(u.PF_NO) === String(pfNo)) || null
     );
   }
+
   serachBranchID1(branchCode: any) {
     if (!Array.isArray(this.users)) {
       return null;
     }
 
     return (
-      this.users.find((u: any) => String(u.branch_id) === String(branchCode) && u.role === 'BM') ||
-      null
+      this.users.find(
+        (u: any) =>
+          String(u.branch_id) === String(branchCode) && u.role === 'BM',
+      ) || null
     );
+  }
+  history: any;
+  hostaffScores: any;
+  attenderTransferScores: any;
+  mergeHistoryed: any;
+  transferStaffHistory(period: any, staff_id: any) {
+    this.adminService
+      .getTrafterKpiHistory(period, staff_id)
+      .subscribe((data: any) => {
+        if (Array.isArray(data) && data.length > 0) {
+          this.history = data[0];
+          this.mergeHistory();
+        } else {
+          this.history = null;
+        }
+      });
+  }
+  transferHOStaffHistory(period: any, staff_id: any) {
+    this.all_performanceService
+      .getHoStaffHistory(period, staff_id)
+      .subscribe((data: any) => {
+        this.hostaffScores =
+          Array.isArray(data) && data.length > 0 ? data[0] : null;
+        this.mergeHistory();
+      });
+    ``;
+  }
+  transferAttenderHistory(period: any, staff_id: any) {
+    this.performanceService
+      .getAttenderTransferScore(period, staff_id)
+      .subscribe((data: any) => {
+        this.attenderTransferScores =
+          Array.isArray(data) && data.length > 0 ? data[0] : null;
+        this.mergeHistory();
+      });
+  }
+  mergeHistory() {
+    const h1 = this.history;
+    const h2 = this.hostaffScores;
+    const h3 = this.attenderTransferScores;
+
+    if (!h1 && !h2 && !h3) {
+      this.mergeHistoryed = null;
+      return;
+    }
+
+    const transfers = [
+      ...(h1?.transfers || []),
+      ...(h2?.transfers || []),
+      ...(h3?.transfers || []),
+    ];
+
+    transfers.sort(
+      (a: any, b: any) =>
+        new Date(a.transfer_date || 0).getTime() -
+        new Date(b.transfer_date || 0).getTime(),
+    );
+
+    this.mergeHistoryed = {
+      staff_id: h1?.staff_id ?? h2?.staff_id ?? h3?.staff_id,
+      name: h1?.name ?? h2?.name ?? h3?.name,
+      period: h1?.period ?? h2?.period ?? h3?.period,
+      resigned: h1?.resigned ?? h2?.resigned ?? h3?.resigned,
+      transfers,
+      total_months:
+        (h1?.total_months || 0) +
+        (h2?.total_months || 0) +
+        (h3?.total_months || 0),
+    };
   }
 
   AGMDGMFunction(
@@ -344,11 +429,11 @@ export class ReportsComponent implements OnInit {
   }
   isAllUsersLoading = false;
   isGMLoading = false;
+  transferBmScores: any;
   generateReport(row: any) {
     this.entredUserData = this.serachBranchID1(row.pf);
 
     if (row.type === 'BM') {
-    
       if (this.entredUserData.role !== 'BM') {
         this.showToast('Enter valid branch code ');
         return;
@@ -569,6 +654,18 @@ export class ReportsComponent implements OnInit {
         )
         .subscribe((data: any) => {
           this.singleHoStaffScore = data;
+          this.transferStaffHistory(
+            this.selectedPeriod,
+            this.entredUserData.id,
+          );
+          this.transferHOStaffHistory(
+            this.selectedPeriod,
+            this.entredUserData.id,
+          );
+          this.transferAttenderHistory(
+            this.selectedPeriod,
+            this.entredUserData.id,
+          );
         });
 
       const modalEl = document.getElementById('hoStaffReportModal');
@@ -748,21 +845,46 @@ export class ReportsComponent implements OnInit {
     } else if (row.type === 'STAFF') {
       this.entredUserData = this.serachBranchID(row.pf);
 
-      if (this.entredUserData.role !== 'Clerk') {
+      if (
+        this.entredUserData.role !== 'Clerk' &&
+        this.entredUserData.role !== 'BM'
+      ) {
         this.showToast('Enter valid PF No Number');
         return;
       }
+      if (this.entredUserData?.role === 'Clerk') {
+        this.performanceService
+          .getStaffScores(
+            this.selectedPeriod,
+            this.entredUserData.id,
+            this.entredUserData.branch_id,
+          )
+          .subscribe((data: any) => {
+            this.singlStaffScore = data;
+          });
+      }
+      if (this.entredUserData?.role === 'BM') {
+        this.performanceService
+          .getBmTransferScores(
+            this.selectedPeriod,
+            this.entredUserData.branch_id,
+          )
+          .subscribe((transferData: any) => {
+            if (!transferData || transferData.length === 0) {
+              this.performanceService
+                .getBmScores(this.selectedPeriod, this.entredUserData.branch_id)
+                .subscribe((bmData: any) => {
+                  this.singlStaffScore = bmData;
+                });
+            } else {
+              this.singlStaffScore = transferData;
+            }
+          });
+      }
 
-      this.performanceService
-        .getStaffScores(
-          this.selectedPeriod,
-          this.entredUserData.id,
-          this.entredUserData.branch_id,
-        )
-        .subscribe((data: any) => {
-          this.singlStaffScore = data;
-        });
-
+      this.transferStaffHistory(this.selectedPeriod, this.entredUserData.id);
+      this.transferHOStaffHistory(this.selectedPeriod, this.entredUserData.id);
+      this.transferAttenderHistory(this.selectedPeriod, this.entredUserData.id);
       const modalEl = document.getElementById('staffReportModal');
       if (modalEl) {
         new bootstrap.Modal(modalEl).show();
@@ -808,6 +930,20 @@ export class ReportsComponent implements OnInit {
         new bootstrap.Modal(modalEl).show();
       }
     }
+  }
+  getKpis(transfer: any): string[] {
+    if (!transfer) return [];
+
+    const ignore = [
+      'transfer_date',
+      'total_weightage_score',
+      'old_branch_name',
+      'new_branch_name',
+      'old_designation',
+      'new_designation',
+    ];
+
+    return Object.keys(transfer).filter((k) => !ignore.includes(k));
   }
   isPdfDownloading = false;
 
@@ -937,12 +1073,12 @@ export class ReportsComponent implements OnInit {
 
       XLSX.utils.book_append_sheet(workbook, worksheet, role.substring(0, 31));
     });
-
+    const formattedDate = new Date()
+      .toLocaleDateString('en-GB')
+      .replace(/\//g, '-');
     XLSX.writeFile(
       workbook,
-      `All_Users_Custom_Role_Wise_${new Date()
-        .toISOString()
-        .slice(0, 10)}.xlsx`,
+      `All_Users_Custom_Role_Wise_Report_${formattedDate}.xlsx`,
     );
   }
   exportAllReportsExcel() {
@@ -999,8 +1135,10 @@ export class ReportsComponent implements OnInit {
       'Clerk Staff KPI',
       this.singlStaffScore,
     );
+    const sheetName = `${this.entredUserData?.name}_${this.selectedPeriod}`;
+
     if (clerkSheet)
-      XLSX.utils.book_append_sheet(workbook, clerkSheet, 'Clerk Staff');
+      XLSX.utils.book_append_sheet(workbook, clerkSheet, sheetName);
 
     /* -------- HO STAFF KPI SHEET (NEW) -------- */
     const hoStaffSheet = this.exportHoStaffExcel(
@@ -1120,16 +1258,14 @@ export class ReportsComponent implements OnInit {
       console.warn('Workbook empty');
       return;
     }
+    const formattedDate = new Date()
+      .toLocaleDateString('en-GB')
+      .replace(/\//g, '-');
     /* ------- DOWNLOAD -------- */
-    XLSX.writeFile(
-      workbook,
-      `Vertical_Staff_KPI_${new Date().toISOString().slice(0, 10)}.xlsx`,
-    );
+    XLSX.writeFile(workbook, `KPI_REPORT_${formattedDate}.xlsx`);
   }
 
   exportStaffKpiVertical(title: string, staffArr: any[]) {
-    
-
     if (!Array.isArray(staffArr) || staffArr.length === 0) return;
 
     const rows: any[] = [];
@@ -1173,38 +1309,110 @@ export class ReportsComponent implements OnInit {
 
     return ws;
   }
-  exportStaffKpiVerticalForSingle(title: string, staffArr: any[]) {
+  exportStaffKpiVerticalForSingle(title: string, staffObj: any) {
     const rows: any[][] = [];
-    const data = this.ensureArray(staffArr);
-    if (!data.length) return;
 
+    if (!staffObj) return;
+
+    // ===== STAFF INFO =====
     rows.push([`STAFF NAME: ${this.entredUserData?.name}`]);
-
+    rows.push([`ROLE: ${this.entredUserData?.role}`]);
     rows.push([]);
 
+    // ===== MAIN KPI TABLE =====
     rows.push(['KPI', 'Target', 'Achieved', 'Weightage', 'Score']);
 
-    data.forEach((k: any) => {
-      if (k.KPI === 'total') {
-        rows.push(['TOTAL', '', '', '', Number(k.value || 0).toFixed(2)]);
-        return;
-      }
+    this.kpiKeys.forEach((kpi: string) => {
+      const item = staffObj[kpi];
+      if (!item) return;
 
       rows.push([
-        k.KPI.toUpperCase(),
-        k.target,
-        k.achieved,
-        k.weightage,
-        Number(k.weightageScore || 0).toFixed(2),
+        kpi.toUpperCase(),
+        item.target || 0,
+        item.achieved || 0,
+        item.weightage || 0,
+        Number(item.weightageScore || 0).toFixed(2),
       ]);
     });
+
+    rows.push([
+      'TOTAL',
+      '',
+      '',
+      '',
+      Number(staffObj.originalTotal || staffObj.total || 0).toFixed(2),
+    ]);
+
+    rows.push([]);
+    rows.push([]);
+
+    // ===== TRANSFER HISTORY =====
+    if (this.mergeHistoryed?.transfers?.length > 0) {
+      rows.push(['TRANSFER HISTORY']);
+      rows.push([]);
+
+      this.mergeHistoryed.transfers.forEach((transfer: any, index: number) => {
+        const formattedDate = new Date(
+          transfer.transfer_date,
+        ).toLocaleDateString('en-GB');
+
+        rows.push([`Transfer ${index + 1}`]);
+        rows.push([`Date: ${formattedDate}`]);
+        if (transfer.hod_name) {
+          rows.push([`Approved by HOD: ${transfer.hod_name}`]);
+        }
+
+        if (transfer.old_branch_name) {
+          rows.push([
+            `Old Branch: ${transfer.old_branch_name} | Old Designation: ${transfer.old_designation || ''}`,
+          ]);
+        }
+
+        if (transfer.new_branch_name) {
+          rows.push([
+            `New Branch: ${transfer.new_branch_name} | New Designation: ${transfer.new_designation || ''}`,
+          ]);
+        }
+
+        rows.push([]);
+
+        rows.push(['KPI', 'Target', 'Achieved', 'Weightage', 'Score']);
+
+        Object.keys(transfer).forEach((key: string) => {
+          if (
+            transfer[key] &&
+            typeof transfer[key] === 'object' &&
+            transfer[key].target !== undefined
+          ) {
+            rows.push([
+              key.toUpperCase(),
+              transfer[key].target || 0,
+              transfer[key].achieved || 0,
+              transfer[key].weightage || 0,
+              Number(transfer[key].weightageScore || 0).toFixed(2),
+            ]);
+          }
+        });
+
+        rows.push([
+          'TOTAL',
+          '',
+          '',
+          '',
+          Number(transfer.total_weightage_score || 0).toFixed(2),
+        ]);
+
+        rows.push([]);
+        rows.push([]);
+      });
+    }
 
     const ws = XLSX.utils.aoa_to_sheet(rows);
 
     ws['!cols'] = [
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 18 },
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 15 },
       { wch: 15 },
       { wch: 15 },
     ];
@@ -1316,55 +1524,173 @@ export class ReportsComponent implements OnInit {
     return ws;
   }
 
-  exportHoStaffExcel(title: string, staffArr: any) {
-    if (!staffArr) return;
-
-    if (!Array.isArray(staffArr)) {
-      staffArr = [staffArr];
-    }
+  exportHoStaffExcel(title: string, staffData: any) {
+    if (!staffData) return;
 
     const ws = XLSX.utils.aoa_to_sheet([]);
-
     let rowIndex = 0;
 
-    staffArr.forEach((staff: any) => {
-      XLSX.utils.sheet_add_aoa(
-        ws,
-        [
-          [
-            `Staff Name: ${staff?.staffName || this.entredUserData?.name || ''}`,
-          ],
-        ],
-        { origin: `A${rowIndex + 1}` },
-      );
+    const staffName = staffData?.staffName || this.entredUserData?.name || '';
 
-      rowIndex += 1;
-
-      const rows = Object.keys(staff)
-        .filter((k) => k !== 'total' && k !== 'staffName' && k !== 'staffId')
-        .map((kpi: string) => ({
-          KPI: kpi,
-          Achieved: staff[kpi]?.achieved ?? '',
-          Weightage: staff[kpi]?.weightage ?? '',
-          Score: staff[kpi]?.score ?? '',
-          WeightageScore: staff[kpi]?.weightageScore ?? '',
-        }));
-
-      rows.push({
-        KPI: 'TOTAL',
-        Achieved: '',
-        Weightage: '',
-        Score: '',
-        WeightageScore: staff.total,
-      });
-
-      XLSX.utils.sheet_add_json(ws, rows, {
-        origin: `A${rowIndex + 1}`,
-        skipHeader: false,
-      });
-
-      rowIndex += rows.length + 2;
+    //  Header
+    XLSX.utils.sheet_add_aoa(ws, [[title || 'HO_STAFF Performance Report']], {
+      origin: `A${rowIndex + 1}`,
     });
+    rowIndex++;
+
+    XLSX.utils.sheet_add_aoa(ws, [[`Staff Name: ${staffName}`]], {
+      origin: `A${rowIndex + 1}`,
+    });
+    rowIndex += 2;
+
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      [['KPI', 'Weightage', 'Achieved', 'Score', 'Weightage Score']],
+      { origin: `A${rowIndex + 1}` },
+    );
+    rowIndex++;
+
+    Object.keys(staffData)
+      .filter(
+        (k) =>
+          k !== 'total' &&
+          k !== 'originalTotal' &&
+          k !== 'staffName' &&
+          k !== 'staffId',
+      )
+      .forEach((kpi) => {
+        if (!staffData[kpi] || typeof staffData[kpi] !== 'object') return;
+
+        XLSX.utils.sheet_add_aoa(
+          ws,
+          [
+            [
+              kpi.toUpperCase(),
+              staffData[kpi]?.weightage ?? '',
+              staffData[kpi]?.achieved ?? '',
+              Number(staffData[kpi]?.score ?? 0).toFixed(2),
+              Number(staffData[kpi]?.weightageScore ?? 0).toFixed(2),
+            ],
+          ],
+          { origin: `A${rowIndex + 1}` },
+        );
+        rowIndex++;
+      });
+
+    //  Summary Total
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      [['TOTAL', '', '', '', staffData.originalTotal ?? staffData.total ?? 0]],
+      { origin: `A${rowIndex + 1}` },
+    );
+    rowIndex += 3;
+
+    if (this.mergeHistoryed?.transfers?.length > 0) {
+      XLSX.utils.sheet_add_aoa(ws, [['KPI Transfer History']], {
+        origin: `A${rowIndex + 1}`,
+      });
+      rowIndex += 2;
+
+      this.mergeHistoryed.transfers.forEach((transfer: any, index: number) => {
+        const formatDate = new Date(transfer.transfer_date).toLocaleDateString(
+          'en-GB',
+        );
+
+        //  Transfer Header
+        XLSX.utils.sheet_add_aoa(
+          ws,
+          [[`Transfer ${index + 1} - ${formatDate}`]],
+          { origin: `A${rowIndex + 1}` },
+        );
+        rowIndex++;
+
+        if (transfer.old_branch_name) {
+          XLSX.utils.sheet_add_aoa(
+            ws,
+            [
+              [
+                `Old Branch: ${transfer.old_branch_name} | Old Designation: ${transfer.old_designation || ''}`,
+              ],
+            ],
+            { origin: `A${rowIndex + 1}` },
+          );
+          rowIndex++;
+        }
+
+        if (transfer.new_branch_name) {
+          XLSX.utils.sheet_add_aoa(
+            ws,
+            [
+              [
+                `New Branch: ${transfer.new_branch_name} | New Designation: ${transfer.new_designation || ''}`,
+              ],
+            ],
+            { origin: `A${rowIndex + 1}` },
+          );
+          rowIndex++;
+        }
+
+        rowIndex++;
+
+        // Transfer KPI Header
+        XLSX.utils.sheet_add_aoa(
+          ws,
+          [
+            [
+              'KPI',
+              'Weightage',
+              'Target',
+              'Achieved',
+              'Score',
+              'Weightage Score',
+            ],
+          ],
+          { origin: `A${rowIndex + 1}` },
+        );
+        rowIndex++;
+
+        this.getKpis(transfer).forEach((kpi: string) => {
+          if (kpi !== 'hod_name' && kpi !== 'old_hod_name') {
+            const item = transfer[kpi];
+            if (!item) return;
+
+            XLSX.utils.sheet_add_aoa(
+              ws,
+              [
+                [
+                  kpi.toUpperCase(),
+                  item?.weightage ?? '',
+                  item?.target ?? '',
+                  item?.achieved ?? '',
+                  Number(item?.score ?? 0).toFixed(2),
+                  Number(item?.weightageScore ?? 0).toFixed(2),
+                ],
+              ],
+              { origin: `A${rowIndex + 1}` },
+            );
+            rowIndex++;
+          }
+        });
+
+        // Transfer Total
+        XLSX.utils.sheet_add_aoa(
+          ws,
+          [
+            [
+              'TOTAL',
+              '',
+              '',
+              '',
+              '',
+              Number(transfer.total_weightage_score ?? 0).toFixed(2),
+            ],
+          ],
+          { origin: `A${rowIndex + 1}` },
+        );
+
+        rowIndex += 3;
+      });
+    }
 
     return ws;
   }

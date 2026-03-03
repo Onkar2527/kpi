@@ -2,7 +2,7 @@
   <h2>Weightage & Increment</h2>
   <p>Computed KPI scores and salary increments based on performance.</p>
 
-  <div class="card" *ngIf="auth.user?.role === 'Clerk' && staffScores">
+  <div class="card mt-4" *ngIf="auth.user?.role === 'Clerk' && staffScores">
     <div class="card-header">
       <h4>My KPI Scores (out of 10)</h4>
     </div>
@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <div class="card" *ngIf="auth.user?.role === 'BM' && bmScores">
+  <div class="card mt-4" *ngIf="auth.user?.role === 'BM' && bmScores">
     <div class="card-header">
       <h4>Branch Manager KPI Scores (out of 10)</h4>
     </div>
@@ -111,7 +111,7 @@
       </table>
     </div>
   </div>
-  <div class="card" *ngIf="auth.user?.role === 'BM' && transferBmScores?.transfers?.length > 0">
+  <div class="card mt-4" *ngIf="auth.user?.role === 'BM' && transferBmScores && transferBmScores.total !== undefined">
     <div class="card-header">
       <h4>Transfer Branch Manager KPI Scores ({{ transferBmScores.totalMonthsWorked }} Months)</h4>
     </div>
@@ -185,6 +185,126 @@
       </table>
     </div>
   </div>
+  <div class="card mt-4"
+    *ngIf="history || hostaffScoresBM?.transfers?.length > 0 || attenderTransferScoresBM?.transfers?.length > 0">
+
+
+    <div class="card-header">
+      <h4>Branch Manager KPI Transfer History</h4>
+    </div>
+
+    <div class="card-body">
+
+      <div *ngFor="let item of mergeHistoryedBM?.branch_name | keyvalue">
+        <b>{{ item.key }}</b> :
+        {{ +$any(item.value).avg_kpi | number:'1.2-2' }}
+        ({{ $any(item.value).months }} months)
+      </div>
+
+      <div class="mt-2">
+        <b>Total Average KPI Score:</b>
+        (
+        <ng-container *ngFor="let item of mergeHistoryedBM?.branch_name | keyvalue">
+          {{ +$any(item.value).avg_kpi | number:'1.2-2' }} +
+        </ng-container>
+        {{ transferBmScores?.total | number:'1.2-2' }}
+        )
+        /
+        {{ (mergeHistoryedBM.branch_name | keyvalue).length + 1 }}
+        = <b>{{ getAverageKpiBM() | number:'1.2-2' }}</b>
+      </div>
+
+    </div>
+  </div>
+  <div class="card mt-4"
+    *ngIf="history || hostaffScoresBM?.transfers?.length > 0 || attenderTransferScoresBM?.transfers?.length > 0">
+
+    <div class="card-header">
+      <h4>KPI Transfer History Of Branch Manager</h4>
+    </div>
+
+    <div class="card-body">
+
+      <small>
+        <strong>Staff:</strong> {{ mergeHistoryedBM.name }} |
+        <strong>Period:</strong> {{ mergeHistoryedBM.period }} |
+
+      </small>
+
+      <!-- TRANSFER LOOP -->
+      <div *ngFor="let transfer of mergeHistoryedBM.transfers; let i = index"
+        class="border rounded p-3 mb-4 shadow-sm mt-3">
+
+        <h5 class="text-primary mb-3">
+          Transfer {{ i + 1 }} —
+          <span class="text-secondary">
+            {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
+          </span>
+        </h5>
+        <p *ngIf="transfer.hod_name" class="mb-2 text-muted">
+          Approved by HOD:
+          <strong>{{ transfer.hod_name }}</strong>
+        </p>
+        <!-- Branch Info (only if exists) -->
+        <p *ngIf="transfer.old_branch_name">
+          <strong>Old Branch:</strong>
+          {{ transfer.old_branch_name }} |
+          <strong>Old Designation:</strong>
+          {{ transfer.old_designation }}
+        </p>
+
+        <p *ngIf="transfer.new_branch_name">
+          <strong>New Branch:</strong>
+          {{ transfer.new_branch_name }} |
+          <strong>New Designation:</strong>
+          {{ transfer.new_designation }}
+        </p>
+
+        <!-- KPI TABLE -->
+        <table class="table table-bordered table-striped mt-3">
+          <thead class="table-dark">
+            <tr>
+              <th>KPI</th>
+              <th>Weightage</th>
+              <th>Target</th>
+              <th>Achieved</th>
+              <th>Score</th>
+              <th>Weightage Score</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <ng-container *ngFor="let kpi of getKpis(transfer)">
+              <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
+                <td>{{ kpi | titlecase }}</td>
+                <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                <td>{{ transfer[kpi]?.target || '-' }}</td>
+                <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+              </tr>
+            </ng-container>
+
+
+            <tr class="table-info">
+              <td><strong>Total</strong></td>
+              <td colspan="4"></td>
+              <td>
+                <strong>
+                  {{ transfer.total_weightage_score | number:'1.2-2' }}
+                </strong>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+
+      </div>
+
+
+    </div>
+  </div>
   <div class="card mt-4" *ngIf="auth.user?.role === 'BM'">
     <div class="card-header">
       <h4>BM Salary Details</h4>
@@ -254,189 +374,169 @@
             <td colspan="4"></td>
             <td>
               <strong>
-                {{ getAverageKpi() === 0
-                ? (selectedEmployee.total | number:'1.2-2')
-                : (getAverageKpi() | number:'1.2-2') }}
+                {{
+                (selectedEmployee.originalTotal | number:'1.2-2')
+                }}
               </strong>
             </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="mt-4" *ngIf="auth.user?.role === 'BM' && selectedEmployee">
+    <div class="card"
+      *ngIf="history1 || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
+  
+  
+      <div class="card-header">
+        <h4>{{ selectedEmployee.staffName }} Transfer Branch History</h4>
+      </div>
+  
+      <div class="card-body">
+  
+        <div *ngFor="let item of selectedEmployee.branch_name | keyvalue">
+          <b>{{ item.key }}</b> :
+          {{ +$any(item.value).avg_kpi | number:'1.2-2' }}
+          
+        </div>
+  
+        <div class="mt-2">
+          <b>Total Average KPI Score:</b>
+          (
+          <ng-container *ngFor="let item of selectedEmployee.branch_name | keyvalue">
+            {{ +$any(item.value).avg_kpi | number:'1.2-2' }} +
+          </ng-container>
+          {{ selectedEmployee?.originalTotal | number:'1.2-2' }}
+          )
+          /
+          {{ (selectedEmployee.branch_name | keyvalue).length + 1 }}
+          = <b>{{ getAverageKpi() | number:'1.2-2' }}</b>
+        </div>
+  
+      </div>
+    </div>
+  
+    <div class="card mt-4">
+      <div class="card-header">
+        <h4>{{ selectedEmployee.staffName }} SALARY DETAILS</h4>
+      </div>
+  
+      <div class="card-body">
+        <table class="table table-bordered">
+          <thead class="table-info">
+            <tr>
+              <th>Designation</th>
+              <th>Basic Inc.</th>
+              <th>Increment Basic.</th>
+              <th>KPI Based</th>
+              <th>Tot. Basic</th>
+              <th>DA</th>
+              <th>Tot. Salary</th>
             </tr>
-            </tbody>
-      </table>
-    </div>
-
-   <div class="card mt-4" *ngIf="auth.user?.role === 'BM' && selectedEmployee">
-
- 
-
-<div class="card"
-     *ngIf="history1 || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
-
-
-    <div class="card-header">
-      <h4>{{ selectedEmployee.staffName }} Transfer Branch History</h4>
-    </div>
-
-    <div class="card-body">
-
-      <div *ngFor="let item of selectedEmployee.branch_name | keyvalue">
-        <b>{{ item.key }}</b> :
-        {{ +$any(item.value).avg_kpi | number:'1.2-2' }}
-        ({{ $any(item.value).months }} months)
+          </thead>
+  
+          <tbody>
+            <tr>
+              <td>Clerk</td>
+              <td>{{ staffSalary | number:'1.2-2' }}</td>
+              <td>{{ staffIncrementAmt | number:'1.2-2' }}</td>
+              <td>{{ calculateKpiBasedIncrementStaff() | number:'1.2-2' }}</td>
+              <td>{{ calculateTotalSalaryStaff() | number:'1.2-2' }}</td>
+              <td>25%</td>
+              <td>{{ finalSalaryStaff() | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-
-      <div class="mt-2">
-        <b>Total Average KPI Score:</b>
-        (
-        <ng-container *ngFor="let item of selectedEmployee.branch_name | keyvalue">
-          {{ +$any(item.value).avg_kpi | number:'1.2-2' }} +
-        </ng-container>
-        {{ selectedEmployee?.originalTotal | number:'1.2-2' }}
-        )
-        /
-        {{ (selectedEmployee.branch_name | keyvalue).length + 1 }}
-        = <b>{{ getAverageKpi() | number:'1.2-2' }}</b>
-      </div>
-     
     </div>
   </div>
-
-
-
-  <div class="card mt-4">
-
+  
+  
+  <div class="card mt-4"
+    *ngIf="history1 || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
+  
     <div class="card-header">
-      <h4>{{ selectedEmployee.staffName }} SALARY DETAILS</h4>
+      <h4>KPI Transfer History</h4>
     </div>
-
+  
     <div class="card-body">
-      <table class="table table-bordered">
-        <thead class="table-info">
-          <tr>
-            <th>Designation</th>
-            <th>Basic Inc.</th>
-            <th>Increment Basic.</th>
-            <th>KPI Based</th>
-            <th>Tot. Basic</th>
-            <th>DA</th>
-            <th>Tot. Salary</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td>Clerk</td>
-            <td>{{ staffSalary | number:'1.2-2' }}</td>
-            <td>{{ staffIncrementAmt | number:'1.2-2' }}</td>
-            <td>{{ calculateKpiBasedIncrementStaff() | number:'1.2-2' }}</td>
-            <td>{{ calculateTotalSalaryStaff() | number:'1.2-2' }}</td>
-            <td>25%</td>
-            <td>{{ finalSalaryStaff() | number:'1.2-2' }}</td>
-          </tr>
-        </tbody>
-      </table>
+  
+      <small>
+        <strong>Staff:</strong> {{ mergeHistoryed.name }} |
+        <strong>Period:</strong> {{ mergeHistoryed.period }} |
+  
+      </small>
+  
+      <!-- TRANSFER LOOP -->
+      <div *ngFor="let transfer of mergeHistoryed.transfers; let i = index"
+        class="border rounded p-3 mb-4 shadow-sm mt-3">
+  
+        <h5 class="text-primary mb-3">
+          Transfer {{ i + 1 }} —
+          <span class="text-secondary">
+            {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
+          </span>
+        </h5>
+        <p *ngIf="transfer.hod_name" class="mb-2 text-muted">
+          Approved by HOD:
+          <strong>{{ transfer.hod_name }}</strong>
+        </p>
+        <!-- Branch Info (only if exists) -->
+        <p *ngIf="transfer.old_branch_name">
+          <strong>Old Branch:</strong>
+          {{ transfer.old_branch_name }} |
+          <strong>Old Designation:</strong>
+          {{ transfer.old_designation }}
+        </p>
+  
+        <p *ngIf="transfer.new_branch_name">
+          <strong>New Branch:</strong>
+          {{ transfer.new_branch_name }} |
+          <strong>New Designation:</strong>
+          {{ transfer.new_designation }}
+        </p>
+  
+        <!-- KPI TABLE -->
+        <table class="table table-bordered table-striped mt-3">
+          <thead class="table-dark">
+            <tr>
+              <th>KPI</th>
+              <th>Weightage</th>
+              <th>Target</th>
+              <th>Achieved</th>
+              <th>Score</th>
+              <th>Weightage Score</th>
+            </tr>
+          </thead>
+  
+          <tbody>
+  
+            <ng-container *ngFor="let kpi of getKpis(transfer)">
+              <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
+                <td>{{ kpi | titlecase }}</td>
+                <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                <td>{{ transfer[kpi]?.target || '-' }}</td>
+                <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+              </tr>
+            </ng-container>
+  
+  
+            <tr class="table-info">
+              <td><strong>Total</strong></td>
+              <td colspan="4"></td>
+              <td>
+                <strong>
+                  {{ transfer.total_weightage_score | number:'1.2-2' }}
+                </strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-
   </div>
-
-
-
- 
-
-</div>
-
-
-   <div class="card mt-4" *ngIf="history1 || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
-
-  <div class="card-header">
-    <h4>KPI Transfer History</h4>
+  
   </div>
-
-  <div class="card-body">
-
-    <small>
-      <strong>Staff:</strong> {{ mergeHistoryed.name }} |
-      <strong>Period:</strong> {{ mergeHistoryed.period }} |
-      
-    </small>
-
-    <!-- TRANSFER LOOP -->
-    <div *ngFor="let transfer of mergeHistoryed.transfers; let i = index"
-         class="border rounded p-3 mb-4 shadow-sm mt-3">
-
-      <h5 class="text-primary mb-3">
-        Transfer {{ i + 1 }} —
-        <span class="text-secondary">
-          {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
-        </span>
-      </h5>
-      <p *ngIf="transfer.hod_name" class="mb-2 text-muted">
-        Approved by HOD:
-        <strong>{{ transfer.hod_name }}</strong>
-      </p>
-      <!-- Branch Info (only if exists) -->
-      <p *ngIf="transfer.old_branch_name">
-        <strong>Old Branch:</strong>
-        {{ transfer.old_branch_name }} |
-        <strong>Old Designation:</strong>
-        {{ transfer.old_designation }}
-      </p>
-
-      <p *ngIf="transfer.new_branch_name">
-        <strong>New Branch:</strong>
-        {{ transfer.new_branch_name }} |
-        <strong>New Designation:</strong>
-        {{ transfer.new_designation }}
-      </p>
-
-      <!-- KPI TABLE -->
-      <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-          <tr>
-            <th>KPI</th>
-             <th>Weightage</th>
-            <th>Target</th>
-            <th>Achieved</th>
-            <th>Score</th>
-            <th>Weightage Score</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-        <ng-container *ngFor="let kpi of getKpis(transfer)">
-          <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
-            <td>{{ kpi | titlecase }}</td>
-            <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
-            <td>{{ transfer[kpi]?.target || '-' }}</td>
-            <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
-            <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
-            <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
-          </tr>
-        </ng-container>
-
-
-          <tr class="table-info">
-            <td><strong>Total</strong></td>
-            <td colspan="4"></td>
-            <td>
-              <strong>
-                {{ transfer.total_weightage_score | number:'1.2-2' }}
-              </strong>
-            </td>
-          </tr>
-
-        </tbody>
-      </table>
-
-    </div>
-
-    
-  </div>
-</div>
-  </div>
-
-</div>
-
-
-
-

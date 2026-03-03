@@ -27,6 +27,9 @@ autoDistributeTargetsToTransfer(period: string, branchId: string) {
   autoDistributeTargetsTorResign(period: string, branchId: string) {
     return this.http.post(`${environment.apiBaseUrl}/allocations/auto-distribute-resign?period=${period}&branchId=${branchId}`, {});
   }
+   autoDistributeTargetsTorResignBM(period: string, branchId: string) {
+    return this.http.post(`${environment.apiBaseUrl}/allocations/auto-distribute-resign-BM?period=${period}&branchId=${branchId}`, {});
+  }
   autoDistributeTargetsNewUser(period: string, branchId: string) {
     return this.http.post(`${environment.apiBaseUrl}/allocations/auto-distribute-new-user?period=${period}&branchId=${branchId}`, {});
   }

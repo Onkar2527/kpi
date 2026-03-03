@@ -1096,7 +1096,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let kpi of singleHoStaffScore | keyvalue">
-                <ng-container *ngIf="kpi.key !== 'total'">
+                <ng-container *ngIf="kpi.key !== 'total' && kpi.key !== 'originalTotal'">
                   <td>{{ $any(kpi.key) }}</td>
                   <td>{{ $any(kpi.value).weightage }}</td>
                   <td>{{ $any(kpi.value).achieved }}</td>
@@ -1106,10 +1106,95 @@
               </tr>
               <tr class="table-info fw-bold">
                 <td colspan="4">Total</td>
-                <td>{{ singleHoStaffScore.total | number: "1.2-2" }}</td>
+                <td>{{ singleHoStaffScore.originalTotal | number: "1.2-2" }}</td>
               </tr>
             </tbody>
           </table>
+        </div>
+         <div class="card mt-4 shadow-sm border-0"
+          *ngIf="history || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
+
+          <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0">🔁 KPI Transfer History</h4>
+          </div>
+
+          <div class="card-body bg-light">
+
+            <small class="text-muted">
+              <strong>Staff:</strong> {{ mergeHistoryed.name }} |
+              <strong>Period:</strong> {{ mergeHistoryed.period }}
+            </small>
+
+            <!-- TRANSFER LOOP -->
+            <div *ngFor="let transfer of mergeHistoryed.transfers; let i = index"
+              class="border-start border-4 border-secondary rounded p-3 mb-4 mt-3 shadow-sm bg-white">
+
+              <h5 class="text-secondary mb-3 fw-bold">
+                Transfer {{ i + 1 }} —
+                <span class="text-muted">
+                  {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
+                </span>
+              </h5>
+
+              <p *ngIf="transfer.hod_name" class="mb-2 text-muted">
+                Approved by HOD:
+                <strong class="text-dark">{{ transfer.hod_name }}</strong>
+              </p>
+
+              <p *ngIf="transfer.old_branch_name">
+                <strong>Old Branch:</strong>
+                {{ transfer.old_branch_name }} |
+                <strong>Old Designation:</strong>
+                {{ transfer.old_designation }}
+              </p>
+
+              <p *ngIf="transfer.new_branch_name">
+                <strong>New Branch:</strong>
+                {{ transfer.new_branch_name }} |
+                <strong>New Designation:</strong>
+                {{ transfer.new_designation }}
+              </p>
+
+              <!-- KPI TABLE -->
+              <table class="table table-bordered table-striped mt-3">
+                <thead class="table-secondary">
+                  <tr>
+                    <th>KPI</th>
+                    <th>Weightage</th>
+                    <th>Target</th>
+                    <th>Achieved</th>
+                    <th>Score</th>
+                    <th>Weightage Score</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  <ng-container *ngFor="let kpi of getKpis(transfer)">
+                    <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
+                      <td>{{ kpi | titlecase }}</td>
+                      <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                      <td>{{ transfer[kpi]?.target || '-' }}</td>
+                      <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                      <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                      <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+                    </tr>
+                  </ng-container>
+
+                  <tr class="table-info fw-bold">
+                    <td>Total</td>
+                    <td colspan="4"></td>
+                    <td>
+                      {{ transfer.total_weightage_score | number:'1.2-2' }}
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
@@ -1118,32 +1203,23 @@
 
 <!-- Clerk ReportModal MODAL -->
 <div class="modal fade" id="staffReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-     <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
-        <h5 class="modal-title mb-0 fw-bold">📊 Clerk Performance Report</h5>
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="modal-title mb-0 fw-bold">📊 Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('staffReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('staffReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -1156,18 +1232,14 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
       <!-- BODY -->
       <div class="modal-body" id="staffReportContent">
-        <div *ngIf="singlStaffScore" class="bm-summary">
-          <h5 class="mb-3">{{ entredUserData?.name }} (Clerk)</h5>
+        <div *ngIf="singlStaffScore " class="bm-summary">
+          <h5 class="mb-3">{{ entredUserData?.name }} ({{ entredUserData?.role }})</h5>
 
           <table class="table table-bordered table-striped">
             <thead class="table-dark">
@@ -1189,11 +1261,11 @@
                 <td>{{ singlStaffScore[kpi]?.achieved | number }}</td>
                 <td>
                   {{
-                    singlStaffScore[kpi]?.target > 0
-                      ? ((singlStaffScore[kpi].achieved /
-                          singlStaffScore[kpi].target) *
-                          100 | number: "1.2-2")
-                      : "0"
+                  singlStaffScore[kpi]?.target > 0
+                  ? ((singlStaffScore[kpi].achieved /
+                  singlStaffScore[kpi].target) *
+                  100 | number: "1.2-2")
+                  : "0"
                   }}%
                 </td>
                 <td>{{ singlStaffScore[kpi]?.score | number: "1.2-2" }}</td>
@@ -1203,10 +1275,96 @@
               </tr>
               <tr class="table-info fw-bold">
                 <td colspan="6">Total</td>
-                <td>{{ singlStaffScore.total | number: "1.2-2" }}</td>
+                <td>{{ (singlStaffScore.originalTotal | number: "1.2-2") || (singlStaffScore.total | number: "1.2-2") ||
+                  '0.00' }}</td>
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="card mt-4 shadow-sm border-0"
+          *ngIf="history || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
+
+          <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0">🔁 KPI Transfer History</h4>
+          </div>
+
+          <div class="card-body bg-light">
+
+            <small class="text-muted">
+              <strong>Staff:</strong> {{ mergeHistoryed.name }} |
+              <strong>Period:</strong> {{ mergeHistoryed.period }}
+            </small>
+
+            <!-- TRANSFER LOOP -->
+            <div *ngFor="let transfer of mergeHistoryed.transfers; let i = index"
+              class="border-start border-4 border-secondary rounded p-3 mb-4 mt-3 shadow-sm bg-white">
+
+              <h5 class="text-secondary mb-3 fw-bold">
+                Transfer {{ i + 1 }} —
+                <span class="text-muted">
+                  {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
+                </span>
+              </h5>
+
+              <p *ngIf="transfer.hod_name" class="mb-2 text-muted">
+                Approved by HOD:
+                <strong class="text-dark">{{ transfer.hod_name }}</strong>
+              </p>
+
+              <p *ngIf="transfer.old_branch_name">
+                <strong>Old Branch:</strong>
+                {{ transfer.old_branch_name }} |
+                <strong>Old Designation:</strong>
+                {{ transfer.old_designation }}
+              </p>
+
+              <p *ngIf="transfer.new_branch_name">
+                <strong>New Branch:</strong>
+                {{ transfer.new_branch_name }} |
+                <strong>New Designation:</strong>
+                {{ transfer.new_designation }}
+              </p>
+
+              <!-- KPI TABLE -->
+              <table class="table table-bordered table-striped mt-3">
+                <thead class="table-secondary">
+                  <tr>
+                    <th>KPI</th>
+                    <th>Weightage</th>
+                    <th>Target</th>
+                    <th>Achieved</th>
+                    <th>Score</th>
+                    <th>Weightage Score</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  <ng-container *ngFor="let kpi of getKpis(transfer)">
+                    <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
+                      <td>{{ kpi | titlecase }}</td>
+                      <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                      <td>{{ transfer[kpi]?.target || '-' }}</td>
+                      <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                      <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                      <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+                    </tr>
+                  </ng-container>
+
+                  <tr class="table-info fw-bold">
+                    <td>Total</td>
+                    <td colspan="4"></td>
+                    <td>
+                      {{ transfer.total_weightage_score | number:'1.2-2' }}
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
@@ -1680,7 +1838,7 @@
                     'text-black': branch.departmentData.score >= 0,
                   }"
                 >
-                  {{ branch.departmentData.score | number: "1.2-2" }}
+                  {{ branch.departmentData?.score | number: "1.2-2" }}
                 </td>
               </tr>
             </tbody>

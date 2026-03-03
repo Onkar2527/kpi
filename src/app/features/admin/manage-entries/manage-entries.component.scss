@@ -20,3 +20,9 @@
   90% { opacity: 1; }
   100% { opacity: 0; transform: translateY(20px); }
 }
+
+.scroll-dropdown {
+  max-height: 250px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

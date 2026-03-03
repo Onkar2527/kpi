@@ -48,6 +48,7 @@ export class WeightageAllComponent implements OnInit {
   hostaffScores1: any;
   clerkHistory: any;
   mergeHistoryed: any;
+  isLoading: boolean = false;
   constructor(
     private performanceService: AllPerformanceService,
     public auth: AuthService,
@@ -194,15 +195,26 @@ loadAGMScores() {
 }
 
   loadScores() {
-    this.performanceService
-      .getScores(this.period, this.HODId, 'HO_STAFF')
-      .subscribe((data: any) => {
+  this.isLoading = true;   
+
+  this.performanceService
+    .getScores(this.period, this.HODId, 'HO_STAFF')
+    .subscribe({
+      next: (data: any) => {
         this.scores = data;
-        if (this.scores.length > 0) {
+
+        if (this.scores?.length > 0) {
           this.selectEmployee(this.scores[0]);
         }
-      });
-  }
+
+        this.isLoading = false;  
+      },
+      error: (err) => {
+        console.error('Error loading scores:', err);
+        this.isLoading = false;  
+      }
+    });
+}
   getSalary(period: any, PF_NO: any) {
     this.performanceServicestaff
       .getSalary(period, PF_NO)
@@ -391,8 +403,8 @@ loadAGMScores() {
   let total = 0;
   values.forEach(v => total += v);
 
-  total += +this.hostaffScores?.total ||
-           +this.selectedEmployee?.total ||
+  total += +this.hostaffScores?.originalTotal ||
+           +this.selectedEmployee?.originalTotal ||
            0;
 
   const count = values.length + 1;

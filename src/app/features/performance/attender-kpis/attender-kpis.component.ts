@@ -43,10 +43,16 @@ export class AttenderKpisComponent implements OnInit {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
       if (this.period) {
-        if (this.auth.user?.role === 'BM' || this.auth.user?.role === 'GM') {
+        if (this.auth.user?.role === 'BM' || this.auth.user?.role === 'GM' || this.auth.user?.role === 'Attender') {
           this.getAttenderScore(
             this.period,
             this.branchId!,
+            this.auth.user!.id,
+          );
+        }
+        if ( this.auth.user?.role === 'Attender') {
+          this.getSingleAttenderScore(
+            this.period,
             this.auth.user!.id,
           );
         }
@@ -70,6 +76,17 @@ export class AttenderKpisComponent implements OnInit {
   getAttenderScore(period: string, branchId: string, hod_id: string) {
     this.performanceService
       .getAttenderScores(period, branchId, hod_id)
+      .subscribe((data) => {
+        this.attenderScores = data;
+        if (this.attenderScores.length > 0) {
+          this.selectEmployee(this.attenderScores[0]);
+        }
+      });
+  }
+  
+ getSingleAttenderScore(period: string,hod_id: string) {
+    this.performanceService
+      .getAttenderScore(period,hod_id)
       .subscribe((data) => {
         this.attenderScores = data;
         if (this.attenderScores.length > 0) {

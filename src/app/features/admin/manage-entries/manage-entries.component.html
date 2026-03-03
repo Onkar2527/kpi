@@ -1,21 +1,136 @@
 <div class="container mt-4">
   <h2>Manage KPI Entries</h2>
 
-  <div class="mb-3">
-    <input
-      type="text"
-      class="form-control"
-      placeholder="Search..."
-      [(ngModel)]="searchTerm"
-      (ngModelChange)="onSearch()"
-    />
+
+  <div class="row mb-3">
+    <div class="col-md-12">
+    <input type="text" class="form-control form-control-sm" placeholder="Search..." [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearch()" />
+     </div> 
   </div>
+
+
+  <div class="row mb-3 align-items-end">
+
+    <!-- KPI Type -->
+    <div class="col-md-2">
+      <label class="small fw-bold">KPI Type</label>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
+          data-bs-toggle="dropdown">
+          {{ selectedKpiTypes.length > 0
+          ? selectedKpiTypes.join(', ')
+          : 'Select KPI' }}
+        </button>
+
+        <ul class="dropdown-menu w-100 p-2 scroll-dropdown">
+          <li *ngFor="let kpi of uniqueKpiTypes">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" [checked]="selectedKpiTypes.includes(kpi)"
+                (change)="toggleSelection(kpi, selectedKpiTypes)" />
+              <label class="form-check-label">
+                {{ kpi }}
+              </label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="col-md-2">
+      <label class="small fw-bold">Status</label>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
+          data-bs-toggle="dropdown">
+          {{ selectedStatuses.length > 0
+          ? selectedStatuses.join(', ')
+          : 'Select Status' }}
+        </button>
+
+        <ul class="dropdown-menu w-100 p-2 scroll-dropdown">
+          <li *ngFor="let status of uniqueStatuses">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" [checked]="selectedStatuses.includes(status)"
+                (change)="toggleSelection(status, selectedStatuses)" />
+              <label class="form-check-label">
+                {{ status }}
+              </label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PF Number -->
+    <div class="col-md-2">
+      <label class="small fw-bold">PF Number</label>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
+          data-bs-toggle="dropdown">
+          {{ selectedPfNumbers.length > 0
+          ? selectedPfNumbers.join(', ')
+          : 'Select PF Number' }}
+        </button>
+
+        <ul class="dropdown-menu w-100 p-2 scroll-dropdown">
+          <li *ngFor="let pf of uniquePfNumbers">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" [checked]="selectedPfNumbers.includes(pf)"
+                (change)="toggleSelection(pf, selectedPfNumbers)" />
+              <label class="form-check-label">
+                {{ pf }}
+              </label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Branch -->
+    <div class="col-md-3">
+      <label class="small fw-bold">Branch Name</label>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
+          data-bs-toggle="dropdown">
+          {{ selectedBranches.length > 0
+          ? selectedBranches.join(', ')
+          : 'Select Branch' }}
+        </button>
+
+        <ul class="dropdown-menu w-100 p-2 scroll-dropdown">
+          <li *ngFor="let branch of uniqueBranches">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" [checked]="selectedBranches.includes(branch)"
+                (change)="toggleSelection(branch, selectedBranches)" />
+              <label class="form-check-label">
+                {{ branch }}
+              </label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Clear Button -->
+    <div class="col-md-3 text-end">
+      <button class="btn btn-sm btn-danger" (click)="clearAllFilters()" [disabled]="
+        !searchTerm &&
+        !selectedKpiTypes.length &&
+        !selectedStatuses.length &&
+        !selectedPfNumbers.length &&
+        !selectedBranches.length
+      ">
+        Clear All Filters
+      </button>
+    </div>
+
+  </div>
+
+
+
   <div *ngIf="loading" class="d-flex justify-content-center my-5">
-    <div
-      class="spinner-border text-primary"
-      role="status"
-      style="width: 3rem; height: 3rem"
-    >
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem">
       <span class="visually-hidden">Loading...</span>
     </div>
   </div>
@@ -47,10 +162,7 @@
         <td>{{ entry.date | date: "dd-MM-yyyy" }}</td>
         <td>{{ entry.status }}</td>
         <td>
-          <button
-            class="btn btn-primary btn-sm me-2"
-            (click)="editEntry(entry)"
-          >
+          <button class="btn btn-primary btn-sm me-2" (click)="editEntry(entry)">
             Edit
           </button>
           <button class="btn btn-danger btn-sm" (click)="deleteEntry(entry.id)">
@@ -64,31 +176,17 @@
   <nav *ngIf="totalPages > 1">
     <ul class="pagination justify-content-center">
       <li class="page-item" [class.disabled]="currentPage === 1">
-        <a
-          class="page-link"
-          href="#"
-          (click)="goToPage($event, currentPage - 1)"
-          >Previous</a
-        >
+        <a class="page-link" href="#" (click)="goToPage($event, currentPage - 1)">Previous</a>
       </li>
 
-      <li
-        class="page-item"
-        *ngFor="let page of visiblePages"
-        [class.active]="currentPage === page"
-      >
+      <li class="page-item" *ngFor="let page of visiblePages" [class.active]="currentPage === page">
         <a class="page-link" href="#" (click)="goToPage($event, page)">{{
           page
-        }}</a>
+          }}</a>
       </li>
 
       <li class="page-item" [class.disabled]="currentPage === totalPages">
-        <a
-          class="page-link"
-          href="#"
-          (click)="goToPage($event, currentPage + 1)"
-          >Next</a
-        >
+        <a class="page-link" href="#" (click)="goToPage($event, currentPage + 1)">Next</a>
       </li>
     </ul>
   </nav>
@@ -99,81 +197,44 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Edit Entries</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
         <div class="mb-3">
-          
-          <ng-container
-            *ngIf="
+
+          <ng-container *ngIf="
               entriesData.kpi === 'deposit' || entriesData.kpi === 'loan_gen'
-            "
-          >
+            ">
             <label for="account_no" class="form-label">Account Number</label>
-            <input disabled
-              type="text"
-              class="form-control"
-              id="account_no"
-              [(ngModel)]="entriesData.account_no"
-              name="account_no"
-            />
+            <input disabled type="text" class="form-control" id="account_no" [(ngModel)]="entriesData.account_no"
+              name="account_no" />
           </ng-container>
-  
+
         </div>
 
         <div class="mb-3">
           <label for="date" class="form-label">Date</label>
-          <input
-            type="date"
-            class="form-control"
-            id="date"
-            [(ngModel)]="entriesData.date"
-            name="date"
-          />
+          <input type="date" class="form-control" id="date" [(ngModel)]="entriesData.date" name="date" />
         </div>
 
         <div class="mb-3">
           <label for="kpi" class="form-label">KPI NAME</label>
-          <input
-            type="text"
-            class="form-control"
-            id="kpi"
-            [(ngModel)]="entriesData.kpi"
-            name="kpi"
-          />
+          <input type="text" class="form-control" id="kpi" [(ngModel)]="entriesData.kpi" name="kpi" />
         </div>
 
         <div class="mb-3">
-          <ng-container
-            *ngIf="
+          <ng-container *ngIf="
               entriesData.kpi === 'loan_amulya';
               else Kpi
-            "
-          >
-          <label for="value" class="form-label">Number of Accounts</label>
-          <input
-            type="text"
-            class="form-control"
-            id="value"
-            [(ngModel)]="entriesData.value"
-            name="value"
-          />
+            ">
+            <label for="value" class="form-label">Number of Accounts</label>
+            <input type="text" class="form-control" id="value" [(ngModel)]="entriesData.value" name="value" />
           </ng-container>
-          
-            <ng-template #Kpi>
+
+          <ng-template #Kpi>
             <label for="value" class="form-label">Value</label>
-          <input
-            type="text"
-            class="form-control"
-            id="value"
-            [(ngModel)]="entriesData.value"
-            name="value"
-          />
+            <input type="text" class="form-control" id="value" [(ngModel)]="entriesData.value" name="value" />
           </ng-template>
         </div>
       </div>

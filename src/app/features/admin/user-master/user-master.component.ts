@@ -82,6 +82,7 @@ export class UserMasterComponent implements OnInit {
   showDropdown = false;
   hostaffScores: any;
   attenderScores: any;
+  toastMessage: any;
 
   constructor(
     private adminService: AdminService,
@@ -131,6 +132,8 @@ export class UserMasterComponent implements OnInit {
     this.branchSearch = branch.name;
 
     this.transfer.new_branch_id = branch.code;
+    this.user.branch_id = branch.code;
+
     this.showDropdown = false;
   }
   onSearch(): void {
@@ -285,7 +288,7 @@ export class UserMasterComponent implements OnInit {
         .getBmScores(this.period, branchId)
         .subscribe((data: any) => {
           this.populateKPIs(data, kpis);
-          this.finalResign(user, branchId, resignedDate);
+          this.finalResignBM(user, branchId, resignedDate);
         });
     } else if (this.selectedUserRole === 'HO_STAFF') {
       this.allperformanceService
@@ -324,8 +327,11 @@ export class UserMasterComponent implements OnInit {
               this.transfer[`${field}_achieved`] = score;
             });
 
-          if(Number(this.transfer.deposit_achieved !==0) || Number(this.transfer.loan_gen_achieved !==0) || Number(this.transfer.loan_amulya_achieved !==0) || Number(this.transfer.audit_achieved !==0))
-           this.finalResignForHoStaff(user, this.transfer, resignedDate);
+          if(Number(this.transfer.deposit_achieved !==0) || Number(this.transfer.loan_gen_achieved !==0) || Number(this.transfer.loan_amulya_achieved !==0) || Number(this.transfer.audit_achieved !==0)){
+           this.finalResignForHoStaff(user, this.transfer, resignedDate);}
+           else{
+              this.showToast('Please First Do Marking for HO Staff');
+           }
           },
           (error: any) => {
             alert(error.error.error);
@@ -361,10 +367,13 @@ export class UserMasterComponent implements OnInit {
                 this.transfer[`${field}_target`] = score;
                 this.transfer[`${field}_achieved`] = score;
               });
-              console.log(this.transfer);
               
-               if(Number(this.transfer.deposit_achieved !==0) || Number(this.transfer.loan_gen_achieved !==0) )
-               this.finalResignForAttender(user, this.transfer, resignedDate);
+              
+               if(Number(this.transfer.deposit_achieved !==0) || Number(this.transfer.loan_gen_achieved !==0)){
+               this.finalResignForAttender(user, this.transfer, resignedDate);}
+               else{
+              this.showToast('Please First Do Marking for Attender');
+              }
             },
             (error: any) => {
               alert(error.error.error);
@@ -416,6 +425,20 @@ export class UserMasterComponent implements OnInit {
       });
     });
   }
+  finalResignBM(user: any, branchId: any, resignDate: string) {
+    this.adminService.addTrasferedStaff(this.transfer).subscribe(() => {
+      this.adminService.deleteUser(user.id, resignDate).subscribe(() => {
+        this.branchManagerService
+          .autoDistributeTargetsTorResignBM(this.period, branchId)
+          .subscribe(() => {
+           
+            this.loadUsers();
+
+            this.resetTransfer();
+          });
+      });
+    });
+  }
 
   resetTransfer() {
     this.transfer = {
@@ -452,5 +475,13 @@ export class UserMasterComponent implements OnInit {
       userId: userId,
     };
     this.adminService.updateEmployeeTrasfer(payload).subscribe(() => {});
+  
+  }
+   showToast(msg: string) {
+    this.toastMessage = msg;
+
+    setTimeout(() => {
+      this.toastMessage = '';
+    }, 3000);
   }
 }

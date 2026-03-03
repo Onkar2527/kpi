@@ -33,9 +33,14 @@ export class WeightageIncrementComponent implements OnInit {
   history1: any;
   transferBmScores: any;
   attenderTransferScores: any;
+  attenderTransferScoresBM: any;
   bmtransferSum: any;
   hostaffScores: any;
+  hostaffScoresBM: any;
   mergeHistoryed: any;
+  mergeHistoryedBM: any;
+  BMOverAllScore: any;
+
   constructor(
     private performanceService: PerformanceService,
     private al: AllPerformanceService,
@@ -77,6 +82,8 @@ export class WeightageIncrementComponent implements OnInit {
       }
       this.getSalary(this.period, this.auth.user?.username);
       this.gettrasferBMScore(this.period, this.branchId!);
+      this.transferHOStaffHistoryBM();
+      this.transferAttenderHistoryBM();
       this.transferHistory();
     });
   }
@@ -199,6 +206,7 @@ export class WeightageIncrementComponent implements OnInit {
             },
             { sum: 0, count: 0 },
           );
+          this.mergeHistoryBM();
         } else {
           this.history = null;
         }
@@ -280,7 +288,88 @@ export class WeightageIncrementComponent implements OnInit {
         (h3?.total_months || 0),
     };
   }
+  mergeHistoryBM() {
+    const h1 = this.history;
+    const h2 = this.hostaffScoresBM;
+    const h3 = this.attenderTransferScoresBM;
 
+    if (!h1 && !h2 && !h3) {
+      this.mergeHistoryedBM = null;
+      return;
+    }
+
+    const transfers = [
+      ...(h1?.transfers || []),
+      ...(h2?.transfers || []),
+      ...(h3?.transfers || []),
+    ];
+
+    transfers.sort(
+      (a: any, b: any) =>
+        new Date(a.transfer_date || 0).getTime() -
+        new Date(b.transfer_date || 0).getTime(),
+    );
+    const branch =
+      this.history?.branch_avg_kpi || this.history?.branch_name || {};
+    const ho = this.hostaffScoresBM?.branch_avg_kpi || {};
+    const attender = this.attenderTransferScoresBM?.branch_avg_kpi || {};
+
+    this.mergeHistoryedBM = {
+      staff_id: h1?.staff_id ?? h2?.staff_id ?? h3?.staff_id,
+      name: h1?.name ?? h2?.name ?? h3?.name,
+      period: h1?.period ?? h2?.period ?? h3?.period,
+      resigned: h1?.resigned ?? h2?.resigned ?? h3?.resigned,
+      transfers,
+      total_months:
+        (h1?.total_months || 0) +
+        (h2?.total_months || 0) +
+        (h3?.total_months || 0),
+      branch_name: {
+        ...branch,
+        ...ho,
+        ...attender,
+      },
+    };
+  }
+  getAverageKpiBM(): number {
+    if (!this.mergeHistoryedBM?.branch_name) return 0;
+
+    const values = Object.entries(this.mergeHistoryedBM.branch_name).map(
+      ([_, v]: any) => v,
+    );
+
+    let total = 0;
+    values.forEach((v: any) => {
+      total += +v.avg_kpi;
+    });
+
+    total += +this.transferBmScores?.total;
+
+    const count = values.length + 1;
+
+    return total / count;
+  }
+  transferHOStaffHistoryBM() {
+    if (!this.period) return;
+    this.al
+      .getHoStaffHistory(this.period, this.auth.user!.id)
+      .subscribe((data: any) => {
+        this.hostaffScoresBM =
+          Array.isArray(data) && data.length > 0 ? data[0] : null;
+        this.mergeHistoryBM();
+      });
+  }
+  transferAttenderHistoryBM() {
+    if (this.selectedEmployee?.staffId) {
+      this.performanceService
+        .getAttenderTransferScore(this.period, this.auth.user!.id)
+        .subscribe((data: any) => {
+          this.attenderTransferScoresBM =
+            Array.isArray(data) && data.length > 0 ? data[0] : null;
+          this.mergeHistoryBM();
+        });
+    }
+  }
   calculateStaffKpiBasedIncrement(score: number) {
     if (score < 5) {
       return 0;

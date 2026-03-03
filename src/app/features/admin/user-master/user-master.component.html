@@ -57,7 +57,7 @@
 
 
           <!-- Dropdown -->
-          <ul class="list-group position-absolute w-100" *ngIf="showDropdown && filteredBranches.length"
+          <ul class="list-group position-absolute w-100" *ngIf="showDropdown && filteredBranches?.length"
             style="z-index: 1050; max-height: 200px; overflow-y: auto;">
             <li class="list-group-item list-group-item-action" *ngFor="let branch of filteredBranches"
               (click)="selectBranch(branch)">
@@ -157,4 +157,8 @@
 
     </div>
   </div>
+</div>
+
+<div class="toast-message" *ngIf="toastMessage">
+  {{ toastMessage }}
 </div>
