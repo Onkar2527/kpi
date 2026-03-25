@@ -107,6 +107,7 @@ export class WeightageAllComponent implements OnInit {
         }else{
           this.loadKpiroleWise();
         }
+        this.getAGMSalary(this.period, this.HODId);
       }
       
     });
@@ -206,7 +207,7 @@ loadAGMScores() {
         if (this.scores?.length > 0) {
           this.selectEmployee(this.scores[0]);
         }
-
+               
         this.isLoading = false;  
       },
       error: (err) => {
@@ -300,13 +301,16 @@ loadAGMScores() {
       this.transferStaffHistory();
       this.transferAttenderHistory();
       this.transferHOStaffHistory();
+      
+      this.getAGMSalary(this.period, this.selectedEmployee.staffId);
     }
-    if (this.auth.user?.role === 'GM') {
+    if (this.auth.user?.role === 'GM' ) {
        if (this.selectedEmployee?.role)
         this.loadKpiroleWiseAGM(this.selectedEmployee.role);
       this.getAGMSalary(this.period, this.selectedEmployee.hod_id);
     }
-    
+     
+     
   }
  transferStaffHistory() {
 
@@ -486,13 +490,14 @@ loadAGMScores() {
     return this.AGMsalary + this.calculateKpiBasedIncrement();
   }
   finalSalaryHOStaff() {
-    const finalSalary = this.calculateTotalSalary() * 0.25;
-    return finalSalary + this.calculateTotalSalary();
+    const finalSalary = this.calculateTotalSalaryHOStaff() * 0.25;
+    return finalSalary + this.calculateTotalSalaryHOStaff();
   }
 
   calculateKpiBasedIncrementHOStaff() {
-    if (!this.hodScores) return 0;
-    const score = this.hodTotalScore;
+    if (!this.selectedEmployee.total) return 0;
+    const score =this.selectedEmployee.total;
+    
     if (score < 5) return 0;
     if (score >= 5 && score < 10) return this.HOincrementAmt * (score / 10);
     if (score >= 10 && score < 12.5) return this.HOincrementAmt;
@@ -500,13 +505,16 @@ loadAGMScores() {
   }
 
   calculateTotalSalaryHOStaff() {
-    return this.HOsalary + this.calculateKpiBasedIncrement();
+    return this.HOsalary + this.calculateKpiBasedIncrementHOStaff();
   }
   
   calculateGMKpiBasedIncrement() {
     if(!this.gmFinalTotal) return 0;
     const score = this.gmFinalTotal;
-    return this.GMincrementAmt/10* score;
+    if (score < 5) return 0;
+    if (score >= 5 && score < 10) return this.GMincrementAmt * (score / 10);
+    if (score >= 10 && score < 12.5) return this.GMincrementAmt;
+    return this.GMincrementAmt *1.25;
   }
   calculateGMTotalSalary() {
     return this.GMsalary + this.calculateGMKpiBasedIncrement();

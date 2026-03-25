@@ -10,7 +10,8 @@ import { AuthService } from '../../auth.service';
   selector: 'app-login',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   username = '';
@@ -29,4 +30,5 @@ export class LoginComponent {
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
+  
 }

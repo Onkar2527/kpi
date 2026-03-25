@@ -12,7 +12,7 @@ export class UploadTargetsComponent {
   file: File | null = null;
 
   uploadType: 'main' | 'branch-specific' | 'dashborad' | 'dashborad-achieved' |'salary'|
-  'recovery-achiveved' |'insurance-achiveved' |'audit-achiveved' | 'deputation-staff'= 'main'; 
+  'recovery-achiveved' |'insurance-achiveved' |'audit-achiveved' | 'deputation-staff' | 'insurance-traget'= 'main'; 
 
   message: string = '';
   messageType: 'success' | 'error' | '' = '';
@@ -93,6 +93,9 @@ export class UploadTargetsComponent {
                case 'audit-achiveved':
                 upload$ = this.hoService.uploadAuditAchieved(period, this.file!);
                 break; 
+               case 'insurance-traget':
+                upload$ = this.hoService.uploadInsuranceTargets(period, this.file!);
+                break;  
               default:
                 this.message = 'Invalid upload type selected.';
                 this.messageType = 'error';

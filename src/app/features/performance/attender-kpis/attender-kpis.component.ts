@@ -56,9 +56,7 @@ export class AttenderKpisComponent implements OnInit {
             this.auth.user!.id,
           );
         }
-        if (this.auth.user?.role === 'BM') {
-          this.getAllStaffSalary(this.period, this.branchId!);
-        }
+       
         this.getAGMSalary(this.period, this.auth.user!.id);
         this.loadKpiroleWise();
         this.transferStaffHistory();
@@ -94,25 +92,7 @@ export class AttenderKpisComponent implements OnInit {
         }
       });
   }
-  getAllStaffSalary(period: string, branch_id: string) {
-    this.performanceService
-      .getAllStaffSalary(period, branch_id)
-      .subscribe((data: any) => {
-        this.allStaffSalaries = data;
-
-        const staff = this.allStaffSalaries.find(
-          (s: any) => s.id === this.selectedEmployee?.staffId,
-        );
-        if (staff === undefined) {
-          this.staffSalary = 0;
-          this.staffIncrementAmt = 0;
-          return;
-        } else {
-          this.staffSalary = staff?.salary || 0;
-          this.staffIncrementAmt = staff?.increment || 0;
-        }
-      });
-  }
+ 
 
   getAGMSalary(period: any, hod_id: any) {
     this.performance_all
@@ -234,10 +214,7 @@ export class AttenderKpisComponent implements OnInit {
   }
   selectEmployee(employee: any) {
     this.selectedEmployee = employee;
-    if (this.auth.user?.role === 'BM') {
-      this.getAllStaffSalary(this.period, this.branchId!);
-    }
-    this.getAGMSalary(this.period, this.auth.user!.id);
+    this.getAGMSalary(this.period, this.selectedEmployee.staffId);
     this.originalScores = JSON.parse(JSON.stringify(this.selectedEmployee));
 
     this.transferStaffHistory();
@@ -288,15 +265,15 @@ export class AttenderKpisComponent implements OnInit {
   }
 
   calculateKpiBasedIncrementStaff() {
-    if (!this.staffTotalScore) {
+    if (!this.selectedEmployee.total) {
       return 0;
     }
-    const score = this.staffTotalScore || 0;
+    const score = this.selectedEmployee.total || 0;
     if (score < 5) {
       return 0;
     }
     if (score >= 5 && score < 10) {
-      return this.staffIncrementAmt * (score / 100);
+      return this.staffIncrementAmt * (score / 10);
     }
     if (score >= 10 && score < 12.5) {
       return this.staffIncrementAmt;

@@ -30,7 +30,10 @@ export class NewEntryComponent implements OnInit {
   minDate: string;
   maxDate: string;
   error: string | null = null;
+  validDepositCodes = ['111', '112', '113', '115', '117'];
+  validLoanCodes = ['801', '802', '804', '805', '811', '812', '851', '853', '854'];
 
+accountError: string = '';
   constructor(
     private staffService: StaffService,
     private auth: AuthService,
@@ -50,9 +53,7 @@ export class NewEntryComponent implements OnInit {
 allowOnlyNumbers(event: any) {
   let input = event.target.value;
 
-  
   input = input.replace(/[eE.+-]/g, '');
-
   input = input.replace(/[^0-9]/g, '');
 
   if (input.length > 14) {
@@ -61,14 +62,43 @@ allowOnlyNumbers(event: any) {
 
   event.target.value = input;
   this.accountNo = input;
+
+  
+  this.validateSchemeCode();
 }
 
+validateSchemeCode() {
+  this.accountError = '';
 
+  if (!this.accountNo || this.accountNo.length < 7) return;
+
+  const schemeCode = this.accountNo.substring(4, 7);
+  console.log('Scheme Code:', this.accountNo.substring(4, 7));
+  if (this.kpi === 'deposit') {
+    console.log(this.validDepositCodes.includes(schemeCode));
+    
+    if (!this.validDepositCodes.includes(schemeCode)) {
+      this.accountError = `Invalid Deposit Scheme Code (${schemeCode})`;
+    }
+  }
+
+  if (this.kpi === 'loan_gen' || this.kpi === 'loan_amulya') {
+    if (!this.validLoanCodes.includes(schemeCode)) {
+      this.accountError = `Invalid Loan Scheme Code (${schemeCode})`;
+    }
+  }
+}
 
 
 isSubmitted = false;
   onSubmit() {
     if (this.isSubmitted) return;
+    console.log(this.accountError);
+    
+    if (this.accountError) {
+    this.error = this.accountError;
+    return;
+   }
     if(this.accountNo.length < 14 && (this.kpi==="deposit"||this.kpi==="loan_gen") ){
       this.error = 'Account Number must be at least 14 digits long.';
       return;

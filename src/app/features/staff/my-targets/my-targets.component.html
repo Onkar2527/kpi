@@ -218,8 +218,8 @@
           <thead class="table-dark">
             <tr>
               <th>KPI</th>
-              <th>Target</th>
               <th>Weightage</th>
+              <th>Target</th>
               <th>Achieved</th>
               <th>Score</th>
               <th>Weightage Score</th>
@@ -231,8 +231,8 @@
             <ng-container *ngFor="let kpi of getKpis(transfer)">
               <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
                 <td>{{ kpi | titlecase }}</td>
-                <td>{{ transfer[kpi]?.target || '-' }}</td>
-                <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                 <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                 <td>{{ transfer[kpi]?.target || '-' }}</td>
                 <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
                 <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
                 <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>

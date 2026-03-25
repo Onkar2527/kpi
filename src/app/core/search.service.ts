@@ -35,9 +35,32 @@ filterByBranchSearch(data: any[], searchTerm: string): any[] {
   } 
   
 
+
   return data.filter(item => 
     String(item.branchName).toLowerCase().includes(searchStr.toLowerCase())
   );
+}
+filterByBranchCode(data: any[], searchTerm: string): any[] {
+  if (!searchTerm) return data;
+
+  const searchStr = searchTerm.trim();
+
+  
+  const isNumeric = /^\d+$/.test(searchStr);
+
+  if (isNumeric) {
+    
+    return data.filter(item =>
+      String(item.PF_NO).includes(searchStr)  
+    );
+  } else {
+    
+    return data.filter(item =>
+      String(item.branch_name)
+        .toLowerCase()
+        .includes(searchStr.toLowerCase())
+    );
+  }
 }
 
 

@@ -38,7 +38,10 @@ export class manageEntriesComponent implements OnInit {
   uniqueBranches: any[] = [];
   allPfNumbers: string[] = [];
   allBranches: string[] = [];
-
+  loadingDots: string = '';
+  private dotInterval: any;
+  branchSearchTerm: string = '';
+  filteredBranches: string[] = [];
   constructor(
     private adminService: AdminService,
     private searchService: SearchService,
@@ -76,7 +79,13 @@ export class manageEntriesComponent implements OnInit {
     this.adminService
       .updateEntries(this.entriesData.id, this.entriesData)
       .subscribe(() => {
+        const current = this.currentPage;
         this.loadEntries();
+        setTimeout(() => {
+          this.currentPage = current;
+          this.updatePaginatedEntries();
+          this.updateVisiblePages();
+        }, 0);
         this.entriesData = {
           id: '',
           kpi: '',
@@ -100,14 +109,18 @@ export class manageEntriesComponent implements OnInit {
 
   loadEntries() {
     this.loading = true;
-    this.adminService
-      .getMonthEntries(this.period)
-      .subscribe((response: any) => {
+    this.startLoadingAnimation();
+    this.adminService.getMonthEntries(this.period).subscribe(
+      (response: any) => {
         const data = response as any[];
+
+        // Sort by date descending
         data.sort(
           (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
         );
+
         this.entries = data;
+
         this.uniqueKpiTypes = [...new Set(this.entries.map((e: any) => e.kpi))];
         this.uniqueStatuses = [
           ...new Set(this.entries.map((e: any) => e.status)),
@@ -115,16 +128,48 @@ export class manageEntriesComponent implements OnInit {
         this.uniquePfNumbers = [
           ...new Set(this.entries.map((e: any) => e.PF_NO)),
         ];
-        this.uniqueBranches = [
-          ...new Set(this.entries.map((e: any) => e.branchName)),
+       this.uniqueBranches = [
+        ...new Set(this.entries.map((e: any) => e.branchName))
         ];
+
+         this.filteredBranches = [...this.uniqueBranches];
         this.allPfNumbers = [...this.uniquePfNumbers];
         this.allBranches = [...this.uniqueBranches];
-        this.onSearch();
+
+        this.applyAdvancedFilters(false);
+        this.stopLoadingAnimation();
         this.loading = false;
-      });
+      },
+      (error) => {
+        console.error(error);
+        this.stopLoadingAnimation();
+        this.loading = false;
+      },
+    );
   }
-  applyAdvancedFilters(): void {
+  startLoadingAnimation() {
+    this.loadingDots = '';
+    this.dotInterval = setInterval(() => {
+      if (this.loadingDots.length < 5) {
+        this.loadingDots += '.';
+      } else {
+        this.loadingDots = '';
+      }
+    }, 500);
+  }
+
+  stopLoadingAnimation() {
+    clearInterval(this.dotInterval);
+    this.loadingDots = '';
+  }
+  filterBranches() {
+  const term = this.branchSearchTerm.toLowerCase();
+
+  this.filteredBranches = this.uniqueBranches.filter(branch =>
+    branch.toLowerCase().includes(term)
+  );
+ }
+  applyAdvancedFilters(resetPage: boolean = true): void {
     let tempData = [...this.entries];
 
     if (this.selectedBranches.length > 0) {
@@ -181,7 +226,9 @@ export class manageEntriesComponent implements OnInit {
       this.pageSize,
     );
 
+    if (resetPage) {
     this.currentPage = 1;
+    }
     this.updatePaginatedEntries();
     this.updateVisiblePages();
   }
@@ -230,7 +277,7 @@ export class manageEntriesComponent implements OnInit {
     );
     this.updatePaginatedEntries();
     this.updateVisiblePages();
-    this.applyAdvancedFilters();
+    this.applyAdvancedFilters(false);
   }
 
   updatePaginatedEntries(): void {
@@ -279,13 +326,22 @@ export class manageEntriesComponent implements OnInit {
     this.modal = new bootstrap.Modal(modalEl);
     this.modal.show();
   }
-  deleteEntry(id: string) {
-    if (confirm('Are you sure you want to delete this entry?')) {
-      this.adminService.deleteEntries(id).subscribe(() => {
-        this.loadEntries();
-      });
-    }
+deleteEntry(id: string) {
+  if (confirm('Are you sure you want to delete this entry?')) {
+
+    const current = this.currentPage; 
+
+    this.adminService.deleteEntries(id).subscribe(() => {
+      this.loadEntries();
+
+      setTimeout(() => {
+        this.currentPage = current;
+        this.updatePaginatedEntries();
+        this.updateVisiblePages();
+      }, 0);
+    });
   }
+}
 
   showToast(msg: string) {
     this.toastMessage = msg;

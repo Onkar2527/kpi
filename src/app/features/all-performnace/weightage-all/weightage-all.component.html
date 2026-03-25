@@ -66,6 +66,37 @@
       </div>
     </div>
   </div>
+   <div class="card mt-4" *ngIf="auth.user?.role === 'HO_STAFF'">
+        <div class="card-header">
+          <h4>Salary Details</h4>
+        </div>
+        <div class="card-body">
+          <table class="table table-bordered">
+            <thead class="table-info">
+              <tr>
+                <th>Designation</th>
+                <th>Basic Inc.</th>
+                <th>Increment Basic.</th>
+                <th>KPI Based</th>
+                <th>Tot. Basic</th>
+                <th>DA</th>
+                <th>Tot. Salary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>HO Staff</td>
+                <td>{{ HOsalary | number:'1.2-2' }}</td>
+                <td>{{ HOincrementAmt | number:'1.2-2' }}</td>
+                <td>{{ calculateKpiBasedIncrementHOStaff() | number:'1.2-2' }}</td>
+                <td>{{ calculateTotalSalaryHOStaff() | number:'1.2-2' }}</td>
+                <td>25%</td>
+                <td>{{ finalSalaryHOStaff() | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
   <div class="card mt-4" *ngIf="auth.user?.role === 'HO_STAFF' && !hostaffScores">
     <div class="card-header bg-info text-white">
       <h4>No Record Available</h4>
@@ -313,10 +344,10 @@
                 <td>HO Staff</td>
                 <td>{{ HOsalary | number:'1.2-2' }}</td>
                 <td>{{ HOincrementAmt | number:'1.2-2' }}</td>
-                <td>{{ calculateKpiBasedIncrement() | number:'1.2-2' }}</td>
-                <td>{{ calculateTotalSalary() | number:'1.2-2' }}</td>
+                <td>{{ calculateKpiBasedIncrementHOStaff() | number:'1.2-2' }}</td>
+                <td>{{ calculateTotalSalaryHOStaff() | number:'1.2-2' }}</td>
                 <td>25%</td>
-                <td>{{ finalSalary() | number:'1.2-2' }}</td>
+                <td>{{ finalSalaryHOStaff() | number:'1.2-2' }}</td>
               </tr>
             </tbody>
           </table>

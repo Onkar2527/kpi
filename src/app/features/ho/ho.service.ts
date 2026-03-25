@@ -75,4 +75,10 @@ export class HoService {
     formData.append('deputationFile', file);
     return this.http.post(`${environment.apiBaseUrl}/targets/upload-deputation-staff`, formData);
   }
+  uploadInsuranceTargets(period: string, file: File) {
+    const formData = new FormData();
+    formData.append('period', period);
+    formData.append('insuranceTargetFile', file);
+    return this.http.post(`${environment.apiBaseUrl}/targets/upload-insurance-target`, formData);
+  }
 }

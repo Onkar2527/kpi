@@ -163,16 +163,18 @@ export class WeightageIncrementComponent implements OnInit {
     if (!this.bmScores) {
       return 0;
     }
-    const bmSum = this.bmtransferSum?.sum ?? 0;
-    const transferTotal = this.transferBmScores?.total ?? 0;
-    const transferCount = this.bmtransferSum?.count ?? 0;
-    const score = (bmSum + transferTotal) / (transferCount + 1) || 0;
-
+    // const bmSum = this.bmtransferSum?.sum ?? 0;
+    // const transferTotal = this.transferBmScores?.total ?? 0;
+    // const transferCount = this.bmtransferSum?.count ?? 0;
+  
+    const score = this.getAverageKpiBM() || this.bmScores.total ||0;
+ 
+  
     if (score < 5) {
       return 0;
     }
     if (score >= 5 && score < 10) {
-      return this.BMincrementAmt * (score / 100);
+      return this.BMincrementAmt * (score / 10);
     }
     if (score >= 10 && score < 12.5) {
       return this.BMincrementAmt;
@@ -418,22 +420,7 @@ export class WeightageIncrementComponent implements OnInit {
     );
   }
 
-  calculateKpiBasedIncrementStaff() {
-    if (!this.staffTotalScore) {
-      return 0;
-    }
-    const score = this.staffTotalScore || 0;
-    if (score < 5) {
-      return 0;
-    }
-    if (score >= 5 && score < 10) {
-      return this.staffIncrementAmt * (score / 100);
-    }
-    if (score >= 10 && score < 12.5) {
-      return this.staffIncrementAmt;
-    }
-    return this.staffIncrementAmt * 1.25;
-  }
+  
   finalSalaryStaff() {
     const basic = this.calculateTotalSalaryStaff();
     const da = basic * 0.25;
@@ -441,7 +428,7 @@ export class WeightageIncrementComponent implements OnInit {
   }
   calculateTotalSalaryStaff() {
     return (
-      this.staffSalary + this.calculateKpiIncrement(this.selectedEmployee.total)
+      this.staffSalary + this.calculateKpiIncrement(this.getAverageKpi()||this.selectedEmployee.total)
     );
   }
   calculateKpiIncrement(score: number) {
@@ -449,7 +436,7 @@ export class WeightageIncrementComponent implements OnInit {
       return 0;
     }
     if (score >= 5 && score < 10) {
-      return this.staffIncrementAmt * (score / 100);
+      return this.staffIncrementAmt * (score / 10);
     }
     if (score >= 10 && score < 12.5) {
       return this.staffIncrementAmt;

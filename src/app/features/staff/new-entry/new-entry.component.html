@@ -46,7 +46,7 @@
       <input type="date" class="form-control" id="date" [(ngModel)]="date" name="date"  [max]="maxDate" required>
     </div>
     <button type="submit" class="btn btn-primary"
-     [disabled]="isSubmitted">
+     [disabled]="isSubmitted ">
   {{ isSubmitted ? 'Submitting...' : 'Submit' }}</button>
   </form>
 </div>

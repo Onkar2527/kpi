@@ -51,12 +51,15 @@ export class TrasferHistoryComponent implements OnInit {
 
   loadUsers() {
     this.adminService.getTrafterHistory(this.period).subscribe((data: any) => {
-      data.sort(
+       const filteredSortedData =data
+      .filter((item:any)=>item.resign == 0)
+      .sort(
         (a: any, b: any) =>
           new Date(b.transfer_date).getTime() -
           new Date(a.transfer_date).getTime()
       );
-      this.TranferData = data;
+     
+      this.TranferData = filteredSortedData ;
       this.onSearch();
     });
   }

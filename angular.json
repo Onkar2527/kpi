@@ -72,10 +72,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "kpi-app:build:production"
+              "buildTarget": "kpi-app:build:production"
             },
             "development": {
-              "browserTarget": "kpi-app:build:development"
+              "buildTarget": "kpi-app:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -83,7 +83,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "kpi-app:build"
+            "buildTarget": "kpi-app:build"
           }
         },
         "test": {

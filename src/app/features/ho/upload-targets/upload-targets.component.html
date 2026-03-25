@@ -16,14 +16,12 @@
         </label>
       </div>
 
-      <div class="form-check" *ngIf="auth.user?.role === 'insurance_ho' 
-        || auth.user?.role === 'recovery_ho'">
+      <div class="form-check" *ngIf="auth.user?.role === 'recovery_ho'">
 
         <input class="form-check-input" type="radio" name="uploadType" id="branch-specific" value="branch-specific"
           [(ngModel)]="uploadType">
 
         <label class="form-check-label" for="branch-specific">
-          <span *ngIf="auth.user?.role === 'insurance_ho'">Insurance</span>
           <span *ngIf="auth.user?.role === 'recovery_ho'">Recovery</span>  
         </label>
       </div>
@@ -35,6 +33,7 @@
           Dashborad Previous Year Data
         </label>
       </div>
+
       <div class="form-check" *ngIf="auth.user?.role === 'HO'">
         <input class="form-check-input" type="radio" name="uploadType" id="dashborad-achieved"
           value="dashborad-achieved" [(ngModel)]="uploadType">
@@ -42,6 +41,7 @@
           Dashborad Total Achieved Data
         </label>
       </div>
+
       <div class="form-check" *ngIf="auth.user?.role === 'HO'">
         <input class="form-check-input" type="radio" name="uploadType" id="salary" value="salary"
           [(ngModel)]="uploadType">
@@ -49,6 +49,7 @@
           Upload Base Salary
         </label>
       </div>
+
        <div class="form-check" *ngIf="auth.user?.role === 'HO'">
         <input class="form-check-input" type="radio" name="uploadType" id="deputation-staff" value="deputation-staff"
           [(ngModel)]="uploadType">
@@ -56,6 +57,15 @@
           Upload Deputation Staff
         </label>
       </div>
+      
+        <div class="form-check" *ngIf="auth.user?.role === 'insurance_ho'">
+        <input class="form-check-input" type="radio" name="uploadType" id="insurance-traget"
+          value="insurance-traget" [(ngModel)]="uploadType">
+        <label class="form-check-label" for="insurance-traget">
+        Insurance-Traget
+        </label>
+      </div>
+
        <div class="form-check" *ngIf="auth.user?.role === 'insurance_ho'">
         <input class="form-check-input" type="radio" name="uploadType" id="insurance-achiveved"
           value="insurance-achiveved" [(ngModel)]="uploadType">
@@ -63,6 +73,7 @@
         Insurance-Achieved
         </label>
       </div>
+
        <div class="form-check" *ngIf="auth.user?.role === 'recovery_ho'">
         <input class="form-check-input" type="radio" name="uploadType" id="recovery-achiveved"
           value="recovery-achiveved" [(ngModel)]="uploadType">
@@ -70,6 +81,7 @@
         Recovery-Achieved
         </label>
       </div>
+
        <div class="form-check" *ngIf="auth.user?.role === 'audit_ho'">
         <input class="form-check-input" type="radio" name="uploadType" id="audit-achiveved"
           value="audit-achiveved" [(ngModel)]="uploadType">
@@ -77,6 +89,7 @@
         audit-Achieved
         </label>
       </div>
+      
     </div>
 
     <div class="mb-3" *ngIf="uploadType">

@@ -1,0 +1,105 @@
+.login-page{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  background: linear-gradient(135deg,#cfe2ff,#eaf2ff);
+}
+
+/* Card */
+
+.login-card{
+  width:400px;
+  padding:40px;
+
+  background:white;
+
+  border-radius:16px;
+
+  box-shadow:0 20px 50px rgba(0,0,0,0.1);
+
+  transition:0.3s;
+}
+
+.login-card:hover{
+  transform:translateY(-4px);
+}
+
+/* Header */
+
+.login-header{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.login-header h2{
+  font-weight:700;
+  color:#2c6bed;
+}
+
+.login-header p{
+  color:#777;
+}
+
+/* Input Box */
+
+.input-box{
+  display:flex;
+  align-items:center;
+
+  border:1px solid #dbe3f0;
+
+  border-radius:10px;
+
+  padding:8px 12px;
+
+  background:#f8fbff;
+}
+
+.input-box i{
+  margin-right:8px;
+  color:#3b82f6;
+}
+
+.input-box input{
+  border:none;
+  outline:none;
+  background:transparent;
+}
+
+/* Eye */
+
+.eye{
+  cursor:pointer;
+  color:#555;
+}
+
+/* Button */
+
+.login-btn{
+  background:#3b82f6;
+  border:none;
+
+  padding:10px;
+
+  border-radius:10px;
+
+  color:white;
+
+  font-weight:600;
+
+  transition:0.3s;
+}
+
+
+.login-btn:hover{
+  background:#2563eb;
+}
+
+/* Forgot */
+
+.forgot{
+  text-decoration:none;
+  color:#3b82f6;
+}

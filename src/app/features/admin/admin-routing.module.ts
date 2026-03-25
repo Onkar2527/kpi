@@ -12,6 +12,8 @@ import { KpiMappingComponent } from './kpi-mapping/kpi-mapping.component';
 import { manageEntriesComponent } from './manage-entries/manage-entries.component';
 import { ReportsComponent } from './report/report.component';
 import { ResignHistoryComponent } from './resign-history/resign-history.component';
+import { BranchStaffListComponent } from './branch-staff-list/branch-staff-list.component';
+import { HOStaffListComponent } from './ho-staff-list/ho-staff-list.component';
 
 const routes: Routes = [
   {
@@ -34,8 +36,13 @@ const routes: Routes = [
   {
     path: 'weightage-master',
     component: WeightageMasterComponent
-  },
-   {
+  },{
+    path:'branch-staff-list',
+    component:BranchStaffListComponent
+  },{
+    path:'ho-staff-list',
+    component:HOStaffListComponent
+  },{
     path: 'transfer-master',
     component: TransferMasterComponent
   },
