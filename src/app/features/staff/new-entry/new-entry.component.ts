@@ -92,54 +92,56 @@ validateSchemeCode() {
 
 isSubmitted = false;
   onSubmit() {
-    if (this.isSubmitted) return;
-    console.log(this.accountError);
+    this.error = 'Unable to process entries. Please contact the Head Office.';
+return;
+  //   if (this.isSubmitted) return;
+  //   console.log(this.accountError);
     
-    if (this.accountError) {
-    this.error = this.accountError;
-    return;
-   }
-    if(this.accountNo.length < 14 && (this.kpi==="deposit"||this.kpi==="loan_gen") ){
-      this.error = 'Account Number must be at least 14 digits long.';
-      return;
-    }
-    if (this.kpi === 'loan_amulya') {
-    if (!this.value || !this.typeOfDeposit || !this.type || !this.date) {
-      this.error = 'Please fill in all required fields for Loan Amulya.';
-      return;
-    }
-  } else {
-    if (!this.kpi || !this.value || !this.typeOfDeposit || !this.type || !this.accountNo || !this.date) {
-      this.error = 'Please fill in all required fields.';
-      return;
-    }
-  }
+  //   if (this.accountError) {
+  //   this.error = this.accountError;
+  //   return;
+  //  }
+  //   if(this.accountNo.length < 14 && (this.kpi==="deposit"||this.kpi==="loan_gen") ){
+  //     this.error = 'Account Number must be at least 14 digits long.';
+  //     return;
+  //   }
+  //   if (this.kpi === 'loan_amulya') {
+  //   if (!this.value || !this.typeOfDeposit || !this.type || !this.date) {
+  //     this.error = 'Please fill in all required fields for Loan Amulya.';
+  //     return;
+  //   }
+  // } else {
+  //   if (!this.kpi || !this.value || !this.typeOfDeposit || !this.type || !this.accountNo || !this.date) {
+  //     this.error = 'Please fill in all required fields.';
+  //     return;
+  //   }
+  // }
 
-    this.error = null;
-    this.isSubmitted = true;
-    const entry = {
-      period: this.period,
-      branchId: this.branchId,
-      employeeId: this.employeeId,
-      kpi: this.kpi,
-      typeOfDeposit: this.typeOfDeposit,
-      type: this.type,
-      accountNo: this.accountNo,
-      value: this.value,
-      date: this.date,
+  //   this.error = null;
+  //   this.isSubmitted = true;
+  //   const entry = {
+  //     period: this.period,
+  //     branchId: this.branchId,
+  //     employeeId: this.employeeId,
+  //     kpi: this.kpi,
+  //     typeOfDeposit: this.typeOfDeposit,
+  //     type: this.type,
+  //     accountNo: this.accountNo,
+  //     value: this.value,
+  //     date: this.date,
 
-    };
+  //   };
     
-    this.staffService.submitNewEntry(entry).subscribe({
-    next: () => {
-      this.sharedService.notifyEntryVerified();
-      this.router.navigateByUrl('/staff/my-submissions');
-    },
-    error: (err) => {
-      console.error(err);
-      this.error = 'Submission failed. Please try again.';
-      this.isSubmitted = false; 
-    }
-  });
+  //   this.staffService.submitNewEntry(entry).subscribe({
+  //   next: () => {
+  //     this.sharedService.notifyEntryVerified();
+  //     this.router.navigateByUrl('/staff/my-submissions');
+  //   },
+  //   error: (err) => {
+  //     console.error(err);
+  //     this.error = 'Submission failed. Please try again.';
+  //     this.isSubmitted = false; 
+  //   }
+  // });
   }
 }

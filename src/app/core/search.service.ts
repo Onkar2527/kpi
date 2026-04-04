@@ -25,20 +25,22 @@ filterByBranchSearch(data: any[], searchTerm: string): any[] {
 
   const searchStr = String(searchTerm).trim();
 
- 
-  if (searchStr.length >=10) {
-    return data.filter(item => String(item.account_no) === searchStr);
-  } 
-  
-  if (searchStr.length <= 5) {
+ const isNumeric = /^\d+$/.test(searchStr);
+
+  if (isNumeric) {
+    if (searchStr.length <= 4) {
     return data.filter(item => String(item.PF_NO) === searchStr);
   } 
   
-
-
+     return data.filter(item => String(item.account_no).includes(searchStr));
+  }else{
+     
   return data.filter(item => 
     String(item.branchName).toLowerCase().includes(searchStr.toLowerCase())
   );
+  }
+  
+ 
 }
 filterByBranchCode(data: any[], searchTerm: string): any[] {
   if (!searchTerm) return data;

@@ -17,9 +17,7 @@
 
         <!-- PF -->
         <td>
-          <span *ngIf="row.pf; else noPf"
-            ><b>{{ row.pf }}</b></span
-          >
+          <span *ngIf="row.pf; else noPf"><b>{{ row.pf }}</b></span>
           <ng-template #noPf>
             <span class="text-muted">Not entered</span>
           </ng-template>
@@ -38,27 +36,20 @@
           <ng-template #dash>—</ng-template>
         </td>
 
-  
+
         <!-- Action -->
         <td>
-          <button
-            class="btn btn-sm btn-success me-2"
-            (click)="openPfPopup(row)"
-          >
+          <button class="btn btn-sm btn-success me-2" (click)="openPfPopup(row)">
             Enter Details
           </button>
 
-          <button
-            class="btn btn-sm btn-primary"
-            [disabled]="
+          <button class="btn btn-sm btn-primary" [disabled]="
               row.type === 'deputation_staff' || row.type === 'Department_Wise'
                 ? !row.period || !row.department
                 : row.type === 'all_branch' || row.type === 'all_users'
                   ? !row.period
                   : !row.pf || !row.period
-            "
-            (click)="generateReport(row)"
-          >
+            " (click)="generateReport(row)">
             Generate Report
           </button>
         </td>
@@ -73,11 +64,7 @@
     <div class="modal-content">
       <div class="modal-header bg-info text-white">
         <h5 class="modal-title">Enter Report Details</h5>
-        <button
-          type="button"
-          class="btn-close btn-close-white"
-          data-bs-dismiss="modal"
-        ></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
@@ -93,10 +80,7 @@
           <label class="form-label">Department</label>
           <select class="form-select" [(ngModel)]="selectedDepartment">
             <option value="">Select Department</option>
-            <option
-              *ngFor="let p of deputationStaffDepartmentList || branchdepartment"
-              [value]="p.department"
-            >
+            <option *ngFor="let p of deputationStaffDepartmentList || branchdepartment" [value]="p.department">
               {{ p.department }}
             </option>
           </select>
@@ -106,10 +90,7 @@
           <label class="form-label">Department</label>
           <select class="form-select" [(ngModel)]="selectedDepartment">
             <option value="">Select Department</option>
-            <option
-              *ngFor="let p of branchdepartment"
-              [value]="p.department"
-            >
+            <option *ngFor="let p of branchdepartment" [value]="p.department">
               {{ p.department }}
             </option>
           </select>
@@ -121,19 +102,35 @@
             selectedRow?.type !== 'all_users' &&
             selectedRow?.type !== 'Department_Wise'
           ">
-        
+
           <!-- BM → Branch Code -->
           <ng-container *ngIf="selectedRow?.type === 'BM'; else pfBlock">
             <label class="form-label">Enter Branch Code</label>
-            <input type="text" class="form-control" [(ngModel)]="selectedPf" placeholder="Enter Branch Code" />
+
+            <div style="position: relative;">
+
+              <!-- Input (acts like dropdown search) -->
+              <input type="text" class="form-control" placeholder="Search Branch" [(ngModel)]="searchText"
+                (focus)="showDropdown = true" (input)="filterBranches()" />
+
+              <!-- Dropdown list -->
+              <div *ngIf="showDropdown"
+                style="position:absolute; width:100%; max-height:200px; overflow:auto; border:1px solid #ccc; background:white; z-index:1000;">
+                <div *ngFor="let branch of filteredBranches" (click)="selectBranch(branch)"
+                  style="padding:8px; cursor:pointer;">
+                  {{ branch.code }} - {{ branch.name }}
+                </div>
+              </div>
+
+            </div>
           </ng-container>
-        
+
           <!-- Others → PF -->
           <ng-template #pfBlock>
             <label class="form-label">PF Number</label>
             <input type="text" class="form-control" [(ngModel)]="selectedPf" placeholder="Enter PF Number" />
           </ng-template>
-        
+
         </div>
 
       </div>
@@ -142,11 +139,7 @@
         <button class="btn btn-secondary" data-bs-dismiss="modal">
           Cancel
         </button>
-        <button
-          class="btn btn-primary"
-          [disabled]="isSaveDisabled()"
-          (click)="savePf()"
-        >
+        <button class="btn btn-primary" [disabled]="isSaveDisabled()" (click)="savePf()">
           Save
         </button>
       </div>
@@ -156,32 +149,24 @@
 
 <!-- BM ReportModal MODAL -->
 <div class="modal fade" id="bmReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-      <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 BM Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('bmReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('bmReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -194,63 +179,24 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
       <!-- BODY -->
       <div class="modal-body" id="bmReportContent">
-        <div *ngIf="bmScores" class="bm-summary">
-          <h5 class="mb-3">
-            {{ entredUserData?.name }} (BM) – {{ entredUserData.branch_name }}
-          </h5>
 
-          <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-              <tr>
-                <th>KPI</th>
-                <th>Weightage</th>
-                <th>Target</th>
-                <th>Achieved</th>
-                <th>Score</th>
-                <th>Weightage Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                *ngFor="
-                  let kpi of [
-                    'deposit',
-                    'loan_gen',
-                    'loan_amulya',
-                    'recovery',
-                    'audit',
-                    'insurance',
-                  ]
-                "
-              >
-                <td>{{ kpi | titlecase }}</td>
-                <td>{{ bmScores[kpi]?.weightage }}</td>
-                <td>{{ bmScores[kpi]?.target | number }}</td>
-                <td>{{ bmScores[kpi]?.achieved | number }}</td>
-                <td>{{ bmScores[kpi]?.score | number: "1.2-2" }}</td>
-                <td>{{ bmScores[kpi]?.weightageScore | number: "1.2-2" }}</td>
-              </tr>
-              <tr class="table-info fw-bold">
-                <td colspan="5">Total</td>
-                <td>{{ bmScores.total | number: "1.2-2" }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div *ngIf="isBmLoading" class="text-center p-4">
+          <div class="spinner-border text-primary"></div>
+          <p>Loading...</p>
         </div>
 
-        <div *ngFor="let staff of bmStaffScore; let i = index">
-          <div class="staff-page border p-4 rounded mt-3">
-            <h6>{{ staff.staffName }}</h6>
+        <div *ngIf="!isBmLoading">
+
+          <div *ngIf="bmScores" class="bm-summary">
+            <h5 class="mb-3">
+              {{ entredUserData?.name }} (BM) – {{ entredUserData.branch_name }}
+            </h5>
 
             <table class="table table-bordered table-striped">
               <thead class="table-dark">
@@ -259,36 +205,78 @@
                   <th>Weightage</th>
                   <th>Target</th>
                   <th>Achieved</th>
-                  <th>Achieved</th>
                   <th>Score</th>
                   <th>Weightage Score</th>
                 </tr>
               </thead>
-
               <tbody>
-                <tr *ngFor="let kpi of kpiKeys">
+                <tr *ngFor="
+                  let kpi of [
+                    'deposit',
+                    'loan_gen',
+                    'loan_amulya',
+                    'recovery',
+                    'audit',
+                    'insurance',
+                  ]
+                ">
                   <td>{{ kpi | titlecase }}</td>
-                  <td>{{ staff[kpi]?.weightage }}</td>
-                  <td>{{ staff[kpi]?.target | number }}</td>
-                  <td>{{ staff[kpi]?.achieved | number }}</td>
-                  <td>
-                    {{
-                      staff[kpi]?.target > 0
-                        ? ((staff[kpi].achieved / staff[kpi].target) * 100
-                          | number: "1.2-2")
-                        : "0"
-                    }}%
-                  </td>
-                  <td>{{ staff[kpi]?.score | number: "1.2-2" }}</td>
-                  <td>{{ staff[kpi]?.weightageScore | number: "1.2-2" }}</td>
+                  <td>{{ bmScores[kpi]?.weightage }}</td>
+                  <td>{{ bmScores[kpi]?.target | number }}</td>
+                  <td>{{ bmScores[kpi]?.achieved | number }}</td>
+                  <td>{{ bmScores[kpi]?.score | number: "1.2-2" }}</td>
+                  <td>{{ bmScores[kpi]?.weightageScore | number: "1.2-2" }}</td>
                 </tr>
                 <tr class="table-info fw-bold">
-                  <td>Total</td>
-                  <td colspan="5"></td>
-                  <td>{{ staff.total | number: "1.2-2" }}</td>
+                  <td colspan="5">Total</td>
+                  <td>{{ bmScores.total | number: "1.2-2" }}</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div *ngFor="let staff of bmStaffScore; let i = index">
+            <div class="staff-page border p-4 rounded mt-3">
+              <h6>{{ staff.staffName }}</h6>
+
+              <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                  <tr>
+                    <th>KPI</th>
+                    <th>Weightage</th>
+                    <th>Target</th>
+                    <th>Achieved</th>
+                    <th>Achieved</th>
+                    <th>Score</th>
+                    <th>Weightage Score</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let kpi of kpiKeys">
+                    <td>{{ kpi | titlecase }}</td>
+                    <td>{{ staff[kpi]?.weightage }}</td>
+                    <td>{{ staff[kpi]?.target | number }}</td>
+                    <td>{{ staff[kpi]?.achieved | number }}</td>
+                    <td>
+                      {{
+                      staff[kpi]?.target > 0
+                      ? ((staff[kpi].achieved / staff[kpi].target) * 100
+                      | number: "1.2-2")
+                      : "0"
+                      }}%
+                    </td>
+                    <td>{{ staff[kpi]?.score | number: "1.2-2" }}</td>
+                    <td>{{ staff[kpi]?.weightageScore | number: "1.2-2" }}</td>
+                  </tr>
+                  <tr class="table-info fw-bold">
+                    <td>Total</td>
+                    <td colspan="5"></td>
+                    <td>{{ staff.total | number: "1.2-2" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -298,32 +286,23 @@
 
 <!-- AGM ReportModal MODAL -->
 <div class="modal fade" id="agmReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-      <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 AGM Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('agmReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('agmReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -336,52 +315,21 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
       <!-- BODY -->
       <div class="modal-body" id="agmReportContent">
-        <div *ngIf="agmScores" class="bm-summary">
-          <h5 class="mb-3">{{ entredUserData?.name }} (AGM)</h5>
 
-          <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-              <tr>
-                <th>KPI</th>
-                <th>Weightage</th>
-                <th>Achieved</th>
-                <th>Score</th>
-                <th>Weightage Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let kpi of agmkpiList">
-                <td>{{ kpi.kpi_name | titlecase }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.weightage }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.achieved | number }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
-                <td>
-                  {{
-                    agmScores[kpi.kpi_name]?.weightageScore | number: "1.2-2"
-                  }}
-                </td>
-              </tr>
-              <tr class="table-info fw-bold">
-                <td colspan="4">Total</td>
-                <td>{{ agmtotal | number: "1.2-2" }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div *ngIf="isAgmLoading" class="text-center p-4">
+          <div class="spinner-border text-primary"></div>
+          <p>Loading...</p>
         </div>
 
-        <div *ngFor="let staff of hoStaffScore; let i = index">
-          <div class="staff-page border p-4 rounded mt-3">
-            <h6>{{ staff.staffName }}</h6>
+        <div *ngIf="!isAgmLoading">
+          <div *ngIf="agmScores" class="bm-summary">
+            <h5 class="mb-3">{{ entredUserData?.name }} (AGM)</h5>
 
             <table class="table table-bordered table-striped">
               <thead class="table-dark">
@@ -393,25 +341,60 @@
                   <th>Weightage Score</th>
                 </tr>
               </thead>
-
               <tbody>
-                <tr *ngFor="let kpi of hostaffKpiList">
+                <tr *ngFor="let kpi of agmkpiList">
                   <td>{{ kpi.kpi_name | titlecase }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.weightage }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.achieved | number }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.weightage }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.achieved | number }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
                   <td>
-                    {{ staff[kpi.kpi_name]?.weightageScore | number: "1.2-2" }}
+                    {{
+                    agmScores[kpi.kpi_name]?.weightageScore | number: "1.2-2"
+                    }}
                   </td>
                 </tr>
-
                 <tr class="table-info fw-bold">
-                  <td>Total</td>
-                  <td colspan="3"></td>
-                  <td>{{ staff.total | number: "1.2-2" }}</td>
+                  <td colspan="4">Total</td>
+                  <td>{{ agmtotal | number: "1.2-2" }}</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div *ngFor="let staff of hoStaffScore; let i = index">
+            <div class="staff-page border p-4 rounded mt-3">
+              <h6>{{ staff.staffName }}</h6>
+
+              <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                  <tr>
+                    <th>KPI</th>
+                    <th>Weightage</th>
+                    <th>Achieved</th>
+                    <th>Score</th>
+                    <th>Weightage Score</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let kpi of hostaffKpiList">
+                    <td>{{ kpi.kpi_name | titlecase }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.weightage }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.achieved | number }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
+                    <td>
+                      {{ staff[kpi.kpi_name]?.weightageScore | number: "1.2-2" }}
+                    </td>
+                  </tr>
+
+                  <tr class="table-info fw-bold">
+                    <td>Total</td>
+                    <td colspan="3"></td>
+                    <td>{{ staff.total | number: "1.2-2" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -421,32 +404,23 @@
 
 <!-- AGM_IT ReportModal MODAL -->
 <div class="modal fade" id="itAgmReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-      <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 AGM Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('itAgmReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('itAgmReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -459,52 +433,21 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
       <!-- BODY -->
       <div class="modal-body" id="itAgmReportContent">
-        <div *ngIf="agmScores" class="bm-summary">
-          <h5 class="mb-3">{{ entredUserData?.name }} (AGM)</h5>
 
-          <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-              <tr>
-                <th>KPI</th>
-                <th>Weightage</th>
-                <th>Achieved</th>
-                <th>Score</th>
-                <th>Weightage Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let kpi of agmkpiList">
-                <td>{{ kpi.kpi_name | titlecase }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.weightage }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.achieved | number }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
-                <td>
-                  {{
-                    agmScores[kpi.kpi_name]?.weightageScore | number: "1.2-2"
-                  }}
-                </td>
-              </tr>
-              <tr class="table-info fw-bold">
-                <td colspan="4">Total</td>
-                <td>{{ agmtotal | number: "1.2-2" }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div *ngIf="isAgmLoading" class="text-center p-4">
+          <div class="spinner-border text-primary"></div>
+          <p>Loading...</p>
         </div>
 
-        <div *ngFor="let staff of hoStaffScore; let i = index">
-          <div class="staff-page border p-4 rounded mt-3">
-            <h6>{{ staff.staffName }}</h6>
+        <div *ngIf="!isAgmLoading">
+          <div *ngIf="agmScores" class="bm-summary">
+            <h5 class="mb-3">{{ entredUserData?.name }} (AGM)</h5>
 
             <table class="table table-bordered table-striped">
               <thead class="table-dark">
@@ -516,25 +459,60 @@
                   <th>Weightage Score</th>
                 </tr>
               </thead>
-
               <tbody>
-                <tr *ngFor="let kpi of hostaffKpiList">
+                <tr *ngFor="let kpi of agmkpiList">
                   <td>{{ kpi.kpi_name | titlecase }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.weightage }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.achieved | number }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.weightage }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.achieved | number }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
                   <td>
-                    {{ staff[kpi.kpi_name]?.weightageScore | number: "1.2-2" }}
+                    {{
+                    agmScores[kpi.kpi_name]?.weightageScore | number: "1.2-2"
+                    }}
                   </td>
                 </tr>
-
                 <tr class="table-info fw-bold">
-                  <td>Total</td>
-                  <td colspan="3"></td>
-                  <td>{{ staff.total | number: "1.2-2" }}</td>
+                  <td colspan="4">Total</td>
+                  <td>{{ agmtotal | number: "1.2-2" }}</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div *ngFor="let staff of hoStaffScore; let i = index">
+            <div class="staff-page border p-4 rounded mt-3">
+              <h6>{{ staff.staffName }}</h6>
+
+              <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                  <tr>
+                    <th>KPI</th>
+                    <th>Weightage</th>
+                    <th>Achieved</th>
+                    <th>Score</th>
+                    <th>Weightage Score</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let kpi of hostaffKpiList">
+                    <td>{{ kpi.kpi_name | titlecase }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.weightage }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.achieved | number }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
+                    <td>
+                      {{ staff[kpi.kpi_name]?.weightageScore | number: "1.2-2" }}
+                    </td>
+                  </tr>
+
+                  <tr class="table-info fw-bold">
+                    <td>Total</td>
+                    <td colspan="3"></td>
+                    <td>{{ staff.total | number: "1.2-2" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -544,32 +522,23 @@
 
 <!-- AGM_AUDIT ReportModal MODAL -->
 <div class="modal fade" id="auditAgmReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-       <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 AGM_AUDIT Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('auditAgmReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('auditAgmReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -582,52 +551,21 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
       <!-- BODY -->
       <div class="modal-body" id="auditAgmReportContent">
-        <div *ngIf="agmScores" class="bm-summary">
-          <h5 class="mb-3">{{ entredUserData?.name }} (AGM)</h5>
 
-          <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-              <tr>
-                <th>KPI</th>
-                <th>Weightage</th>
-                <th>Achieved</th>
-                <th>Score</th>
-                <th>Weightage Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let kpi of agmkpiList">
-                <td>{{ kpi.kpi_name | titlecase }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.weightage }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.achieved | number }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
-                <td>
-                  {{
-                    agmScores[kpi.kpi_name]?.weightageScore | number: "1.2-2"
-                  }}
-                </td>
-              </tr>
-              <tr class="table-info fw-bold">
-                <td colspan="4">Total</td>
-                <td>{{ agmtotal | number: "1.2-2" }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div *ngIf="isAgmLoading" class="text-center p-4">
+          <div class="spinner-border text-primary"></div>
+          <p>Loading...</p>
         </div>
 
-        <div *ngFor="let staff of hoStaffScore; let i = index">
-          <div class="staff-page border p-4 rounded mt-3">
-            <h6>{{ staff.staffName }}</h6>
+        <div *ngIf="!isAgmLoading">
+          <div *ngIf="agmScores" class="bm-summary">
+            <h5 class="mb-3">{{ entredUserData?.name }} (AGM)</h5>
 
             <table class="table table-bordered table-striped">
               <thead class="table-dark">
@@ -639,25 +577,60 @@
                   <th>Weightage Score</th>
                 </tr>
               </thead>
-
               <tbody>
-                <tr *ngFor="let kpi of hostaffKpiList">
+                <tr *ngFor="let kpi of agmkpiList">
                   <td>{{ kpi.kpi_name | titlecase }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.weightage }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.achieved | number }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.weightage }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.achieved | number }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
                   <td>
-                    {{ staff[kpi.kpi_name]?.weightageScore | number: "1.2-2" }}
+                    {{
+                    agmScores[kpi.kpi_name]?.weightageScore | number: "1.2-2"
+                    }}
                   </td>
                 </tr>
-
                 <tr class="table-info fw-bold">
-                  <td>Total</td>
-                  <td colspan="3"></td>
-                  <td>{{ staff.total | number: "1.2-2" }}</td>
+                  <td colspan="4">Total</td>
+                  <td>{{ agmtotal | number: "1.2-2" }}</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div *ngFor="let staff of hoStaffScore; let i = index">
+            <div class="staff-page border p-4 rounded mt-3">
+              <h6>{{ staff.staffName }}</h6>
+
+              <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                  <tr>
+                    <th>KPI</th>
+                    <th>Weightage</th>
+                    <th>Achieved</th>
+                    <th>Score</th>
+                    <th>Weightage Score</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let kpi of hostaffKpiList">
+                    <td>{{ kpi.kpi_name | titlecase }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.weightage }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.achieved | number }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
+                    <td>
+                      {{ staff[kpi.kpi_name]?.weightageScore | number: "1.2-2" }}
+                    </td>
+                  </tr>
+
+                  <tr class="table-info fw-bold">
+                    <td>Total</td>
+                    <td colspan="3"></td>
+                    <td>{{ staff.total | number: "1.2-2" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -667,32 +640,23 @@
 
 <!-- AGM_INSURNCE ReportModal MODAL -->
 <div class="modal fade" id="inAgmReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-      <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 AGM_INSURNCE Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('inAgmReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('inAgmReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -705,52 +669,21 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
       <!-- BODY -->
       <div class="modal-body" id="inAgmReportContent">
-        <div *ngIf="agmScores" class="bm-summary">
-          <h5 class="mb-3">{{ entredUserData?.name }} (AGM)</h5>
 
-          <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-              <tr>
-                <th>KPI</th>
-                <th>Weightage</th>
-                <th>Achieved</th>
-                <th>Score</th>
-                <th>Weightage Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let kpi of agmkpiList">
-                <td>{{ kpi.kpi_name | titlecase }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.weightage }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.achieved | number }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
-                <td>
-                  {{
-                    agmScores[kpi.kpi_name]?.weightageScore | number: "1.2-2"
-                  }}
-                </td>
-              </tr>
-              <tr class="table-info fw-bold">
-                <td colspan="4">Total</td>
-                <td>{{ agmtotal | number: "1.2-2" }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div *ngIf="isAgmLoading" class="text-center p-4">
+          <div class="spinner-border text-primary"></div>
+          <p>Loading...</p>
         </div>
 
-        <div *ngFor="let staff of hoStaffScore; let i = index">
-          <div class="staff-page border p-4 rounded mt-3">
-            <h6>{{ staff.staffName }}</h6>
+        <div *ngIf="!isAgmLoading">
+          <div *ngIf="agmScores" class="bm-summary">
+            <h5 class="mb-3">{{ entredUserData?.name }} (AGM)</h5>
 
             <table class="table table-bordered table-striped">
               <thead class="table-dark">
@@ -762,25 +695,60 @@
                   <th>Weightage Score</th>
                 </tr>
               </thead>
-
               <tbody>
-                <tr *ngFor="let kpi of hostaffKpiList">
+                <tr *ngFor="let kpi of agmkpiList">
                   <td>{{ kpi.kpi_name | titlecase }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.weightage }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.achieved | number }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.weightage }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.achieved | number }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
                   <td>
-                    {{ staff[kpi.kpi_name]?.weightageScore | number: "1.2-2" }}
+                    {{
+                    agmScores[kpi.kpi_name]?.weightageScore | number: "1.2-2"
+                    }}
                   </td>
                 </tr>
-
                 <tr class="table-info fw-bold">
-                  <td>Total</td>
-                  <td colspan="3"></td>
-                  <td>{{ staff.total | number: "1.2-2" }}</td>
+                  <td colspan="4">Total</td>
+                  <td>{{ agmtotal | number: "1.2-2" }}</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div *ngFor="let staff of hoStaffScore; let i = index">
+            <div class="staff-page border p-4 rounded mt-3">
+              <h6>{{ staff.staffName }}</h6>
+
+              <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                  <tr>
+                    <th>KPI</th>
+                    <th>Weightage</th>
+                    <th>Achieved</th>
+                    <th>Score</th>
+                    <th>Weightage Score</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let kpi of hostaffKpiList">
+                    <td>{{ kpi.kpi_name | titlecase }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.weightage }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.achieved | number }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
+                    <td>
+                      {{ staff[kpi.kpi_name]?.weightageScore | number: "1.2-2" }}
+                    </td>
+                  </tr>
+
+                  <tr class="table-info fw-bold">
+                    <td>Total</td>
+                    <td colspan="3"></td>
+                    <td>{{ staff.total | number: "1.2-2" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -790,32 +758,23 @@
 
 <!-- DGM ReportModal MODAL -->
 <div class="modal fade" id="dgmReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-         <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 DGM Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('dgmReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('dgmReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -828,52 +787,21 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
       <!-- BODY -->
       <div class="modal-body" id="dgmReportContent">
-        <div *ngIf="agmScores" class="bm-summary">
-          <h5 class="mb-3">{{ entredUserData?.name }} (DGM)</h5>
 
-          <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-              <tr>
-                <th>KPI</th>
-                <th>Weightage</th>
-                <th>Achieved</th>
-                <th>Score</th>
-                <th>Weightage Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let kpi of agmkpiList">
-                <td>{{ kpi.kpi_name | titlecase }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.weightage }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.achieved | number }}</td>
-                <td>{{ agmScores[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
-                <td>
-                  {{
-                    agmScores[kpi.kpi_name]?.weightageScore | number: "1.2-2"
-                  }}
-                </td>
-              </tr>
-              <tr class="table-info fw-bold">
-                <td colspan="4">Total</td>
-                <td>{{ agmtotal | number: "1.2-2" }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div *ngIf="isAgmLoading" class="text-center p-4">
+          <div class="spinner-border text-primary"></div>
+          <p>Loading...</p>
         </div>
 
-        <div *ngFor="let staff of hoStaffScore; let i = index">
-          <div class="staff-page border p-4 rounded mt-3">
-            <h6>{{ staff.staffName }}</h6>
+        <div *ngIf="!isAgmLoading">
+          <div *ngIf="agmScores" class="bm-summary">
+            <h5 class="mb-3">{{ entredUserData?.name }} (DGM)</h5>
 
             <table class="table table-bordered table-striped">
               <thead class="table-dark">
@@ -885,25 +813,60 @@
                   <th>Weightage Score</th>
                 </tr>
               </thead>
-
               <tbody>
-                <tr *ngFor="let kpi of hostaffKpiList">
+                <tr *ngFor="let kpi of agmkpiList">
                   <td>{{ kpi.kpi_name | titlecase }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.weightage }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.achieved | number }}</td>
-                  <td>{{ staff[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.weightage }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.achieved | number }}</td>
+                  <td>{{ agmScores[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
                   <td>
-                    {{ staff[kpi.kpi_name]?.weightageScore | number: "1.2-2" }}
+                    {{
+                    agmScores[kpi.kpi_name]?.weightageScore | number: "1.2-2"
+                    }}
                   </td>
                 </tr>
-
                 <tr class="table-info fw-bold">
-                  <td>Total</td>
-                  <td colspan="3"></td>
-                  <td>{{ staff.total | number: "1.2-2" }}</td>
+                  <td colspan="4">Total</td>
+                  <td>{{ agmtotal | number: "1.2-2" }}</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div *ngFor="let staff of hoStaffScore; let i = index">
+            <div class="staff-page border p-4 rounded mt-3">
+              <h6>{{ staff.staffName }}</h6>
+
+              <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                  <tr>
+                    <th>KPI</th>
+                    <th>Weightage</th>
+                    <th>Achieved</th>
+                    <th>Score</th>
+                    <th>Weightage Score</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let kpi of hostaffKpiList">
+                    <td>{{ kpi.kpi_name | titlecase }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.weightage }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.achieved | number }}</td>
+                    <td>{{ staff[kpi.kpi_name]?.score | number: "1.2-2" }}</td>
+                    <td>
+                      {{ staff[kpi.kpi_name]?.weightageScore | number: "1.2-2" }}
+                    </td>
+                  </tr>
+
+                  <tr class="table-info fw-bold">
+                    <td>Total</td>
+                    <td colspan="3"></td>
+                    <td>{{ staff.total | number: "1.2-2" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -913,32 +876,23 @@
 
 <!-- GM ReportModal MODAL -->
 <div class="modal fade" id="gmReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-        <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 GM Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('gmReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('gmReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -951,11 +905,7 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
       <div *ngIf="isGMLoading" class="text-center py-5">
@@ -1033,32 +983,23 @@
 
 <!-- HO_STAFF ReportModal MODAL -->
 <div class="modal fade" id="hoStaffReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-    <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 HO_STAFF Performance Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('hoStaffReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('hoStaffReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -1071,129 +1012,133 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
       <!-- BODY -->
       <div class="modal-body" id="hoStaffReportContent">
-        <div *ngIf="singleHoStaffScore" class="bm-summary">
-          <h5 class="mb-3">{{ entredUserData?.name }} (HO Staff)</h5>
 
-          <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-              <tr>
-                <th>KPI</th>
-                <th>Weightage</th>
-                <th>Achieved</th>
-                <th>Score</th>
-                <th>Weightage Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let kpi of singleHoStaffScore | keyvalue">
-                <ng-container *ngIf="kpi.key !== 'total' && kpi.key !== 'originalTotal'">
-                  <td>{{ $any(kpi.key) }}</td>
-                  <td>{{ $any(kpi.value).weightage }}</td>
-                  <td>{{ $any(kpi.value).achieved }}</td>
-                  <td>{{ $any(kpi.value).score }}</td>
-                  <td>{{ $any(kpi.value).weightageScore }}</td>
-                </ng-container>
-              </tr>
-              <tr class="table-info fw-bold">
-                <td colspan="4">Total</td>
-                <td>{{ singleHoStaffScore.originalTotal | number: "1.2-2" }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div *ngIf="isHoLoading" class="text-center p-4">
+          <div class="spinner-border text-primary"></div>
+          <p>Loading...</p>
         </div>
-         <div class="card mt-4 shadow-sm border-0"
-          *ngIf="history || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
 
-          <div class="card-header bg-secondary text-white">
-            <h4 class="mb-0">🔁 KPI Transfer History</h4>
-          </div>
+        <div *ngIf="!isHoLoading">
+          <div *ngIf="singleHoStaffScore" class="bm-summary">
+            <h5 class="mb-3">{{ entredUserData?.name }} (HO Staff)</h5>
 
-          <div class="card-body bg-light">
-
-            <small class="text-muted">
-              <strong>Staff:</strong> {{ mergeHistoryed.name }} |
-              <strong>Period:</strong> {{ mergeHistoryed.period }}
-            </small>
-
-            <!-- TRANSFER LOOP -->
-            <div *ngFor="let transfer of mergeHistoryed.transfers; let i = index"
-              class="border-start border-4 border-secondary rounded p-3 mb-4 mt-3 shadow-sm bg-white">
-
-              <h5 class="text-secondary mb-3 fw-bold">
-                Transfer {{ i + 1 }} —
-                <span class="text-muted">
-                  {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
-                </span>
-              </h5>
-
-              <p *ngIf="transfer.hod_name" class="mb-2 text-muted">
-                Approved by HOD:
-                <strong class="text-dark">{{ transfer.hod_name }}</strong>
-              </p>
-
-              <p *ngIf="transfer.old_branch_name">
-                <strong>Old Branch:</strong>
-                {{ transfer.old_branch_name }} |
-                <strong>Old Designation:</strong>
-                {{ transfer.old_designation }}
-              </p>
-
-              <p *ngIf="transfer.new_branch_name">
-                <strong>New Branch:</strong>
-                {{ transfer.new_branch_name }} |
-                <strong>New Designation:</strong>
-                {{ transfer.new_designation }}
-              </p>
-
-              <!-- KPI TABLE -->
-              <table class="table table-bordered table-striped mt-3">
-                <thead class="table-secondary">
-                  <tr>
-                    <th>KPI</th>
-                    <th>Weightage</th>
-                    <th>Target</th>
-                    <th>Achieved</th>
-                    <th>Score</th>
-                    <th>Weightage Score</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-
-                  <ng-container *ngFor="let kpi of getKpis(transfer)">
-                    <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
-                      <td>{{ kpi | titlecase }}</td>
-                      <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
-                      <td>{{ transfer[kpi]?.target || '-' }}</td>
-                      <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
-                      <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
-                      <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
-                    </tr>
+            <table class="table table-bordered table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>KPI</th>
+                  <th>Weightage</th>
+                  <th>Achieved</th>
+                  <th>Score</th>
+                  <th>Weightage Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let kpi of singleHoStaffScore | keyvalue">
+                  <ng-container *ngIf="kpi.key !== 'total' && kpi.key !== 'originalTotal'">
+                    <td>{{ $any(kpi.key) }}</td>
+                    <td>{{ $any(kpi.value).weightage }}</td>
+                    <td>{{ $any(kpi.value).achieved }}</td>
+                    <td>{{ $any(kpi.value).score }}</td>
+                    <td>{{ $any(kpi.value).weightageScore }}</td>
                   </ng-container>
+                </tr>
+                <tr class="table-info fw-bold">
+                  <td colspan="4">Total</td>
+                  <td>{{ singleHoStaffScore.originalTotal | number: "1.2-2" }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card mt-4 shadow-sm border-0"
+            *ngIf="history || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
 
-                  <tr class="table-info fw-bold">
-                    <td>Total</td>
-                    <td colspan="4"></td>
-                    <td>
-                      {{ transfer.total_weightage_score | number:'1.2-2' }}
-                    </td>
-                  </tr>
-
-                </tbody>
-              </table>
-
+            <div class="card-header bg-secondary text-white">
+              <h4 class="mb-0">🔁 KPI Transfer History</h4>
             </div>
 
+            <div class="card-body bg-light">
+
+              <small class="text-muted">
+                <strong>Staff:</strong> {{ mergeHistoryed.name }} |
+                <strong>Period:</strong> {{ mergeHistoryed.period }}
+              </small>
+
+              <!-- TRANSFER LOOP -->
+              <div *ngFor="let transfer of mergeHistoryed.transfers; let i = index"
+                class="border-start border-4 border-secondary rounded p-3 mb-4 mt-3 shadow-sm bg-white">
+
+                <h5 class="text-secondary mb-3 fw-bold">
+                  Transfer {{ i + 1 }} —
+                  <span class="text-muted">
+                    {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
+                  </span>
+                </h5>
+
+                <p *ngIf="transfer.hod_name" class="mb-2 text-muted">
+                  Approved by HOD:
+                  <strong class="text-dark">{{ transfer.hod_name }}</strong>
+                </p>
+
+                <p *ngIf="transfer.old_branch_name">
+                  <strong>Old Branch:</strong>
+                  {{ transfer.old_branch_name }} |
+                  <strong>Old Designation:</strong>
+                  {{ transfer.old_designation }}
+                </p>
+
+                <p *ngIf="transfer.new_branch_name">
+                  <strong>New Branch:</strong>
+                  {{ transfer.new_branch_name }} |
+                  <strong>New Designation:</strong>
+                  {{ transfer.new_designation }}
+                </p>
+
+                <!-- KPI TABLE -->
+                <table class="table table-bordered table-striped mt-3">
+                  <thead class="table-secondary">
+                    <tr>
+                      <th>KPI</th>
+                      <th>Weightage</th>
+                      <th>Target</th>
+                      <th>Achieved</th>
+                      <th>Score</th>
+                      <th>Weightage Score</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+
+                    <ng-container *ngFor="let kpi of getKpis(transfer)">
+                      <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
+                        <td>{{ kpi | titlecase }}</td>
+                        <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                        <td>{{ transfer[kpi]?.target || '-' }}</td>
+                        <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                        <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                        <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+                      </tr>
+                    </ng-container>
+
+                    <tr class="table-info fw-bold">
+                      <td>Total</td>
+                      <td colspan="4"></td>
+                      <td>
+                        {{ transfer.total_weightage_score | number:'1.2-2' }}
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
+
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
@@ -1238,166 +1183,167 @@
 
       <!-- BODY -->
       <div class="modal-body" id="staffReportContent">
-        <div *ngIf="singlStaffScore " class="bm-summary">
-          <h5 class="mb-3">{{ entredUserData?.name }} ({{ entredUserData?.role }})</h5>
 
-          <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-              <tr>
-                <th>KPI</th>
-                <th>Weightage</th>
-                <th>Target</th>
-                <th>Achieved</th>
-                <th>Achieved</th>
-                <th>Score</th>
-                <th>Weightage Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let kpi of kpiKeys">
-                <td>{{ kpi | titlecase }}</td>
-                <td>{{ singlStaffScore[kpi]?.weightage }}</td>
-                <td>{{ singlStaffScore[kpi]?.target | number }}</td>
-                <td>{{ singlStaffScore[kpi]?.achieved | number }}</td>
-                <td>
-                  {{
-                  singlStaffScore[kpi]?.target > 0
-                  ? ((singlStaffScore[kpi].achieved /
-                  singlStaffScore[kpi].target) *
-                  100 | number: "1.2-2")
-                  : "0"
-                  }}%
-                </td>
-                <td>{{ singlStaffScore[kpi]?.score | number: "1.2-2" }}</td>
-                <td>
-                  {{ singlStaffScore[kpi]?.weightageScore | number: "1.2-2" }}
-                </td>
-              </tr>
-              <tr class="table-info fw-bold">
-                <td colspan="6">Total</td>
-                <td>{{ (singlStaffScore.originalTotal | number: "1.2-2") || (singlStaffScore.total | number: "1.2-2") ||
-                  '0.00' }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div *ngIf="isStaffLoading" class="text-center p-4">
+          <div class="spinner-border text-primary"></div>
+          <p>Loading...</p>
         </div>
-        <div class="card mt-4 shadow-sm border-0"
-          *ngIf="history || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
 
-          <div class="card-header bg-secondary text-white">
-            <h4 class="mb-0">🔁 KPI Transfer History</h4>
+        <div *ngIf="!isStaffLoading">
+          <div *ngIf="singlStaffScore " class="bm-summary">
+            <h5 class="mb-3">{{ entredUserData?.name }} ({{ entredUserData?.role }})</h5>
+
+            <table class="table table-bordered table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>KPI</th>
+                  <th>Weightage</th>
+                  <th>Target</th>
+                  <th>Achieved</th>
+                  <th>Achieved</th>
+                  <th>Score</th>
+                  <th>Weightage Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let kpi of kpiKeys">
+                  <td>{{ kpi | titlecase }}</td>
+                  <td>{{ singlStaffScore[kpi]?.weightage }}</td>
+                  <td>{{ singlStaffScore[kpi]?.target | number }}</td>
+                  <td>{{ singlStaffScore[kpi]?.achieved | number }}</td>
+                  <td>
+                    {{
+                    singlStaffScore[kpi]?.target > 0
+                    ? ((singlStaffScore[kpi].achieved /
+                    singlStaffScore[kpi].target) *
+                    100 | number: "1.2-2")
+                    : "0"
+                    }}%
+                  </td>
+                  <td>{{ singlStaffScore[kpi]?.score | number: "1.2-2" }}</td>
+                  <td>
+                    {{ singlStaffScore[kpi]?.weightageScore | number: "1.2-2" }}
+                  </td>
+                </tr>
+                <tr class="table-info fw-bold">
+                  <td colspan="6">Total</td>
+                  <td>{{ (singlStaffScore.originalTotal | number: "1.2-2") || (singlStaffScore.total | number: "1.2-2")
+                    ||
+                    '0.00' }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
+          <div class="card mt-4 shadow-sm border-0"
+            *ngIf="history || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
 
-          <div class="card-body bg-light">
-
-            <small class="text-muted">
-              <strong>Staff:</strong> {{ mergeHistoryed.name }} |
-              <strong>Period:</strong> {{ mergeHistoryed.period }}
-            </small>
-
-            <!-- TRANSFER LOOP -->
-            <div *ngFor="let transfer of mergeHistoryed.transfers; let i = index"
-              class="border-start border-4 border-secondary rounded p-3 mb-4 mt-3 shadow-sm bg-white">
-
-              <h5 class="text-secondary mb-3 fw-bold">
-                Transfer {{ i + 1 }} —
-                <span class="text-muted">
-                  {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
-                </span>
-              </h5>
-
-              <p *ngIf="transfer.hod_name" class="mb-2 text-muted">
-                Approved by HOD:
-                <strong class="text-dark">{{ transfer.hod_name }}</strong>
-              </p>
-
-              <p *ngIf="transfer.old_branch_name">
-                <strong>Old Branch:</strong>
-                {{ transfer.old_branch_name }} |
-                <strong>Old Designation:</strong>
-                {{ transfer.old_designation }}
-              </p>
-
-              <p *ngIf="transfer.new_branch_name">
-                <strong>New Branch:</strong>
-                {{ transfer.new_branch_name }} |
-                <strong>New Designation:</strong>
-                {{ transfer.new_designation }}
-              </p>
-
-              <!-- KPI TABLE -->
-              <table class="table table-bordered table-striped mt-3">
-                <thead class="table-secondary">
-                  <tr>
-                    <th>KPI</th>
-                    <th>Weightage</th>
-                    <th>Target</th>
-                    <th>Achieved</th>
-                    <th>Score</th>
-                    <th>Weightage Score</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-
-                  <ng-container *ngFor="let kpi of getKpis(transfer)">
-                    <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
-                      <td>{{ kpi | titlecase }}</td>
-                      <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
-                      <td>{{ transfer[kpi]?.target || '-' }}</td>
-                      <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
-                      <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
-                      <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
-                    </tr>
-                  </ng-container>
-
-                  <tr class="table-info fw-bold">
-                    <td>Total</td>
-                    <td colspan="4"></td>
-                    <td>
-                      {{ transfer.total_weightage_score | number:'1.2-2' }}
-                    </td>
-                  </tr>
-
-                </tbody>
-              </table>
-
+            <div class="card-header bg-secondary text-white">
+              <h4 class="mb-0">🔁 KPI Transfer History</h4>
             </div>
 
+            <div class="card-body bg-light">
+
+              <small class="text-muted">
+                <strong>Staff:</strong> {{ mergeHistoryed.name }} |
+                <strong>Period:</strong> {{ mergeHistoryed.period }}
+              </small>
+
+              <!-- TRANSFER LOOP -->
+              <div *ngFor="let transfer of mergeHistoryed.transfers; let i = index"
+                class="border-start border-4 border-secondary rounded p-3 mb-4 mt-3 shadow-sm bg-white">
+
+                <h5 class="text-secondary mb-3 fw-bold">
+                  Transfer {{ i + 1 }} —
+                  <span class="text-muted">
+                    {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
+                  </span>
+                </h5>
+
+                <p *ngIf="transfer.hod_name" class="mb-2 text-muted">
+                  Approved by HOD:
+                  <strong class="text-dark">{{ transfer.hod_name }}</strong>
+                </p>
+
+                <p *ngIf="transfer.old_branch_name">
+                  <strong>Old Branch:</strong>
+                  {{ transfer.old_branch_name }} |
+                  <strong>Old Designation:</strong>
+                  {{ transfer.old_designation }}
+                </p>
+
+                <p *ngIf="transfer.new_branch_name">
+                  <strong>New Branch:</strong>
+                  {{ transfer.new_branch_name }} |
+                  <strong>New Designation:</strong>
+                  {{ transfer.new_designation }}
+                </p>
+
+                <!-- KPI TABLE -->
+                <table class="table table-bordered table-striped mt-3">
+                  <thead class="table-secondary">
+                    <tr>
+                      <th>KPI</th>
+                      <th>Weightage</th>
+                      <th>Target</th>
+                      <th>Achieved</th>
+                      <th>Score</th>
+                      <th>Weightage Score</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+
+                    <ng-container *ngFor="let kpi of getKpis(transfer)">
+                      <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
+                        <td>{{ kpi | titlecase }}</td>
+                        <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                        <td>{{ transfer[kpi]?.target || '-' }}</td>
+                        <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
+                        <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
+                        <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+                      </tr>
+                    </ng-container>
+
+                    <tr class="table-info fw-bold">
+                      <td>Total</td>
+                      <td colspan="4"></td>
+                      <td>
+                        {{ transfer.total_weightage_score | number:'1.2-2' }}
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
+
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
 <!-- deputational ReportModal MODAL -->
 <div class="modal fade" id="deputationstaffReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-     <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 Deputational Staff Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('deputationstaffReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('deputationstaffReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -1410,94 +1356,87 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
       <!-- BODY -->
       <div class="modal-body" id="deputationstaffReportContent">
-        <ng-container *ngIf="groupedDeputationStaff.length; else noData">
-          <div class="bm-summary">
-            <div
-              *ngFor="let group of groupedDeputationStaff"
-              class="staff-page mb-4"
-            >
-              <h5 class="p-2 text-center fw-bold text-dark mb-2">
-                {{ group.department }}
-              </h5>
 
-              <hr class="mt-0 mb-3" />
+        <div *ngIf="isDeputationLoading" class="text-center p-4">
+          <div class="spinner-border text-primary"></div>
+          <p>Loading...</p>
+        </div>
 
-              <table class="table table-bordered table-striped">
-                <thead class="table-dark">
-                  <tr>
-                    <th>Emp ID</th>
-                    <th>Name</th>
-                    <th>Place</th>
-                    <th>Design</th>
-                    <th>Branch</th>
-                    <th>Work At</th>
-                    <th>Weightage Score</th>
-                  </tr>
-                </thead>
+        <div *ngIf="!isDeputationLoading">
+          <ng-container *ngIf="groupedDeputationStaff.length; else noData">
+            <div class="bm-summary">
+              <div *ngFor="let group of groupedDeputationStaff" class="staff-page mb-4">
+                <h5 class="p-2 text-center fw-bold text-dark mb-2">
+                  {{ group.department }}
+                </h5>
 
-                <tbody>
-                  <tr *ngFor="let staff of group.staff">
-                    <td>{{ staff.emp_id }}</td>
-                    <td>{{ staff.name }}</td>
-                    <td>{{ staff.place }}</td>
-                    <td>{{ staff.design }}</td>
-                    <td>{{ staff.branch }}</td>
-                    <td>{{ staff.work_at }}</td>
-                    <td class="fw-bold text-center">
-                      {{ staff.weightage_score }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                <hr class="mt-0 mb-3" />
+
+                <table class="table table-bordered table-striped">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Emp ID</th>
+                      <th>Name</th>
+                      <th>Place</th>
+                      <th>Design</th>
+                      <th>Branch</th>
+                      <th>Work At</th>
+                      <th>Weightage Score</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr *ngFor="let staff of group.staff">
+                      <td>{{ staff.emp_id }}</td>
+                      <td>{{ staff.name }}</td>
+                      <td>{{ staff.place }}</td>
+                      <td>{{ staff.design }}</td>
+                      <td>{{ staff.branch }}</td>
+                      <td>{{ staff.work_at }}</td>
+                      <td class="fw-bold text-center">
+                        {{ staff.weightage_score }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        </ng-container>
+          </ng-container>
 
-        <ng-template #noData>
-          <div class="text-center text-muted fw-bold py-5">No data found</div>
-        </ng-template>
+          <ng-template #noData>
+            <div class="text-center text-muted fw-bold py-5">No data found</div>
+          </ng-template>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
 <!-- in-charge ReportModal MODAL -->
 <div class="modal fade" id="inChargeReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-     <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 In-Charge Wise Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('inChargeReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('inChargeReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -1510,84 +1449,76 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
       <!-- BODY -->
       <div class="modal-body" id="inChargeReportContent">
-        <div *ngIf="totalBranches?.length; else noData" class="bm-summary">
-          <h5 class="mb-3">
-            In-Charge:{{ entredUserData?.name }} Branch Count:{{
-              totalBranchesCount
-            }}
-          </h5>
 
-          <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-              <tr>
-                <th>Sr. No</th>
-                <th>Branch Code</th>
-                <th>Branch Name</th>
-                <th>Branch Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let branch of totalBranches; let i = index">
-                <td>{{ i + 1 }}</td>
-                <td>{{ branch.code }}</td>
-                <td>{{ branch.name }}</td>
-                <td
-                  [ngClass]="{
+        <div *ngIf="isinchargewise" class="text-center p-4">
+          <div class="spinner-border text-primary"></div>
+          <p>Loading...</p>
+        </div>
+        <div *ngIf="!isinchargewise">
+          <div *ngIf="totalBranches?.length; else noData" class="bm-summary">
+            <h5 class="mb-3">
+              In-Charge:{{ entredUserData?.name }} Branch Count:{{
+              totalBranchesCount
+              }}
+            </h5>
+
+            <table class="table table-bordered table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Sr. No</th>
+                  <th>Branch Code</th>
+                  <th>Branch Name</th>
+                  <th>Branch Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let branch of totalBranches; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ branch.code }}</td>
+                  <td>{{ branch.name }}</td>
+                  <td [ngClass]="{
                     'text-danger': branch.bmTotalScore < 0,
                     'text-black': branch.bmTotalScore >= 0,
-                  }"
-                >
-                  {{ branch.bmTotalScore | number: "1.2-2" }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  }">
+                    {{ branch.bmTotalScore | number: "1.2-2" }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noData>
+            <p class="text-center text-muted">No branch data available</p>
+          </ng-template>
         </div>
-        <ng-template #noData>
-          <p class="text-center text-muted">No branch data available</p>
-        </ng-template>
       </div>
     </div>
   </div>
 </div>
 <!-- allBranch ReportModal MODAL -->
 <div class="modal fade" id="allBranchReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- HEADER -->
-      <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 All Branch Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('allBranchReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('allBranchReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -1600,11 +1531,7 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
@@ -1613,10 +1540,7 @@
       </div>
       <!-- BODY -->
       <div class="modal-body" id="allBranchReportContent">
-        <div
-          *ngIf="!isAllBranchLoading && ALLtotalBranches?.length; else noData"
-          class="bm-summary"
-        >
+        <div *ngIf="!isAllBranchLoading && ALLtotalBranches?.length; else noData" class="bm-summary">
           <h5 class="mb-3">Total Branch Count:{{ ALLtotalBranchesCount }}</h5>
 
           <table class="table table-bordered table-striped">
@@ -1637,12 +1561,10 @@
                 <td>{{ branch.name }}</td>
                 <td>{{ branch.bmId }}</td>
                 <td>{{ branch.bmName }}</td>
-                <td
-                  [ngClass]="{
+                <td [ngClass]="{
                     'text-danger': branch.bmTotalScore < 0,
                     'text-black': branch.bmTotalScore >= 0,
-                  }"
-                >
+                  }">
                   {{ branch.bmTotalScore | number: "1.2-2" }}
                 </td>
               </tr>
@@ -1658,15 +1580,11 @@
 </div>
 <!-- allUsers ReportModal MODAL -->
 <div class="modal fade" id="allusersReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
 
       <!-- HEADER (UNCHANGED) -->
-      <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0">All Users at once Report</h5>
 
         <div class="d-flex align-items-center gap-2">
@@ -1674,11 +1592,7 @@
             ⬇ Download Excel
           </button>
 
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
 
@@ -1692,9 +1606,7 @@
           </div>
 
           <div class="progress" style="height: 6px;">
-            <div
-              class="progress-bar progress-bar-striped progress-bar-animated"
-              role="progressbar"
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
               [style.width.%]="loadingPercent">
             </div>
           </div>
@@ -1726,12 +1638,10 @@
                 <td>{{ branch.name }}</td>
                 <td>{{ branch.role }}</td>
                 <td>{{ branch.branch_name }}</td>
-                <td
-                  [ngClass]="{
+                <td [ngClass]="{
                     'text-danger': branch.bmTotalScore < 0,
                     'text-black': branch.bmTotalScore >= 0
-                  }"
-                >
+                  }">
                   {{ branch.bmTotalScore | number:'1.2-2' }}
                 </td>
               </tr>
@@ -1740,10 +1650,7 @@
         </div>
 
         <!-- EMPTY STATE -->
-        <div
-          *ngIf="!isAllUsersLoading && !ALLTotalUser?.length"
-          class="text-center text-muted py-5"
-        >
+        <div *ngIf="!isAllUsersLoading && !ALLTotalUser?.length" class="text-center text-muted py-5">
           No data available
         </div>
 
@@ -1754,31 +1661,22 @@
 
 <!-- all department wise rreport  model -->
 <div class="modal fade" id="allDeparmentWiseReportModal" tabindex="-1">
-  <div
-    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
-  >
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
-       <div
-        class="modal-header bg-primary text-white d-flex justify-content-between align-items-center"
-      >
+      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="modal-title mb-0 fw-bold">📊 Department-Wise Branches Report</h5>
 
         <div class="d-flex align-items-center gap-2">
           <!-- Excel Button -->
-          <button
-            class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            (click)="exportAllReportsExcel()"
-          >
+          <button class="btn btn-success btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            (click)="exportAllReportsExcel()">
             <i class="bi bi-file-earmark-excel"></i>
             <span>Excel</span>
           </button>
 
           <!-- PDF Button -->
-          <button
-            class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
-            [disabled]="isPdfDownloading"
-            (click)="downloadPdf('allDeparmentWiseReportModal')"
-          >
+          <button class="btn btn-light btn-sm px-3 d-flex align-items-center gap-1 shadow-sm rounded-pill"
+            [disabled]="isPdfDownloading" (click)="downloadPdf('allDeparmentWiseReportModal')">
             <ng-container *ngIf="!isPdfDownloading; else pdfLoading">
               <i class="bi bi-file-earmark-pdf text-danger"></i>
               <span>PDF</span>
@@ -1791,25 +1689,18 @@
           </button>
 
           <!-- Close Button -->
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-          ></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
       <!-- HEADER -->
-     
+
 
       <div *ngIf="isAllBranchLoading" class="text-center p-4">
         <div class="spinner-border text-primary"></div>
       </div>
       <!-- BODY -->
       <div class="modal-body" id="allDeparmentWiseReportContent">
-        <div
-          *ngIf="!isAllBranchLoading && ALLtotalBranches?.length; else noData"
-          class="bm-summary"
-        >
+        <div *ngIf="!isAllBranchLoading && ALLtotalBranches?.length; else noData" class="bm-summary">
           <h5 class="mb-3">Total Branch Count:{{ ALLtotalBranchesCount }}</h5>
 
           <table class="table table-bordered table-striped">
@@ -1831,13 +1722,11 @@
                 <td>{{ branch.name }}</td>
                 <td>{{ branch.bmName }}</td>
                 <td>{{branch.departmentData?.target}}</td>
-                 <td>{{branch.departmentData?.achieved}}</td>
-                <td
-                  [ngClass]="{
+                <td>{{branch.departmentData?.achieved}}</td>
+                <td [ngClass]="{
                     'text-danger': branch.departmentData.score < 0,
                     'text-black': branch.departmentData.score >= 0,
-                  }"
-                >
+                  }">
                   {{ branch.departmentData?.score | number: "1.2-2" }}
                 </td>
               </tr>

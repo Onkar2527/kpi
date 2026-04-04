@@ -225,4 +225,7 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
   allSectionWiseReport(data:any){
      return this.http.post(`${environment.apiBaseUrl}/performnceMaster/getAllBranchesScoreSectionsWise`,data);
   }
+  getLastTransfer(period:any,staff_id:any){
+    return this.http.get(`${environment.apiBaseUrl}/performnceMaster/getLasttransfer?period=${period}&staff_id=${staff_id}`);
+  }
 }

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../admin.service';
 import { PerformanceService } from '../../performance/performance.service';
 import html2pdf from 'html2pdf.js';
+import { PeriodService } from 'src/app/core/period.service';
 import { AllPerformanceService } from '../../all-performnace/all-performance.service';
 import * as XLSX from 'xlsx';
 
@@ -128,6 +129,8 @@ export class ReportsComponent implements OnInit {
   ];
 
   periods = ['2025-26', '2026-27', '2027-28'];
+  branches: any;
+
   sortAllUsers() {
     this.ALLTotalUser.sort((a: any, b: any) => {
       const roleA = this.roleOrder[a.role] ?? 99;
@@ -174,8 +177,16 @@ export class ReportsComponent implements OnInit {
   ALLtotalBranchesCount: any;
   ALLtotalBranches: any;
   groupedDeputationStaff: { department: string; staff: any[] }[] = [];
+  isBmLoading = false;
+  isAgmLoading = false;
+  isHoLoading = false;
+  isStaffLoading = false;
+  isDeputationLoading = false;
   isAllBranchLoading = false;
-
+  isAllUsersLoading = false;
+  isinchargewise = false;
+  lastTrasferedBranch:any;
+  period:any;
   branchdepartment = [
     { id: '1', department: 'deposit' },
     { id: '2', department: 'loan_gen' },
@@ -214,6 +225,7 @@ export class ReportsComponent implements OnInit {
     private adminService: AdminService,
     private performanceService: PerformanceService,
     private all_performanceService: AllPerformanceService,
+    private periodService: PeriodService,
   ) {}
 
   ngAfterViewInit() {
@@ -231,7 +243,11 @@ export class ReportsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+     this.periodService.currentPeriod.subscribe((period) => {
+      this.period = period;
+    });
     this.loadUsers();
+    this.loadBranches();
   }
   isSaveDisabled(): boolean {
     if (!this.selectedPeriod) {
@@ -309,6 +325,30 @@ export class ReportsComponent implements OnInit {
     this.adminService.getUsers().subscribe((data) => {
       this.users = data;
     });
+  }
+  searchText: string = '';
+  filteredBranches: any;
+  showDropdown: boolean = false;
+
+  loadBranches() {
+    this.adminService.getBranches().subscribe((data) => {
+      this.branches = data;
+      this.filteredBranches = data;
+    });
+  }
+
+  filterBranches() {
+    const search = this.searchText.toLowerCase();
+
+    this.filteredBranches = this.branches.filter((branch: any) =>
+      branch.name.toLowerCase().includes(search),
+    );
+  }
+
+  selectBranch(branch: any) {
+    this.selectedPf = branch.code;
+    this.searchText = branch.code + ' - ' + branch.name;
+    this.showDropdown = false;
   }
 
   serachBranchID(pfNo: any) {
@@ -427,7 +467,26 @@ export class ReportsComponent implements OnInit {
         .toPromise(),
     ]);
   }
-  isAllUsersLoading = false;
+  getLastTransfer(period:any,staff_id:any){
+    this.adminService.getLastTransfer(period,staff_id).subscribe((data:any) =>{
+      this.lastTrasferedBranch=data.old_branch_id;
+      console.log(this.lastTrasferedBranch)
+    })
+  }
+  getCurrentFinancialYear() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1; // Jan = 1
+
+  if (month >= 4) {
+    // April to Dec
+    return `${year}-${(year + 1).toString().slice(2)}`;
+  } else {
+    // Jan to March
+    return `${year - 1}-${year.toString().slice(2)}`;
+  }
+}
+
   isGMLoading = false;
   transferBmScores: any;
   generateReport(row: any) {
@@ -438,10 +497,17 @@ export class ReportsComponent implements OnInit {
         this.showToast('Enter valid branch code ');
         return;
       }
+      const modal = new bootstrap.Modal(
+        document.getElementById('bmReportModal'),
+      );
+     
+      modal.show();
+      this.isBmLoading = true;
       this.performanceService
         .getBmScores(this.selectedPeriod, this.entredUserData.branch_id)
         .subscribe((data) => {
           this.bmScores = data;
+          this.isBmLoading = false;
         });
       this.performanceService
         .getScores(this.selectedPeriod, this.entredUserData.branch_id)
@@ -449,10 +515,7 @@ export class ReportsComponent implements OnInit {
           this.bmStaffScore = data;
         });
 
-      const modal = new bootstrap.Modal(
-        document.getElementById('bmReportModal'),
-      );
-      modal.show();
+      
     } else if (row.type === 'AGM') {
       this.entredUserData = this.serachBranchID(row.pf);
 
@@ -465,6 +528,11 @@ export class ReportsComponent implements OnInit {
         console.error('AGM user not found for PF:', row.pf);
         return;
       }
+       const modalEl = document.getElementById('agmReportModal');
+          if (modalEl) {
+            new bootstrap.Modal(modalEl).show();
+          }
+          this.isAgmLoading = true;
 
       this.AGMDGMFunction(
         'AGM',
@@ -481,10 +549,7 @@ export class ReportsComponent implements OnInit {
           this.agmkpiList = agmKpis?.data || [];
           this.hostaffKpiList = hoStaffKpis?.data || [];
 
-          const modalEl = document.getElementById('agmReportModal');
-          if (modalEl) {
-            new bootstrap.Modal(modalEl).show();
-          }
+          this.isAgmLoading = false;
         })
         .catch((error) => {
           console.error('AGM/DGM data fetch failed:', error);
@@ -495,6 +560,11 @@ export class ReportsComponent implements OnInit {
         this.showToast('Enter valid PF No Number');
         return;
       }
+     const modalEl = document.getElementById('itAgmReportModal');
+        if (modalEl) {
+          new bootstrap.Modal(modalEl).show();
+        }
+        this.isAgmLoading = true;
 
       this.AGMDGMFunction(
         'AGM_IT',
@@ -508,10 +578,8 @@ export class ReportsComponent implements OnInit {
         this.agmkpiList = agmKpis.data;
         this.hostaffKpiList = hoStaffKpis.data;
 
-        const modalEl = document.getElementById('itAgmReportModal');
-        if (modalEl) {
-          new bootstrap.Modal(modalEl).show();
-        }
+        this.isAgmLoading = false;
+       
       });
     } else if (row.type === 'AGM_AUDIT') {
       this.entredUserData = this.serachBranchID(row.pf);
@@ -519,6 +587,11 @@ export class ReportsComponent implements OnInit {
         this.showToast('Enter valid PF No Number');
         return;
       }
+        const modalEl = document.getElementById('auditAgmReportModal');
+        if (modalEl) {
+          new bootstrap.Modal(modalEl).show();
+        }
+        this.isAgmLoading = true;
 
       this.AGMDGMFunction(
         'AGM_AUDIT',
@@ -531,11 +604,8 @@ export class ReportsComponent implements OnInit {
         this.hoStaffScore = staffRes;
         this.agmkpiList = agmKpis.data;
         this.hostaffKpiList = hoStaffKpis.data;
+        this.isAgmLoading = false;
 
-        const modalEl = document.getElementById('auditAgmReportModal');
-        if (modalEl) {
-          new bootstrap.Modal(modalEl).show();
-        }
       });
     } else if (row.type === 'AGM_INSURANCE') {
       this.entredUserData = this.serachBranchID(row.pf);
@@ -544,6 +614,12 @@ export class ReportsComponent implements OnInit {
         this.showToast('Enter valid PF No Number');
         return;
       }
+      const modalEl = document.getElementById('inAgmReportModal');
+        if (modalEl) {
+          new bootstrap.Modal(modalEl).show();
+        }
+        this.isAgmLoading = true;
+
 
       this.AGMDGMFunction(
         'AGM_INSURANCE',
@@ -556,11 +632,8 @@ export class ReportsComponent implements OnInit {
         this.hoStaffScore = staffRes;
         this.agmkpiList = agmKpis.data;
         this.hostaffKpiList = hoStaffKpis.data;
-
-        const modalEl = document.getElementById('inAgmReportModal');
-        if (modalEl) {
-          new bootstrap.Modal(modalEl).show();
-        }
+        this.isAgmLoading = false;
+        
       });
     } else if (row.type === 'DGM') {
       this.entredUserData = this.serachBranchID(row.pf);
@@ -568,6 +641,12 @@ export class ReportsComponent implements OnInit {
         this.showToast('Enter valid PF No Number');
         return;
       }
+      const modalEl = document.getElementById('dgmReportModal');
+        if (modalEl) {
+          new bootstrap.Modal(modalEl).show();
+        }
+        this.isAgmLoading = true;
+
 
       this.AGMDGMFunction(
         'DGM',
@@ -580,11 +659,8 @@ export class ReportsComponent implements OnInit {
         this.hoStaffScore = staffRes;
         this.agmkpiList = agmKpis.data;
         this.hostaffKpiList = hoStaffKpis.data;
-
-        const modalEl = document.getElementById('dgmReportModal');
-        if (modalEl) {
-          new bootstrap.Modal(modalEl).show();
-        }
+        this.isAgmLoading = false;
+        
       });
     } else if (row.type === 'GM') {
       this.entredUserData = this.serachBranchID(row.pf);
@@ -592,7 +668,10 @@ export class ReportsComponent implements OnInit {
         this.showToast('Enter valid PF No Number');
         return;
       }
-
+     const modalEl = document.getElementById('gmReportModal');
+      if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+      }
       this.isGMLoading = true;
       this.agmScores = null;
       this.AGMArray = [];
@@ -634,16 +713,18 @@ export class ReportsComponent implements OnInit {
           },
         });
 
-      const modalEl = document.getElementById('gmReportModal');
-      if (modalEl) {
-        new bootstrap.Modal(modalEl).show();
-      }
+      
     } else if (row.type === 'HO') {
       this.entredUserData = this.serachBranchID(row.pf);
       if (this.entredUserData.role !== 'HO_STAFF') {
         this.showToast('Enter valid PF No Number');
         return;
       }
+      const modalEl = document.getElementById('hoStaffReportModal');
+      if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+      }
+      this.isHoLoading = true;
 
       this.all_performanceService
         .getSpecificALLScores(
@@ -667,11 +748,9 @@ export class ReportsComponent implements OnInit {
             this.entredUserData.id,
           );
         });
+        this.isHoLoading = false;
 
-      const modalEl = document.getElementById('hoStaffReportModal');
-      if (modalEl) {
-        new bootstrap.Modal(modalEl).show();
-      }
+      
     } else if (row.type === 'In_charge') {
       this.entredUserData = this.serachBranchID(row.pf);
       if (
@@ -685,6 +764,11 @@ export class ReportsComponent implements OnInit {
         this.showToast('Enter valid PF No Number');
         return;
       }
+       const modalEl = document.getElementById('inChargeReportModal');
+      if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+      }
+      this.isinchargewise = true;
 
       this.all_performanceService
         .getDashbroadCount(this.entredUserData.id, this.selectedPeriod)
@@ -692,19 +776,20 @@ export class ReportsComponent implements OnInit {
           next: (data: any) => {
             this.totalBranches = data.totalBranches;
             this.totalBranchesCount = data.totalBranchesCount;
+            this.isinchargewise = false;
           },
           error: (err) => {
             console.error(' load failed', err);
             this.totalBranchesCount = 0;
           },
         });
-      const modalEl = document.getElementById('inChargeReportModal');
+     
+    } else if (row.type === 'all_branch') {
+      const data = { period: this.selectedPeriod };
+       const modalEl = document.getElementById('allBranchReportModal');
       if (modalEl) {
         new bootstrap.Modal(modalEl).show();
       }
-    } else if (row.type === 'all_branch') {
-      const data = { period: this.selectedPeriod };
-
       this.isAllBranchLoading = true;
 
       this.adminService.allBranchReport(data).subscribe({
@@ -722,10 +807,7 @@ export class ReportsComponent implements OnInit {
         },
       });
 
-      const modalEl = document.getElementById('allBranchReportModal');
-      if (modalEl) {
-        new bootstrap.Modal(modalEl).show();
-      }
+     
     } else if (row.type === 'all_users') {
       const data = { period: this.selectedPeriod };
 
@@ -852,6 +934,20 @@ export class ReportsComponent implements OnInit {
         this.showToast('Enter valid PF No Number');
         return;
       }
+      const modalEl = document.getElementById('staffReportModal');
+      if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+      }
+      
+const currentPeriod = this.getCurrentFinancialYear();
+
+if (this.selectedPeriod === this.period) {
+  console.log("Selected period is current year ");
+} else {
+  console.log("Selected period is NOT current year ");
+}
+       this.getLastTransfer(this.selectedPeriod,this.entredUserData.id);
+      this.isStaffLoading = true;
       if (this.entredUserData?.role === 'Clerk') {
         this.performanceService
           .getStaffScores(
@@ -861,6 +957,7 @@ export class ReportsComponent implements OnInit {
           )
           .subscribe((data: any) => {
             this.singlStaffScore = data;
+            this.isStaffLoading = false;
           });
       }
       if (this.entredUserData?.role === 'BM') {
@@ -875,6 +972,7 @@ export class ReportsComponent implements OnInit {
                 .getBmScores(this.selectedPeriod, this.entredUserData.branch_id)
                 .subscribe((bmData: any) => {
                   this.singlStaffScore = bmData;
+                  this.isStaffLoading = false;
                 });
             } else {
               this.singlStaffScore = transferData;
@@ -885,29 +983,31 @@ export class ReportsComponent implements OnInit {
       this.transferStaffHistory(this.selectedPeriod, this.entredUserData.id);
       this.transferHOStaffHistory(this.selectedPeriod, this.entredUserData.id);
       this.transferAttenderHistory(this.selectedPeriod, this.entredUserData.id);
-      const modalEl = document.getElementById('staffReportModal');
+      
+    } else if (row.type === 'deputation_staff') {
+      const payload = { period: row.period, department: row.department };
+      const modalEl = document.getElementById('deputationstaffReportModal');
       if (modalEl) {
         new bootstrap.Modal(modalEl).show();
       }
-    } else if (row.type === 'deputation_staff') {
-      const payload = { period: row.period, department: row.department };
-
+      this.isDeputationLoading = true;
       this.adminService
         .deputationStaffReport(payload)
         .subscribe((data: any) => {
           this.deputationStaffList = data;
           this.groupByDepartment(data);
+          this.isDeputationLoading = false;
         });
-      const modalEl = document.getElementById('deputationstaffReportModal');
-      if (modalEl) {
-        new bootstrap.Modal(modalEl).show();
-      }
+      
     } else if (row.type === 'Department_Wise') {
       const data = {
         period: this.selectedPeriod,
         department: this.selectedDepartment,
       };
-
+      const modalEl = document.getElementById('allDeparmentWiseReportModal');
+      if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+      }
       this.isAllBranchLoading = true;
 
       this.adminService.allSectionWiseReport(data).subscribe({
@@ -925,10 +1025,7 @@ export class ReportsComponent implements OnInit {
         },
       });
 
-      const modalEl = document.getElementById('allDeparmentWiseReportModal');
-      if (modalEl) {
-        new bootstrap.Modal(modalEl).show();
-      }
+     
     }
   }
   getKpis(transfer: any): string[] {
@@ -1525,14 +1622,18 @@ export class ReportsComponent implements OnInit {
   }
 
   exportHoStaffExcel(title: string, staffData: any) {
-    if (!staffData) return;
+  if (!staffData) return;
 
-    const ws = XLSX.utils.aoa_to_sheet([]);
-    let rowIndex = 0;
+  // ✅ FIX: handle array without changing logic
+  const dataList = Array.isArray(staffData) ? staffData : [staffData];
 
-    const staffName = staffData?.staffName || this.entredUserData?.name || '';
+  const ws = XLSX.utils.aoa_to_sheet([]);
+  let rowIndex = 0;
 
-    //  Header
+  dataList.forEach((data: any) => {
+    const staffName = data?.staffName || this.entredUserData?.name || '';
+
+    // Header
     XLSX.utils.sheet_add_aoa(ws, [[title || 'HO_STAFF Performance Report']], {
       origin: `A${rowIndex + 1}`,
     });
@@ -1550,7 +1651,7 @@ export class ReportsComponent implements OnInit {
     );
     rowIndex++;
 
-    Object.keys(staffData)
+    Object.keys(data)
       .filter(
         (k) =>
           k !== 'total' &&
@@ -1559,17 +1660,17 @@ export class ReportsComponent implements OnInit {
           k !== 'staffId',
       )
       .forEach((kpi) => {
-        if (!staffData[kpi] || typeof staffData[kpi] !== 'object') return;
+        if (!data[kpi] || typeof data[kpi] !== 'object') return;
 
         XLSX.utils.sheet_add_aoa(
           ws,
           [
             [
               kpi.toUpperCase(),
-              staffData[kpi]?.weightage ?? '',
-              staffData[kpi]?.achieved ?? '',
-              Number(staffData[kpi]?.score ?? 0).toFixed(2),
-              Number(staffData[kpi]?.weightageScore ?? 0).toFixed(2),
+              data[kpi]?.weightage ?? '',
+              data[kpi]?.achieved ?? '',
+              Number(data[kpi]?.score ?? 0).toFixed(2),
+              Number(data[kpi]?.weightageScore ?? 0).toFixed(2),
             ],
           ],
           { origin: `A${rowIndex + 1}` },
@@ -1577,14 +1678,15 @@ export class ReportsComponent implements OnInit {
         rowIndex++;
       });
 
-    //  Summary Total
+    // Summary Total
     XLSX.utils.sheet_add_aoa(
       ws,
-      [['TOTAL', '', '', '', staffData.originalTotal ?? staffData.total ?? 0]],
+      [['TOTAL', '', '', '', data.originalTotal ?? data.total ?? 0]],
       { origin: `A${rowIndex + 1}` },
     );
     rowIndex += 3;
 
+    // ✅ keep your transfer logic SAME
     if (this.mergeHistoryed?.transfers?.length > 0) {
       XLSX.utils.sheet_add_aoa(ws, [['KPI Transfer History']], {
         origin: `A${rowIndex + 1}`,
@@ -1592,11 +1694,10 @@ export class ReportsComponent implements OnInit {
       rowIndex += 2;
 
       this.mergeHistoryed.transfers.forEach((transfer: any, index: number) => {
-        const formatDate = new Date(transfer.transfer_date).toLocaleDateString(
-          'en-GB',
-        );
+        const formatDate = new Date(
+          transfer.transfer_date,
+        ).toLocaleDateString('en-GB');
 
-        //  Transfer Header
         XLSX.utils.sheet_add_aoa(
           ws,
           [[`Transfer ${index + 1} - ${formatDate}`]],
@@ -1632,7 +1733,6 @@ export class ReportsComponent implements OnInit {
 
         rowIndex++;
 
-        // Transfer KPI Header
         XLSX.utils.sheet_add_aoa(
           ws,
           [
@@ -1672,7 +1772,6 @@ export class ReportsComponent implements OnInit {
           }
         });
 
-        // Transfer Total
         XLSX.utils.sheet_add_aoa(
           ws,
           [
@@ -1691,9 +1790,10 @@ export class ReportsComponent implements OnInit {
         rowIndex += 3;
       });
     }
+  });
 
-    return ws;
-  }
+  return ws;
+}
   exportInChargeSheet(data: any[], inChargeName: string, branchCount: number) {
     if (!Array.isArray(data) || data.length === 0) return;
 

@@ -12,7 +12,7 @@ import { PeriodService } from '../../../core/period.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './verify-entries.component.html',
-  styleUrls: ['./verify-entries.component.css']
+  styleUrls: ['./verify-entries.component.css'],
 })
 export class VerifyEntriesComponent implements OnInit {
   period!: string;
@@ -33,42 +33,76 @@ export class VerifyEntriesComponent implements OnInit {
     private sharedService: SharedService,
     public searchService: SearchService,
     public paginationService: PaginationService,
-    private periodService: PeriodService
-  ) { }
+    private periodService: PeriodService,
+  ) {}
 
   ngOnInit(): void {
-    this.periodService.currentPeriod.subscribe(period => {
+    this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
       this.loadPendingEntries();
     });
   }
 
-  
-loadPendingEntries() {
-  if (this.branchId) {
-    this.branchManagerService.getEntries(this.period, this.branchId).subscribe(data => {
-      
-    data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      this.entries = data;
-      this.filteredEntries = data;
-      this.pendingEntries = data.filter(e => e.status === 'Pending').length;
-      this.verifiedEntries = data.filter(e => e.status === 'Verified').length;
-      this.updatePagination();
-      this.updateVisiblePages();
-    });
-  }
-}
+  loadPendingEntries(page: number = 1) {
+    if (this.branchId && this.period) {
+      this.branchManagerService
+        .getEntries(this.period, this.branchId)
+        .subscribe((data) => {
+          data.sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+          );
 
-  updatePagination() {
-    this.totalPages = this.paginationService.getTotalPages(this.filteredEntries, this.pageSize);
-    this.paginatedEntries = this.paginationService.getPaginatedData(this.filteredEntries, this.currentPage, this.pageSize);
+          this.entries = data;
+          this.filteredEntries = data;
+
+          this.pendingEntries = data.filter(
+            (e) => e.status === 'Pending',
+          ).length;
+          this.verifiedEntries = data.filter(
+            (e) => e.status === 'Verified',
+          ).length;
+
+        
+          this.totalPages = this.paginationService.getTotalPages(
+            this.filteredEntries,
+            this.pageSize,
+          );
+
+         
+          if (page > this.totalPages) {
+            this.currentPage = this.totalPages || 1; 
+          } else {
+            this.currentPage = page;
+          }
+
+          
+          this.paginatedEntries = this.paginationService.getPaginatedData(
+            this.filteredEntries,
+            this.currentPage,
+            this.pageSize,
+          );
+
+          this.updateVisiblePages();
+        });
+    }
   }
-   goToPage(event: Event, page: number): void {
+  updatePagination() {
+    this.totalPages = this.paginationService.getTotalPages(
+      this.filteredEntries,
+      this.pageSize,
+    );
+    this.paginatedEntries = this.paginationService.getPaginatedData(
+      this.filteredEntries,
+      this.currentPage,
+      this.pageSize,
+    );
+  }
+  goToPage(event: Event, page: number): void {
     event.preventDefault();
-    if (page < 1 || page > this.totalPages) return; 
+    if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
     this.updatePagination();
-    this.updateVisiblePages(); 
+    this.updateVisiblePages();
   }
   onSearch(query: string) {
     this.filteredEntries = this.searchService.filterData(this.entries, query);
@@ -84,15 +118,19 @@ loadPendingEntries() {
   }
 
   verify(entryId: string) {
+    const current = this.currentPage; 
+
     this.branchManagerService.verifyEntry(entryId).subscribe(() => {
-      this.loadPendingEntries();
-     this.sharedService.notifyEntryVerified();
+      this.loadPendingEntries(current); 
+      this.sharedService.notifyEntryVerified();
     });
   }
 
   return(entryId: string) {
+    const current = this.currentPage;
+
     this.branchManagerService.returnEntry(entryId).subscribe(() => {
-      this.loadPendingEntries();
+      this.loadPendingEntries(current);
     });
   }
 
@@ -100,15 +138,16 @@ loadPendingEntries() {
     if (status === 'All') {
       this.filteredEntries = this.entries;
     } else {
-      this.filteredEntries = this.entries.filter(e => e.status === status);
+      this.filteredEntries = this.entries.filter((e) => e.status === status);
     }
     this.currentPage = 1;
     this.updatePagination();
     this.updateVisiblePages();
   }
-   updateVisiblePages(): void {
+  updateVisiblePages(): void {
     const pagesPerGroup = 10;
-    const startPage = Math.floor((this.currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
+    const startPage =
+      Math.floor((this.currentPage - 1) / pagesPerGroup) * pagesPerGroup + 1;
     const endPage = Math.min(startPage + pagesPerGroup - 1, this.totalPages);
 
     this.visiblePages = [];
