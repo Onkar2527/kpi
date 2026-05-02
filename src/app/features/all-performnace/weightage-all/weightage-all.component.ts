@@ -241,6 +241,7 @@ loadAGMScores() {
       });
   }
   getAllHOStaffSalary(period: string, branch_id: string) {
+    if(!branch_id) return;
     this.performanceServicestaff
       .getAllStaffSalary(period, branch_id)
       .subscribe((data: any) => {
@@ -487,7 +488,7 @@ loadAGMScores() {
   }
 
   calculateTotalSalary() {
-    return this.AGMsalary + this.calculateKpiBasedIncrement();
+    return this.AGMsalary + this.calculateKpiBasedIncrementHOStaff();
   }
   finalSalaryHOStaff() {
     const finalSalary = this.calculateTotalSalaryHOStaff() * 0.25;
@@ -495,8 +496,8 @@ loadAGMScores() {
   }
 
   calculateKpiBasedIncrementHOStaff() {
-    if (!this.selectedEmployee.total) return 0;
-    const score =this.selectedEmployee.total;
+    
+    const score = this.hostaffScores?.total ?? this.selectedEmployee?.total ?? 0;
     
     if (score < 5) return 0;
     if (score >= 5 && score < 10) return this.HOincrementAmt * (score / 10);

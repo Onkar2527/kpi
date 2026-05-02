@@ -27,8 +27,8 @@ export class AdminService {
   }
 
   // Users
-  getUsers() {
-    return this.http.get(`${environment.apiBaseUrl}/masters/users`);
+  getUsers(period:any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/users`,{period});
   }
    getTrafterHistory(period:any) {
     return this.http.post(`${environment.apiBaseUrl}/masters/trasfer-history`,{period});
@@ -37,25 +37,25 @@ export class AdminService {
     return this.http.post(`${environment.apiBaseUrl}/masters/transfer-kpi-history`,{period,staff_id});
   }
 
-  addUser(user: any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/users`, user);
+  addUser(user: any,period:any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/users`, user,period);
   }
 
-  updateUser(id: string, user: any) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/users/${id}`, user);
+  updateUser(id: string, user: any,period:any) {
+    return this.http.put(`${environment.apiBaseUrl}/masters/users/${id}`, user,period);
   }
 
-  transferUser(id: string, branch_id:string,role:string,hod_id:string) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_user/${id}`, { branch_id ,role,hod_id});
+  transferUser(id: string, branch_id:string,role:string,hod_id:string,period:string) {
+    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_user/${id}`, { branch_id ,role,hod_id,period});
   }
-  transferDate(id:string){
-    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_date/${id}`, {});
+  transferDate(id:string,period:string){
+    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_date/${id}`, {period});
   }
   resignUser(id: string) {
     return this.http.put(`${environment.apiBaseUrl}/masters/Resign_user/${id}`, {});
   }
-  deleteUser(id: string,resignedDate: string) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/users/${id}`,{resignedDate});
+  deleteUser(id: string,resignedDate: string,period:any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/users/${id}`,{resignedDate,period});
   }
   updateEmployeeTrasfer(data:any){
     return this.http.post(`${environment.apiBaseUrl}/masters/update_employee_transfer`,data);
@@ -82,18 +82,18 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
 
 
   // Branches
-  getBranches() {
-    return this.http.get(`${environment.apiBaseUrl}/masters/branches`);
+  getBranches(period:any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/branches`,{period});
   }
-  getAGMS() {
-    return this.http.get(`${environment.apiBaseUrl}/masters/get-AGM`);
+  getAGMS(period:any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/get-AGM`, {period});
   }
-  addBranch(branch: any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/branches`, branch);
+  addBranch(branch: any,period:any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/branches`, branch,period);
   }
 
-  updateBranch(id: string, branch: any) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/branches/${id}`, branch);
+  updateBranch(id: string, branch: any,period:any) {
+    return this.http.put(`${environment.apiBaseUrl}/masters/branches/${id}`, branch,period);
   }
 
   deleteBranch(id: string) {
@@ -110,8 +110,8 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
   }
 
   //transfer
-    getTrasferedStaff() {
-    return this.http.get(`${environment.apiBaseUrl}/masters/transfers`);
+    getTrasferedStaff(period:any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/transfers`,{period});
   }
 
   addTrasferedStaff(branch: any) {
@@ -169,8 +169,8 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
     return this.http.post(`${environment.apiBaseUrl}/masters/verifyPassword`, data);
   }
 
-  updatePassword(id: any, newPassword: any) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/changePassword/${id}`, { newPassword: newPassword });
+  updatePassword(id: any, newPassword: any,period:any) {
+    return this.http.put(`${environment.apiBaseUrl}/masters/changePassword/${id}`, { newPassword: newPassword,period:period });
   }
   updateEntries(id: string, entry: any) {
     return this.http.put(`${environment.apiBaseUrl}/masters/updateentries/${id}`, entry);

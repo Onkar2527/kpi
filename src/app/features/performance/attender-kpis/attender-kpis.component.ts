@@ -43,7 +43,7 @@ export class AttenderKpisComponent implements OnInit {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
       if (this.period) {
-        if (this.auth.user?.role === 'BM' || this.auth.user?.role === 'GM' || this.auth.user?.role === 'Attender') {
+        if (this.auth.user?.role === 'BM' || this.auth.user?.role === 'GM' ) {
           this.getAttenderScore(
             this.period,
             this.branchId!,
@@ -295,7 +295,7 @@ export class AttenderKpisComponent implements OnInit {
       return 0;
     }
     if (score >= 5 && score < 10) {
-      return this.staffIncrementAmt * (score / 100);
+      return this.staffIncrementAmt * (score / 10);
     }
     if (score >= 10 && score < 12.5) {
       return this.staffIncrementAmt;

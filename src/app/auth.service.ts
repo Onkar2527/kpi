@@ -34,8 +34,8 @@ export class AuthService {
     return !!this._user();
   }
 
-  login(username: string, password: string) {
-    return this.http.post<{ token: string; user: UserProfile }>(`${environment.apiBaseUrl}/auth/login`, { username, password }).subscribe({
+  login(username: string, password: string,period:string) {
+    return this.http.post<{ token: string; user: UserProfile }>(`${environment.apiBaseUrl}/auth/login`, { username, password,period }).subscribe({
       next: (resp) => {
         this._token = resp.token;
         this._user.set(resp.user);

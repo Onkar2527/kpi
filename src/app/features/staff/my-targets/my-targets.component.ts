@@ -97,7 +97,7 @@ hoKpiAvg: number = 0;
       return 0;
     }
     if (score >= 5 && score < 10) {
-      return this.incrementAmt * (score / 100);
+      return this.incrementAmt * (score / 10);
     }
     if (score >= 10 && score < 12.5) {
       return this.incrementAmt;
@@ -181,15 +181,11 @@ sortKpis(list: any[]) {
         });
       } else {
         this.staffService.getMyTargets(this.period, this.employeeId, this.branchId).subscribe((data: any) => {
-          this.personalTargets = this.calculateScores(data.personal);
-          this.branchTargets = this.calculateScores(data.branch);
-          
-          
-          this.staffAll=this.sortKpis([...this.personalTargets,...this.branchTargets]);
-          
-         
-          
-          
+          const fullData=[...data.personal,...data.branch];
+          this.personalTargets = this.calculateScores(fullData);
+  
+          this.staffAll=this.sortKpis([...this.personalTargets]);
+  
           this.calculateTotals();
         });
       }
@@ -201,10 +197,18 @@ calculateScores(targets: any[]): any[] {
     return [];
   }
 
+  const auditObj = targets.find(t => t.kpi === 'audit');
+  const recoveryObj = targets.find(t => t.kpi === 'recovery');
+
+  const auditRatio = auditObj ? auditObj.achieved / auditObj.amount : 0;
+  const recoveryRatio = recoveryObj ? recoveryObj.achieved / recoveryObj.amount : 0;
+
+
   return targets.map(target => {
     let outOf10;
-    if(target.amount===0){
-      outOf10=0;
+
+    if (target.amount === 0) {
+      outOf10 = 0;
       return {
         ...target,
         outOf10,
@@ -216,24 +220,17 @@ calculateScores(targets: any[]): any[] {
             : (outOf10 * target.weightage) / 100
       };
     }
-    
+
     const ratio = target.achieved / target.amount;
-    const auditRatio = target.kpi === 'audit' ? target.achieved / target.amount : 0;
-    const recoveryRatio = target.kpi === 'recovery' ? target.achieved / target.amount : 0;
 
     switch (target.kpi) {
       case 'deposit':
       case 'loan_gen':
-        if (ratio < 1) outOf10 = ratio * 10;
-        else if (ratio < 1.25) outOf10 = 10;
+      case 'loan_amulya':
+        if (ratio <= 1) outOf10 = ratio * 10;
+        else if (ratio <= 1.25) outOf10 = 10;
         else if (auditRatio >= 0.75 && recoveryRatio >= 0.75) outOf10 = 12.5;
         else outOf10 = 10;
-        break;
-
-      case 'loan_amulya':
-        if (ratio < 1) outOf10 = ratio * 10;
-        else if (ratio < 1.25) outOf10 = 10;
-        else outOf10 = 12.5;
         break;
 
       case 'insurance':
@@ -245,7 +242,7 @@ calculateScores(targets: any[]): any[] {
 
       case 'recovery':
       case 'audit':
-        if (ratio < 1) outOf10 = ratio * 10;
+        if (ratio <= 1) outOf10 = ratio * 10;
         else outOf10 = 12.5;
         break;
 
@@ -265,7 +262,6 @@ calculateScores(targets: any[]): any[] {
           ? 0
           : (outOf10 * target.weightage) / 100
     };
-    
   });
 }
 

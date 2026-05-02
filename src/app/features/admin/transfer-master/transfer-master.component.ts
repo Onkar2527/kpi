@@ -121,10 +121,10 @@ export class TransferMasterComponent implements OnInit {
     this.loadTrasferedStaff();
     this.loadUsers();
     this.loadBranches();
-    this.adminService.getAGMS().subscribe((data) => (this.AGMS = data));
+    this.adminService.getAGMS(this.period).subscribe((data) => (this.AGMS = data));
   }
   loadUsers() {
-    this.adminService.getUsers().subscribe((data: any) => {
+    this.adminService.getUsers(this.period).subscribe((data: any) => {
       this.userData = data;
       this.filteredUsers = [...this.userData];
       this.onSearch();
@@ -174,7 +174,7 @@ export class TransferMasterComponent implements OnInit {
   }
 
   loadBranches() {
-    this.adminService.getBranches().subscribe((data) => {
+    this.adminService.getBranches(this.period).subscribe((data) => {
       this.branches = data;
     });
   }
@@ -198,7 +198,7 @@ export class TransferMasterComponent implements OnInit {
     this.showDropdown = false;
   }
   loadTrasferedStaff() {
-    this.adminService.getTrasferedStaff().subscribe((data) => {
+    this.adminService.getTrasferedStaff(this.period).subscribe((data) => {
       this.TrasferedStaff = data;
       this.onSearch();
     });
@@ -483,17 +483,17 @@ if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender'
         this.transfer.new_designation === 'HO_STAFF'
       ) {
         await this.adminService
-          .transferUser(staff_id, newBranchId, 'HO_STAFF', hod_id)
+          .transferUser(staff_id, newBranchId, 'HO_STAFF', hod_id,this.period)
           .toPromise();
       } else if ( 
         this.transfer.new_designation === 'Attender'
       ) {
         await this.adminService
-          .transferUser(staff_id, newBranchId, 'Attender', hod_id)
+          .transferUser(staff_id, newBranchId, 'Attender', hod_id,this.period)
           .toPromise();
       } else {
         await this.adminService
-          .transferUser(staff_id, newBranchId, role, hod_id)
+          .transferUser(staff_id, newBranchId, role, hod_id,this.period)
           .toPromise();
       }
 
@@ -573,7 +573,7 @@ if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender'
     return { toPromise: () => Promise.resolve() } as any;
   }
   giveTransferDate(id: any) {
-    this.adminService.transferDate(id).subscribe(() => {});
+    this.adminService.transferDate(id,this.period).subscribe(() => {});
     return { toPromise: () => Promise.resolve() } as any;
   }
   updateEmploye_Trasfer_table(period: any, branchId: any, userId: any) {

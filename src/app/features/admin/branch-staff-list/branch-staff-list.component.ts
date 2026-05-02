@@ -42,7 +42,7 @@ export class BranchStaffListComponent implements OnInit {
   }
 
   loadUsers() {
-    this.adminService.getUsers().subscribe((data: any) => {
+    this.adminService.getUsers(this.period).subscribe((data: any) => {
 
       const filteredSortedData = data
         .filter((item: any) =>

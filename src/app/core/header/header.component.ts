@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth.service';
 import { AdminService } from 'src/app/features/admin/admin.service';
+import { PeriodService } from '../period.service';
 
 
 declare var bootstrap: any;
@@ -14,7 +15,7 @@ declare var bootstrap: any;
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
 
   step = 1;
   oldPassword = '';
@@ -23,11 +24,19 @@ export class HeaderComponent {
   error = '';
   modal: any;
   toastMessage: string="";
+  period: any;
 
   constructor(
     public auth: AuthService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private periodService: PeriodService
   ) { }
+  ngOnInit(): void {
+     this.periodService.currentPeriod.subscribe((period) => {
+      this.period = period;
+      
+    });
+  }
 
   logout() {
     this.auth.logout();
@@ -53,7 +62,7 @@ export class HeaderComponent {
       this.showError('Please enter old password');
       return;
     }
-    const payload = { userId: this.auth.user?.id, oldPassword: this.oldPassword };
+    const payload = { userId: this.auth.user?.id, oldPassword: this.oldPassword ,period: this.period};
   
     this.adminService.verifyOldPassword(payload).subscribe({
     next: (res: any) => {
@@ -83,7 +92,7 @@ export class HeaderComponent {
     }
 
 
-    this.adminService.updatePassword(this.auth.user?.id,this.newPassword).subscribe(() => {
+    this.adminService.updatePassword(this.auth.user?.id,this.newPassword,this.period).subscribe(() => {
       this.modal.hide();
       this.showError('Password Updated Successfully!');
     });

@@ -100,15 +100,16 @@ export class UserMasterComponent implements OnInit {
       this.loadUsers();
     });
 
-    this.adminService.getBranches().subscribe((data) => (this.branches = data));
-    this.adminService.getAGMS().subscribe((data) => (this.AGMS = data));
+    this.adminService.getBranches(this.period).subscribe((data) => (this.branches = data));
+    this.adminService.getAGMS(this.period).subscribe((data) => (this.AGMS = data));
     this.adminService
       .getDepartments()
       .subscribe((data) => (this.departments = data));
   }
 
   loadUsers() {
-    this.adminService.getUsers().subscribe((data) => {
+    if(!this.period) return;
+    this.adminService.getUsers(this.period).subscribe((data) => {
       this.users = data;
       this.onSearch();
     });
@@ -185,14 +186,14 @@ export class UserMasterComponent implements OnInit {
     this.user_role = this.user.role;
 
     if (this.user.id) {
-      this.adminService.updateUser(this.user.id, this.user).subscribe(() => {
+      this.adminService.updateUser(this.user.id, this.user,this.period).subscribe(() => {
         this.loadUsers();
         if (['Clerk', 'BM'].includes(this.user_role)) {
           this.autoDistribute(this.branch_id);
         }
       });
     } else {
-      this.adminService.addUser(this.user).subscribe(() => {
+      this.adminService.addUser(this.user,this.period).subscribe(() => {
         this.loadUsers();
         if (['Clerk', 'BM'].includes(this.user_role)) {
           this.autoDistribute(this.branch_id);
@@ -394,7 +395,7 @@ export class UserMasterComponent implements OnInit {
   }
   finalResignForAttender(user: any, transferData: any, resignDate: string) {
     this.adminService.attenderTransfer({transferData:transferData}).subscribe(() => {
-      this.adminService.deleteUser(user.id, resignDate).subscribe(() => {
+      this.adminService.deleteUser(user.id, resignDate,this.period).subscribe(() => {
         this.loadUsers();
 
         this.resetTransfer();
@@ -403,7 +404,7 @@ export class UserMasterComponent implements OnInit {
   }
   finalResignForHoStaff(user: any, transferData: any, resignDate: string) {
     this.adminService.hoStaffTransfer({transferData:transferData}).subscribe(() => {
-      this.adminService.deleteUser(user.id, resignDate).subscribe(() => {
+      this.adminService.deleteUser(user.id, resignDate,this.period).subscribe(() => {
         this.loadUsers();
 
         this.resetTransfer();
@@ -412,7 +413,7 @@ export class UserMasterComponent implements OnInit {
   }
   finalResign(user: any, branchId: any, resignDate: string) {
     this.adminService.addTrasferedStaff(this.transfer).subscribe(() => {
-      this.adminService.deleteUser(user.id, resignDate).subscribe(() => {
+      this.adminService.deleteUser(user.id, resignDate,this.period).subscribe(() => {
         this.branchManagerService
           .autoDistributeTargetsTorResign(this.period, branchId)
           .subscribe(() => {
@@ -427,7 +428,7 @@ export class UserMasterComponent implements OnInit {
   }
   finalResignBM(user: any, branchId: any, resignDate: string) {
     this.adminService.addTrasferedStaff(this.transfer).subscribe(() => {
-      this.adminService.deleteUser(user.id, resignDate).subscribe(() => {
+      this.adminService.deleteUser(user.id, resignDate,this.period).subscribe(() => {
         this.branchManagerService
           .autoDistributeTargetsTorResignBM(this.period, branchId)
           .subscribe(() => {

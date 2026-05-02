@@ -51,7 +51,7 @@ export class HOStaffListComponent implements OnInit {
   }
 
   loadUsers() {
-    this.adminService.getUsers().subscribe((data: any) => {
+    this.adminService.getUsers(this.period).subscribe((data: any) => {
       const filteredSortedData = data
         .filter((item: any) => {
           if (this.skipRoles.includes(item.role)) {

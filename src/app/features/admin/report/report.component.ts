@@ -245,9 +245,10 @@ export class ReportsComponent implements OnInit {
   ngOnInit(): void {
      this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
-    });
+    
     this.loadUsers();
     this.loadBranches();
+    });
   }
   isSaveDisabled(): boolean {
     if (!this.selectedPeriod) {
@@ -322,7 +323,8 @@ export class ReportsComponent implements OnInit {
   }
 
   loadUsers() {
-    this.adminService.getUsers().subscribe((data) => {
+    if(!this.period) return;
+    this.adminService.getUsers(this.period).subscribe((data) => {
       this.users = data;
     });
   }
@@ -331,7 +333,8 @@ export class ReportsComponent implements OnInit {
   showDropdown: boolean = false;
 
   loadBranches() {
-    this.adminService.getBranches().subscribe((data) => {
+    if(!this.period) return;
+    this.adminService.getBranches(this.period).subscribe((data) => {
       this.branches = data;
       this.filteredBranches = data;
     });
@@ -355,7 +358,8 @@ export class ReportsComponent implements OnInit {
     if (!Array.isArray(this.users)) {
       return null;
     }
-
+ console.log(this.users);
+ 
     return (
       this.users.find((u: any) => String(u.PF_NO) === String(pfNo)) || null
     );
@@ -518,8 +522,9 @@ export class ReportsComponent implements OnInit {
       
     } else if (row.type === 'AGM') {
       this.entredUserData = this.serachBranchID(row.pf);
+console.log(this.entredUserData);
 
-      if (this.entredUserData.role !== 'AGM') {
+      if (this.entredUserData?.role !== 'AGM') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -556,7 +561,7 @@ export class ReportsComponent implements OnInit {
         });
     } else if (row.type === 'AGM_IT') {
       this.entredUserData = this.serachBranchID(row.pf);
-      if (this.entredUserData.role !== 'AGM_IT') {
+      if (this.entredUserData?.role !== 'AGM_IT') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -583,7 +588,7 @@ export class ReportsComponent implements OnInit {
       });
     } else if (row.type === 'AGM_AUDIT') {
       this.entredUserData = this.serachBranchID(row.pf);
-      if (this.entredUserData.role !== 'AGM_AUDIT') {
+      if (this.entredUserData?.role !== 'AGM_AUDIT') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -610,7 +615,7 @@ export class ReportsComponent implements OnInit {
     } else if (row.type === 'AGM_INSURANCE') {
       this.entredUserData = this.serachBranchID(row.pf);
 
-      if (this.entredUserData.role !== 'AGM_INSURANCE') {
+      if (this.entredUserData?.role !== 'AGM_INSURANCE') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -637,7 +642,7 @@ export class ReportsComponent implements OnInit {
       });
     } else if (row.type === 'DGM') {
       this.entredUserData = this.serachBranchID(row.pf);
-      if (this.entredUserData.role !== 'DGM') {
+      if (this.entredUserData?.role !== 'DGM') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -716,7 +721,7 @@ export class ReportsComponent implements OnInit {
       
     } else if (row.type === 'HO') {
       this.entredUserData = this.serachBranchID(row.pf);
-      if (this.entredUserData.role !== 'HO_STAFF') {
+      if (this.entredUserData?.role !== 'HO_STAFF') {
         this.showToast('Enter valid PF No Number');
         return;
       }
@@ -754,12 +759,12 @@ export class ReportsComponent implements OnInit {
     } else if (row.type === 'In_charge') {
       this.entredUserData = this.serachBranchID(row.pf);
       if (
-        this.entredUserData.role !== 'AGM' &&
-        this.entredUserData.role !== 'DGM' &&
-        this.entredUserData.role !== 'GM' &&
-        this.entredUserData.role !== 'AGM_AUDIT' &&
-        this.entredUserData.role !== 'AGM_IT' &&
-        this.entredUserData.role !== 'AGM_INSURANCE'
+        this.entredUserData?.role !== 'AGM' &&
+        this.entredUserData?.role !== 'DGM' &&
+        this.entredUserData?.role !== 'GM' &&
+        this.entredUserData?.role !== 'AGM_AUDIT' &&
+        this.entredUserData?.role !== 'AGM_IT' &&
+        this.entredUserData?.role !== 'AGM_INSURANCE'
       ) {
         this.showToast('Enter valid PF No Number');
         return;
@@ -926,10 +931,11 @@ export class ReportsComponent implements OnInit {
       });
     } else if (row.type === 'STAFF') {
       this.entredUserData = this.serachBranchID(row.pf);
-
+ 
+  
       if (
-        this.entredUserData.role !== 'Clerk' &&
-        this.entredUserData.role !== 'BM'
+        this.entredUserData?.role !== 'Clerk' &&
+        this.entredUserData?.role !== 'BM'
       ) {
         this.showToast('Enter valid PF No Number');
         return;
@@ -939,14 +945,9 @@ export class ReportsComponent implements OnInit {
         new bootstrap.Modal(modalEl).show();
       }
       
-const currentPeriod = this.getCurrentFinancialYear();
 
-if (this.selectedPeriod === this.period) {
-  console.log("Selected period is current year ");
-} else {
-  console.log("Selected period is NOT current year ");
-}
-       this.getLastTransfer(this.selectedPeriod,this.entredUserData.id);
+
+    
       this.isStaffLoading = true;
       if (this.entredUserData?.role === 'Clerk') {
         this.performanceService
@@ -967,6 +968,8 @@ if (this.selectedPeriod === this.period) {
             this.entredUserData.branch_id,
           )
           .subscribe((transferData: any) => {
+            
+            
             if (!transferData || transferData.length === 0) {
               this.performanceService
                 .getBmScores(this.selectedPeriod, this.entredUserData.branch_id)
@@ -976,6 +979,8 @@ if (this.selectedPeriod === this.period) {
                 });
             } else {
               this.singlStaffScore = transferData;
+              this.isStaffLoading = false;
+              
             }
           });
       }

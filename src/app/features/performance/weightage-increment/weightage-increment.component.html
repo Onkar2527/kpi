@@ -198,7 +198,7 @@
       <div *ngFor="let item of mergeHistoryedBM?.branch_name | keyvalue">
         <b>{{ item.key }}</b> :
         {{ +$any(item.value).avg_kpi | number:'1.2-2' }}
-        ({{ $any(item.value).months }} months)
+        
       </div>
 
       <div class="mt-2">

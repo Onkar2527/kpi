@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../admin.service';
 import { SearchService } from '../../../core/search.service';
 import { PaginationService } from '../../../core/pagination.service';
+import { PeriodService } from 'src/app/core/period.service';
 
 @Component({
   selector: 'app-branch-master',
@@ -22,20 +23,28 @@ export class BranchMasterComponent implements OnInit {
   pageSize = 10;
   totalPages = 0;
   AGMS: any;
+  period: any;
 
   constructor(
     private adminService: AdminService,
     private searchService: SearchService,
-    private paginationService: PaginationService
+    private paginationService: PaginationService,
+    private periodService: PeriodService
   ) { }
 
   ngOnInit(): void {
-    this.loadBranches();
-    this.adminService.getAGMS().subscribe((data)=>(this.AGMS = data));
+    
+     this.periodService.currentPeriod.subscribe((period) => {
+      this.period = period;
+      this.loadBranches();
+    });
+    
+    this.adminService.getAGMS(this.period).subscribe((data)=>(this.AGMS = data));
   }
 
   loadBranches() {
-    this.adminService.getBranches().subscribe(data => {
+    if(!this.period) return
+    this.adminService.getBranches(this.period).subscribe(data => {
       this.branches = data;
       this.onSearch();
     });
@@ -59,11 +68,11 @@ export class BranchMasterComponent implements OnInit {
 
   saveBranch() {
     if (this.branch.id) {
-      this.adminService.updateBranch(this.branch.id, this.branch).subscribe(() => {
+      this.adminService.updateBranch(this.branch.id, this.branch,this.period).subscribe(() => {
         this.loadBranches();
       });
     } else {
-      this.adminService.addBranch(this.branch).subscribe(() => {
+      this.adminService.addBranch(this.branch,this.period).subscribe(() => {
         this.loadBranches();
       });
     }
