@@ -268,7 +268,7 @@ export class AttenderKpisComponent implements OnInit {
     if (!this.selectedEmployee.total) {
       return 0;
     }
-    const score = this.selectedEmployee.total || 0;
+    const score = this.getAverageKpi()|| this.selectedEmployee.total || 0;
     if (score < 5) {
       return 0;
     }
