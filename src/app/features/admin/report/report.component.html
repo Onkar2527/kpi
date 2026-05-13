@@ -1724,8 +1724,8 @@
                 <td>{{branch.departmentData?.target}}</td>
                 <td>{{branch.departmentData?.achieved}}</td>
                 <td [ngClass]="{
-                    'text-danger': branch.departmentData.score < 0,
-                    'text-black': branch.departmentData.score >= 0,
+                    'text-danger': branch.departmentData?.score < 0,
+                    'text-black': branch.departmentData?.score >= 0,
                   }">
                   {{ branch.departmentData?.score | number: "1.2-2" }}
                 </td>

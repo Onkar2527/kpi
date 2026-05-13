@@ -19,7 +19,7 @@ export class WeightageAllComponent implements OnInit {
   branchId = this.auth.user?.branchId ?? '';
   scores: any;
   HODId = this.auth.user?.id ?? '';
-  hod_id=this.auth.user?.hod_id ?? '';
+  hod_id = this.auth.user?.hod_id ?? '';
   hodScores: any;
   hostaffScores: any;
   selectedEmployee: any;
@@ -40,11 +40,11 @@ export class WeightageAllComponent implements OnInit {
   AGMArray: any[] = [];
   agmScore: any;
   gmFinalTotal: number = 0;
- fixedWeightage: number = 10;
+  fixedWeightage: number = 10;
   totalAGMsScore: number = 0;
- originalScores: any = {};
- isGmScoreLoading = false;
- isHodScoreLoading = true;
+  originalScores: any = {};
+  isGmScoreLoading = false;
+  isHodScoreLoading = true;
   hostaffScores1: any;
   clerkHistory: any;
   mergeHistoryed: any;
@@ -54,8 +54,8 @@ export class WeightageAllComponent implements OnInit {
     public auth: AuthService,
     private periodService: PeriodService,
     private performanceServicestaff: PerformanceService,
-    private adminService:AdminService
-  ) {}
+    private adminService: AdminService
+  ) { }
 
   ngOnInit(): void {
     this.periodService.currentPeriod.subscribe((period) => {
@@ -84,14 +84,14 @@ export class WeightageAllComponent implements OnInit {
             .subscribe((data: any) => {
               this.hostaffScores = data;
             });
-             this.transferStaffHistory();
-             this.transferHOStaffHistory();
+          this.transferStaffHistory();
+          this.transferHOStaffHistory();
         } else if (this.auth.user?.role === 'GM') {
           this.loadAGMScores();
         }
         this.getSalary(this.period, this.auth.user?.PF_NO);
         this.getGMSalary(this.period, this.auth.user?.PF_NO);
-        
+
         if (
           this.auth.user?.role === 'AGM' ||
           this.auth.user?.role === 'DGM' ||
@@ -104,17 +104,17 @@ export class WeightageAllComponent implements OnInit {
           this.loadKpiroleWiseStaff();
         } else if (this.auth.user?.role === 'GM') {
           this.loadKpiroleWiseAGM(this.selectedEmployee.role);
-        }else{
+        } else {
           this.loadKpiroleWise();
         }
         this.getAGMSalary(this.period, this.HODId);
       }
-      
+
     });
-    
+
   }
-  
- getKpis(transfer: any): string[] {
+
+  getKpis(transfer: any): string[] {
     if (!transfer) return [];
 
     const ignore = [
@@ -128,94 +128,94 @@ export class WeightageAllComponent implements OnInit {
 
     return Object.keys(transfer).filter((k) => !ignore.includes(k));
   }
-loadHodScores() {
-  this.isHodScoreLoading = true;
+  loadHodScores() {
+    this.isHodScoreLoading = true;
 
- this.performanceService
-            .getHoScores(this.period, this.HODId, this.auth.user!.role).subscribe({
-    next: (res:any) => {
-      this.hodScores = res.kpis;
-      this.hodTotalScore = res.total;
-    },
-    error: () => {
-      this.hodScores = null;
-      this.hodTotalScore = 0;
-    },
-    complete: () => {
-      this.isHodScoreLoading = false;
-    }
-  });
-}
-
-loadAGMScores() {
-  this.isGmScoreLoading = true;   
-
-  this.performanceService
-    .getAllAGMScores(this.period)
-    .subscribe({
-      next: (data: any) => {
-        this.agmScore = data || [];
-
-        if (this.agmScore.length > 0) {
-          this.selectEmployee(this.agmScore[0]);
+    this.performanceService
+      .getHoScores(this.period, this.HODId, this.auth.user!.role).subscribe({
+        next: (res: any) => {
+          this.hodScores = res.kpis;
+          this.hodTotalScore = res.total;
+        },
+        error: () => {
+          this.hodScores = null;
+          this.hodTotalScore = 0;
+        },
+        complete: () => {
+          this.isHodScoreLoading = false;
         }
+      });
+  }
 
-        const totalAGMs = data.length || 1;
-        const totalWeightage = 100;
-        const perAGMWeightage = totalWeightage / totalAGMs;
+  loadAGMScores() {
+    this.isGmScoreLoading = true;
 
-        this.AGMArray = data.map((agm: any) => ({
-          hod_id: agm.hod_id,
-          name: agm.name,
-          total_score: agm.total,
-          weightage: perAGMWeightage,
-          weightageScore: (perAGMWeightage * agm.total) / 100
-        }));
+    this.performanceService
+      .getAllAGMScores(this.period)
+      .subscribe({
+        next: (data: any) => {
+          this.agmScore = data || [];
 
-        this.totalAGMsScore = data.reduce(
-          (acc: number, x: any) => acc + x.total,
-          0
-        );
+          if (this.agmScore.length > 0) {
+            this.selectEmployee(this.agmScore[0]);
+          }
 
-        this.gmFinalTotal = this.AGMArray.reduce(
-          (acc: number, x: any) => acc + x.weightageScore,
-          0
-        );
-      },
-      error: (err) => {
-        console.error(err);
-        this.agmScore = [];
-        this.AGMArray = [];
-        this.totalAGMsScore = 0;
-        this.gmFinalTotal = 0;
-      },
-      complete: () => {
-        this.isGmScoreLoading = false;  
-      }
-    });
-}
+          const totalAGMs = data.length || 1;
+          const totalWeightage = 100;
+          const perAGMWeightage = totalWeightage / totalAGMs;
+
+          this.AGMArray = data.map((agm: any) => ({
+            hod_id: agm.hod_id,
+            name: agm.name,
+            total_score: agm.total,
+            weightage: perAGMWeightage,
+            weightageScore: (perAGMWeightage * agm.total) / 100
+          }));
+
+          this.totalAGMsScore = data.reduce(
+            (acc: number, x: any) => acc + x.total,
+            0
+          );
+
+          this.gmFinalTotal = this.AGMArray.reduce(
+            (acc: number, x: any) => acc + x.weightageScore,
+            0
+          );
+        },
+        error: (err) => {
+          console.error(err);
+          this.agmScore = [];
+          this.AGMArray = [];
+          this.totalAGMsScore = 0;
+          this.gmFinalTotal = 0;
+        },
+        complete: () => {
+          this.isGmScoreLoading = false;
+        }
+      });
+  }
 
   loadScores() {
-  this.isLoading = true;   
+    this.isLoading = true;
 
-  this.performanceService
-    .getScores(this.period, this.HODId, 'HO_STAFF')
-    .subscribe({
-      next: (data: any) => {
-        this.scores = data;
+    this.performanceService
+      .getScores(this.period, this.HODId, 'HO_STAFF')
+      .subscribe({
+        next: (data: any) => {
+          this.scores = data;
 
-        if (this.scores?.length > 0) {
-          this.selectEmployee(this.scores[0]);
+          if (this.scores?.length > 0) {
+            this.selectEmployee(this.scores[0]);
+          }
+
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading scores:', err);
+          this.isLoading = false;
         }
-               
-        this.isLoading = false;  
-      },
-      error: (err) => {
-        console.error('Error loading scores:', err);
-        this.isLoading = false;  
-      }
-    });
-}
+      });
+  }
   getSalary(period: any, PF_NO: any) {
     this.performanceServicestaff
       .getSalary(period, PF_NO)
@@ -232,7 +232,7 @@ loadAGMScores() {
         this.GMincrementAmt = data[0]?.increment || 0;
       });
   }
-   getAGMSalary(period: any, hod_id: any) {
+  getAGMSalary(period: any, hod_id: any) {
     this.performanceService
       .getAllAGMSalary(period, hod_id)
       .subscribe((data: any) => {
@@ -241,7 +241,7 @@ loadAGMScores() {
       });
   }
   getAllHOStaffSalary(period: string, branch_id: string) {
-    if(!branch_id) return;
+    if (!branch_id) return;
     this.performanceServicestaff
       .getAllStaffSalary(period, branch_id)
       .subscribe((data: any) => {
@@ -281,15 +281,15 @@ loadAGMScores() {
   selectEmployee(employee: any) {
     if (!employee) return;
     this.selectedEmployee = employee;
-    
-    
+
+
     if (this.selectedEmployee.kpis) {
       Object.keys(this.selectedEmployee.kpis).forEach((key) => {
         this.selectedEmployee[key] = this.selectedEmployee.kpis[key];
       });
     }
     this.originalScores = JSON.parse(JSON.stringify(this.selectedEmployee));
-   
+
     if (
       this.auth.user?.role === 'AGM' ||
       this.auth.user?.role === 'DGM' ||
@@ -302,18 +302,18 @@ loadAGMScores() {
       this.transferStaffHistory();
       this.transferAttenderHistory();
       this.transferHOStaffHistory();
-      
+
       this.getAGMSalary(this.period, this.selectedEmployee.staffId);
     }
-    if (this.auth.user?.role === 'GM' ) {
-       if (this.selectedEmployee?.role)
+    if (this.auth.user?.role === 'GM') {
+      if (this.selectedEmployee?.role)
         this.loadKpiroleWiseAGM(this.selectedEmployee.role);
       this.getAGMSalary(this.period, this.selectedEmployee.hod_id);
     }
-     
-     
+
+
   }
- transferStaffHistory() {
+  transferStaffHistory() {
 
     this.adminService
       .getTrafterKpiHistory(this.period, this.selectedEmployee?.staffId || this.auth.user?.id)
@@ -322,7 +322,7 @@ loadAGMScores() {
           this.clerkHistory = data[0];
           this.mergeHistory();
         } else {
-          this.clerkHistory= null;
+          this.clerkHistory = null;
         }
       });
   }
@@ -332,15 +332,15 @@ loadAGMScores() {
       .subscribe((data: any) => {
         this.hostaffScores1 =
           Array.isArray(data) && data.length > 0 ? data[0] : null;
-         if (this.hostaffScores1?.length > 0) {
+        if (this.hostaffScores1?.length > 0) {
           this.selectedEmployee = this.hostaffScores1[0];
         }
-        
-        
+
+
         this.mergeHistory();
       });
   }
-   transferAttenderHistory() {
+  transferAttenderHistory() {
     if (this.selectedEmployee?.staffId) {
       this.performanceServicestaff
         .getAttenderTransferScore(this.period, this.selectedEmployee?.staffId)
@@ -353,9 +353,9 @@ loadAGMScores() {
   }
   mergeHistory() {
 
-  if (!this.selectedEmployee) {
-    this.selectedEmployee = {};
-  }
+    if (!this.selectedEmployee) {
+      this.selectedEmployee = {};
+    }
     const h1 = this.clerkHistory;
     const h2 = this.hostaffScores1;
     const h3 = this.attenderTransferScores;
@@ -373,18 +373,18 @@ loadAGMScores() {
         new Date(a.transfer_date || 0).getTime() -
         new Date(b.transfer_date || 0).getTime(),
     );
-      const branch =
-        this.clerkHistory?.branch_avg_kpi ||
-        this.clerkHistory?.branch_name ||
-        null;
-      const ho = this.hostaffScores1?.branch_avg_kpi || {};
-      const attender = this.attenderTransferScores?.branch_avg_kpi || {};
+    const branch =
+      this.clerkHistory?.branch_avg_kpi ||
+      this.clerkHistory?.branch_name ||
+      null;
+    const ho = this.hostaffScores1?.branch_avg_kpi || {};
+    const attender = this.attenderTransferScores?.branch_avg_kpi || {};
 
-      this.selectedEmployee.branch_name = {
-        ...(attender || {}),
-        ...(branch || {}),
-        ...(ho || {}),
-      };
+    this.selectedEmployee.branch_name = {
+      ...(attender || {}),
+      ...(branch || {}),
+      ...(ho || {}),
+    };
 
     this.mergeHistoryed = {
       staff_id: h1?.staff_id ?? h2?.staff_id ?? h3?.staff_id,
@@ -396,86 +396,106 @@ loadAGMScores() {
     };
 
 
-    
+
   }
   getAverageKpi(): number {
 
-  if (!this.selectedEmployee?.branch_name) return 0;
+    if (!this.selectedEmployee?.branch_name) return 0;
 
- const values = Object.entries(this.selectedEmployee.branch_name)
-  .map(([_, v]: any) => +v.avg_kpi || 0);
+    const values = Object.entries(this.selectedEmployee.branch_name)
+      .map(([_, v]: any) => +v.avg_kpi || 0);
 
-  let total = 0;
-  values.forEach(v => total += v);
+    let total = 0;
+    values.forEach(v => total += v);
 
-  total += +this.hostaffScores?.originalTotal ||
-           +this.selectedEmployee?.originalTotal ||
-           0;
+    total += +this.hostaffScores?.originalTotal ||
+      +this.selectedEmployee?.originalTotal ||
+      0;
 
-  const count = values.length + 1;
+    const count = values.length + 1;
 
-  return count > 0 ? total / count : 0;
-}
+    return count > 0 ? total / count : 0;
+  }
 
   hasBranchData(obj: any): boolean {
-  return obj && Object.keys(obj).length > 0;
-}
+    return obj && Object.keys(obj).length > 0;
+  }
 
   submitScores() {
-  if (!this.selectedEmployee) return;
+    if (!this.selectedEmployee) return;
 
-  let kpiListToUse = [];
-  if (
-    this.auth.user?.role === 'AGM' ||
-    this.auth.user?.role === 'DGM' ||
-    this.auth.user?.role === 'AGM_AUDIT' ||
-    this.auth.user?.role === 'AGM_IT' ||
-    this.auth.user?.role === 'AGM_INSURANCE'
-  ) {
-    kpiListToUse = this.kpiListStaff;
-  } else if (this.auth.user?.role === 'GM') {
-    kpiListToUse = this.kpiListAGM;
+    let kpiListToUse = [];
+    if (
+      this.auth.user?.role === 'AGM' ||
+      this.auth.user?.role === 'DGM' ||
+      this.auth.user?.role === 'AGM_AUDIT' ||
+      this.auth.user?.role === 'AGM_IT' ||
+      this.auth.user?.role === 'AGM_INSURANCE'
+    ) {
+      kpiListToUse = this.kpiListStaff;
+    } else if (this.auth.user?.role === 'GM') {
+      kpiListToUse = this.kpiListAGM;
+    }
+
+    const changedScores = kpiListToUse
+      .filter((k: any) => k.kpi_name.toLowerCase() !== 'insurance')
+      .filter((k: any) => {
+        const newVal = this.selectedEmployee[k.kpi_name]?.achieved;
+        const oldVal = this.originalScores[k.kpi_name]?.achieved;
+
+
+        return newVal !== undefined && newVal !== oldVal;
+      })
+      .map((k: any) => ({
+        kpi_name: k.kpi_name,
+        role_kpi_mapping_id: k.id,
+        value: this.selectedEmployee[k.kpi_name].achieved,
+      }));
+
+    if (changedScores.length === 0) {
+      alert("No changes detected");
+      return;
+    }
+
+    const payload = {
+      user_id: this.selectedEmployee.staffId || this.selectedEmployee.hod_id,
+      period: this.period,
+      master_user_id: this.HODId,
+      scores: changedScores,
+    };
+
+    this.performanceService.createHoStaffScores(payload).subscribe({
+      next: (response: any) =>
+        alert(response.message || 'Scores created successfully!'),
+      complete: () => {
+        if (this.auth.user?.role === 'GM') { this.loadAGMScores(); } else {
+          this.loadScores();
+        }
+      },
+      error: (err) => console.error('Error creating scores:', err),
+    });
   }
 
-  const changedScores = kpiListToUse
-    .filter((k: any) => k.kpi_name.toLowerCase() !== 'insurance')
-    .filter((k: any) => {
-      const newVal = this.selectedEmployee[k.kpi_name]?.achieved;
-      const oldVal = this.originalScores[k.kpi_name]?.achieved;
-     
-      
-      return newVal !== undefined && newVal !== oldVal;
-    })
-    .map((k: any) => ({
-      kpi_name: k.kpi_name,
-      role_kpi_mapping_id: k.id,
-      value: this.selectedEmployee[k.kpi_name].achieved,
-    }));
+  finalSalary(): number {
 
-  if (changedScores.length === 0) {
-    alert("No changes detected");
-    return;
+    const totalSalary =
+      Number(this.calculateTotalSalary()) || 0;
+
+    const incentive = totalSalary * 0.25;
+
+    const finalSalary = totalSalary + incentive;
+
+    return Number(finalSalary.toFixed(2));
   }
 
-  const payload = {
-    user_id: this.selectedEmployee.staffId || this.selectedEmployee.hod_id,
-    period: this.period,
-    master_user_id: this.HODId,
-    scores: changedScores,
-  };
+  calculateTotalSalary(): number {
 
-  this.performanceService.createHoStaffScores(payload).subscribe({
-    next: (response: any) =>
-      alert(response.message || 'Scores created successfully!'),
-    complete: () => { if(this.auth.user?.role === 'GM') {this.loadAGMScores();}else{
-      this.loadScores();}},
-    error: (err) => console.error('Error creating scores:', err),
-  });
-}
+    const salary = Number(this.AGMsalary) || 0;
 
-  finalSalary() {
-    const finalSalary = this.calculateTotalSalary() * 0.25;
-    return finalSalary + this.calculateTotalSalary();
+    const kpiIncrement =
+      Number(this.calculateKpiBasedIncrementHOStaff()) || 0;
+
+    return salary + kpiIncrement;
   }
 
   calculateKpiBasedIncrement() {
@@ -487,42 +507,68 @@ loadAGMScores() {
     return this.AGMincrementAmt * 1.25;
   }
 
-  calculateTotalSalary() {
-    return this.AGMsalary + this.calculateKpiBasedIncrementHOStaff();
+
+  finalSalaryHOStaff(): number {
+
+    const totalSalary =
+      Number(this.calculateTotalSalaryHOStaff()) || 0;
+
+    const incentive = totalSalary * 0.25;
+
+    const finalSalary = totalSalary + incentive;
+
+    return Number(finalSalary.toFixed(2));
   }
-  finalSalaryHOStaff() {
-    const finalSalary = this.calculateTotalSalaryHOStaff() * 0.25;
-    return finalSalary + this.calculateTotalSalaryHOStaff();
+
+  calculateTotalSalaryHOStaff(): number {
+
+    const salary = Number(this.HOsalary) || 0;
+
+    const kpiIncrement =
+      Number(this.calculateKpiBasedIncrementHOStaff()) || 0;
+
+    return salary + kpiIncrement;
   }
 
   calculateKpiBasedIncrementHOStaff() {
-    
+
     const score = this.hostaffScores?.total ?? this.selectedEmployee?.total ?? 0;
-    
+
     if (score < 5) return 0;
     if (score >= 5 && score < 10) return this.HOincrementAmt * (score / 10);
     if (score >= 10 && score < 12.5) return this.HOincrementAmt;
     return this.HOincrementAmt * 1.25;
   }
 
-  calculateTotalSalaryHOStaff() {
-    return this.HOsalary + this.calculateKpiBasedIncrementHOStaff();
-  }
-  
+
+
   calculateGMKpiBasedIncrement() {
-    if(!this.gmFinalTotal) return 0;
+    if (!this.gmFinalTotal) return 0;
     const score = this.gmFinalTotal;
     if (score < 5) return 0;
     if (score >= 5 && score < 10) return this.GMincrementAmt * (score / 10);
     if (score >= 10 && score < 12.5) return this.GMincrementAmt;
-    return this.GMincrementAmt *1.25;
+    return this.GMincrementAmt * 1.25;
   }
-  calculateGMTotalSalary() {
-    return this.GMsalary + this.calculateGMKpiBasedIncrement();
+  calculateGMTotalSalary(): number {
+
+    const salary = Number(this.GMsalary) || 0;
+
+    const kpiIncrement =
+      Number(this.calculateGMKpiBasedIncrement()) || 0;
+
+    return salary + kpiIncrement;
   }
 
-  finalGmSalary() {
-    const finalSalary = this.calculateGMTotalSalary() * 0.25;
-    return finalSalary + this.calculateGMTotalSalary();
+  finalGmSalary(): number {
+
+    const totalSalary =
+      Number(this.calculateGMTotalSalary()) || 0;
+
+    const incentive = totalSalary * 0.25;
+
+    const finalSalary = totalSalary + incentive;
+
+    return Number(finalSalary.toFixed(2));
   }
 }

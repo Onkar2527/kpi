@@ -195,17 +195,9 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
      return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersBM`,data);
   }
   usersClerk(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk/part1`,data);
+     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk`,data);
   }
-   usersClerk1(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk/part2`,data);
-  }
-   usersClerk2(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk/part3`,data);
-  }
-   usersClerk3(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk/part4`,data);
-  }
+  
   usersHOStaff(data:any){
      return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersHOStaff`,data);
   }

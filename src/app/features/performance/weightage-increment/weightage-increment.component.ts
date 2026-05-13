@@ -47,7 +47,7 @@ export class WeightageIncrementComponent implements OnInit {
     public auth: AuthService,
     private periodService: PeriodService,
     private adminService: AdminService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.periodService.currentPeriod.subscribe((period) => {
@@ -166,10 +166,10 @@ export class WeightageIncrementComponent implements OnInit {
     // const bmSum = this.bmtransferSum?.sum ?? 0;
     // const transferTotal = this.transferBmScores?.total ?? 0;
     // const transferCount = this.bmtransferSum?.count ?? 0;
-  
-    const score = this.getAverageKpiBM() || this.bmScores.total ||0;
- 
-  
+
+    const score = this.getAverageKpiBM() || this.bmScores.total || 0;
+
+
     if (score < 5) {
       return 0;
     }
@@ -183,10 +183,10 @@ export class WeightageIncrementComponent implements OnInit {
   }
   finalSalary() {
     const finalSalary = this.calculateTotalSalary() * 0.25;
-    return finalSalary + this.calculateTotalSalary();
+    return finalSalary || 0 + this.calculateTotalSalary() || 0;
   }
   calculateTotalSalary() {
-    return this.BMsalary + this.calculateKpiBasedIncrement();
+    return this.BMsalary || 0 + this.calculateKpiBasedIncrement() || 0;
   }
 
   transferHistory() {
@@ -413,22 +413,22 @@ export class WeightageIncrementComponent implements OnInit {
     };
 
     this.performanceService.submitAuditScore(payload).subscribe(
-      (response: any) => {},
+      (response: any) => { },
       (error: any) => {
         console.error('Error:', error);
       },
     );
   }
 
-  
+
   finalSalaryStaff() {
     const basic = this.calculateTotalSalaryStaff();
     const da = basic * 0.25;
-    return basic + da;
+    return basic || 0 + da || 0;
   }
   calculateTotalSalaryStaff() {
     return (
-      this.staffSalary + this.calculateKpiIncrement(this.getAverageKpi()||this.selectedEmployee.total)
+      this.staffSalary + this.calculateKpiIncrement(this.getAverageKpi() || this.selectedEmployee.total)
     );
   }
   calculateKpiIncrement(score: number) {

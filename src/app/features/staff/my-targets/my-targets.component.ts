@@ -104,13 +104,27 @@ hoKpiAvg: number = 0;
     }
     return this.incrementAmt * 1.25;
   }
-  finalSalary() {
-    const finalSalary = this.calculateTotalSalary() * 0.25;
-    return finalSalary + this.calculateTotalSalary();
-  }
-  calculateTotalSalary() {
-    return this.salary + this.calculateKpiBasedIncrement();
-  }
+ finalSalary(): number {
+
+  const totalSalary =
+    Number(this.calculateTotalSalary()) || 0;
+
+  const incentive = totalSalary * 0.25;
+
+  const finalSalary = totalSalary + incentive;
+
+  return Number(finalSalary.toFixed(2));
+}
+
+calculateTotalSalary(): number {
+
+  const salary = Number(this.salary) || 0;
+
+  const kpiIncrement =
+    Number(this.calculateKpiBasedIncrement()) || 0;
+
+  return salary + kpiIncrement;
+}
 
   calculateStaffKpiBasedIncrement(score: number) {
     if (score < 5) {
