@@ -182,8 +182,8 @@ export class WeightageIncrementComponent implements OnInit {
     return this.BMincrementAmt * 1.25;
   }
   finalSalary() {
-    const finalSalary = this.calculateTotalSalary() * 0.25;
-    return finalSalary || 0 + this.calculateTotalSalary() || 0;
+    const finalSalary = Number(this.calculateTotalSalary() * 0.25);
+    return Number(finalSalary) + Number(this.calculateTotalSalary()) || 0;
   }
   calculateTotalSalary() {
     return this.BMsalary || 0 + this.calculateKpiBasedIncrement() || 0;
@@ -422,13 +422,13 @@ export class WeightageIncrementComponent implements OnInit {
 
 
   finalSalaryStaff() {
-    const basic = this.calculateTotalSalaryStaff();
+    const basic = Number(this.calculateTotalSalaryStaff());
     const da = basic * 0.25;
-    return basic || 0 + da || 0;
+    return Number(basic || 0) + Number(da || 0);
   }
   calculateTotalSalaryStaff() {
     return (
-      this.staffSalary + this.calculateKpiIncrement(this.getAverageKpi() || this.selectedEmployee.total)
+      Number(this.staffSalary) + Number(this.calculateKpiIncrement(this.getAverageKpi() || this.selectedEmployee.total))
     );
   }
   calculateKpiIncrement(score: number) {
