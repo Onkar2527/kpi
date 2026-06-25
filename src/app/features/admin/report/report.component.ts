@@ -833,102 +833,67 @@ console.log(this.entredUserData);
           this.loadingPercent = 20;
           this.loadingStageText = 'Loading Clerks...';
 
-          this.adminService.usersClerk(data).subscribe({
-            next: (r2: any) => {
-              this.ALLTotalUser.push(...(r2.users || []));
+      this.adminService.usersClerk(data).subscribe({
+        next: (r2: any) => {
+          this.ALLTotalUser.push(...(r2.users || []));
+          this.sortAllUsers();
+          this.loadingPercent = 30;
+          this.loadingStageText = 'Loading HO Staff...';
+
+
+          this.adminService.usersHOStaff(data).subscribe({
+            next: (r6: any) => {
+              this.ALLTotalUser.push(...(r6.users || []));
               this.sortAllUsers();
-              this.loadingPercent = 30;
-              this.loadingStageText = 'Loading HO Staff...';
-              this.adminService.usersClerk1(data).subscribe({
-                next: (r3: any) => {
-                  this.ALLTotalUser.push(...(r3.users || []));
+              this.loadingPercent = 60;
+              this.loadingStageText = 'Loading Attenders...';
+
+              this.adminService.usersAttender(data).subscribe({
+                next: (r7: any) => {
+                  this.ALLTotalUser.push(...(r7.users || []));
                   this.sortAllUsers();
-                  this.loadingPercent = 40;
-                  this.loadingStageText = 'Loading HO Staff...';
-                  this.adminService.usersClerk2(data).subscribe({
-                    next: (r4: any) => {
-                      this.ALLTotalUser.push(...(r4.users || []));
+                  this.loadingPercent = 80;
+                  this.loadingStageText = 'Loading AGM & GM...';
+
+                  this.adminService.usersAgmGm(data).subscribe({
+                    next: (r8: any) => {
+                      this.ALLTotalUser.push(
+                        ...(r8.users || []),
+                      );
                       this.sortAllUsers();
-                      this.loadingPercent = 50;
-                      this.loadingStageText = 'Loading HO Staff...';
-                      this.adminService.usersClerk3(data).subscribe({
-                        next: (r5: any) => {
-                          this.ALLTotalUser.push(...(r5.users || []));
-                          this.sortAllUsers();
-                          this.loadingPercent = 50;
-                          this.loadingStageText = 'Loading HO Staff...';
-
-                          this.adminService.usersHOStaff(data).subscribe({
-                            next: (r6: any) => {
-                              this.ALLTotalUser.push(...(r6.users || []));
-                              this.sortAllUsers();
-                              this.loadingPercent = 60;
-                              this.loadingStageText = 'Loading Attenders...';
-
-                              this.adminService.usersAttender(data).subscribe({
-                                next: (r7: any) => {
-                                  this.ALLTotalUser.push(...(r7.users || []));
-                                  this.sortAllUsers();
-                                  this.loadingPercent = 80;
-                                  this.loadingStageText = 'Loading AGM & GM...';
-
-                                  this.adminService.usersAgmGm(data).subscribe({
-                                    next: (r8: any) => {
-                                      this.ALLTotalUser.push(
-                                        ...(r8.users || []),
-                                      );
-                                      this.sortAllUsers();
-                                      this.loadingPercent = 100;
-                                      this.isAllUsersLoading = false;
-                                    },
-                                    error: (err: any) => {
-                                      console.error('AGM/GM API failed', err);
-                                      this.isAllUsersLoading = false;
-                                    },
-                                  });
-                                },
-                                error: (err: any) => {
-                                  console.error('Attender API failed', err);
-                                  this.isAllUsersLoading = false;
-                                },
-                              });
-                            },
-                            error: (err: any) => {
-                              console.error('HO Staff API failed', err);
-                              this.isAllUsersLoading = false;
-                            },
-                          });
-                        },
-                        error: (err: any) => {
-                          console.error('Clerk API failed', err);
-                          this.isAllUsersLoading = false;
-                        },
-                      });
+                      this.loadingPercent = 100;
+                      this.isAllUsersLoading = false;
                     },
                     error: (err: any) => {
-                      console.error('Clerk API failed', err);
+                      console.error('AGM/GM API failed', err);
                       this.isAllUsersLoading = false;
                     },
                   });
                 },
                 error: (err: any) => {
-                  console.error('Clerk API failed', err);
+                  console.error('Attender API failed', err);
                   this.isAllUsersLoading = false;
                 },
               });
             },
             error: (err: any) => {
-              console.error('Clerk API failed', err);
+              console.error('HO Staff API failed', err);
               this.isAllUsersLoading = false;
             },
           });
         },
         error: (err: any) => {
-          console.error('BM API failed', err);
-          this.ALLTotalUser = [];
+          console.error('Clerk API failed', err);
           this.isAllUsersLoading = false;
         },
       });
+        },
+        error: (err: any) => {
+          console.error('Clerk API failed', err);
+          this.isAllUsersLoading = false;
+        },
+      });
+
     } else if (row.type === 'STAFF') {
       this.entredUserData = this.serachBranchID(row.pf);
  
@@ -1276,8 +1241,8 @@ console.log(this.entredUserData);
     if (gmSheet) XLSX.utils.book_append_sheet(workbook, gmSheet, 'GM Summary');
 
     if (
-      this.selectedDepartment === '' &&
-      this.selectedDepartment === undefined
+      this.selectedDepartment === '' ||
+      this.selectedDepartment === undefined 
     ) {
       const ws = this.exportAllBranchSheet(
         this.ALLtotalBranches,
