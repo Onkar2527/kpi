@@ -43,6 +43,14 @@
       </div>
 
       <div class="form-check" *ngIf="auth.user?.role === 'HO'">
+        <input class="form-check-input" type="radio" name="uploadType" id="previous-period-data"
+          value="previous-period-data" [(ngModel)]="uploadType">
+        <label class="form-check-label" for="previous-period-data">
+          Previous Period Baseline Data (previous_period_data)
+        </label>
+      </div>
+
+      <div class="form-check" *ngIf="auth.user?.role === 'HO'">
         <input class="form-check-input" type="radio" name="uploadType" id="salary" value="salary"
           [(ngModel)]="uploadType">
         <label class="form-check-label" for="salary">
@@ -96,6 +104,11 @@
       <label for="targetFile" class="form-label">Target File (CSV)</label>
       <input class="form-control" type="file" id="targetFile" (change)="onFileChange($event)" name="targetFile"
         accept=".csv" required>
+      <div *ngIf="uploadType === 'previous-period-data'" class="form-text">
+        <a href="javascript:void(0)" (click)="downloadSampleCSV()" class="text-decoration-none">
+          Download Sample CSV
+        </a>
+      </div>
     </div>
     <button type="submit" class="btn btn-primary">Upload</button>
   </form>

@@ -12,7 +12,7 @@ export class UploadTargetsComponent {
   file: File | null = null;
 
   uploadType: 'main' | 'branch-specific' | 'dashborad' | 'dashborad-achieved' |'salary'|
-  'recovery-achiveved' |'insurance-achiveved' |'audit-achiveved' | 'deputation-staff' | 'insurance-traget'= 'main'; 
+  'recovery-achiveved' |'insurance-achiveved' |'audit-achiveved' | 'deputation-staff' | 'insurance-traget' | 'previous-period-data'= 'main'; 
 
   message: string = '';
   messageType: 'success' | 'error' | '' = '';
@@ -78,6 +78,9 @@ export class UploadTargetsComponent {
               case 'dashborad-achieved':
                 upload$ = this.hoService.uploadTotalAchievedData(period, this.file!);
                 break;
+              case 'previous-period-data':
+                upload$ = this.hoService.uploadPreviousPeriodData(period, this.file!);
+                break;
               case 'salary':
                 upload$ = this.hoService.uploadSalary(period, this.file!);
                 break;
@@ -132,5 +135,17 @@ export class UploadTargetsComponent {
 
   reader.readAsText(this.file);
 }
+  downloadSampleCSV() {
+    const csvContent = "period,branch_id,deposit,loan_gen,loan_amulya\n2025-09,1,5000000.00,4000000.00,3000.00\n2025-09,2,6500000.00,4500000.00,4000.00\n";
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "previous_period_data_sample.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 
 }

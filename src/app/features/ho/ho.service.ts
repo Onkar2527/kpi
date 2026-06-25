@@ -39,6 +39,13 @@ export class HoService {
     formData.append('prevoiustargetFile', file);
     return this.http.post(`${environment.apiBaseUrl}/targets/previousData`, formData);
   }
+
+  uploadPreviousPeriodData(period: string, file: File) {
+    const formData = new FormData();
+    formData.append('period', period);
+    formData.append('previousPeriodDataFile', file);
+    return this.http.post(`${environment.apiBaseUrl}/targets/previousPeriodData`, formData);
+  }
    uploadTotalAchievedData(period: string, file: File) {
     const formData = new FormData();
     formData.append('period', period);
