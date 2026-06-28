@@ -3,11 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AdminService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   // Departments
   getDepartments() {
@@ -15,85 +14,157 @@ export class AdminService {
   }
 
   addDepartment(department: any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/departments`, department);
+    return this.http.post(
+      `${environment.apiBaseUrl}/masters/departments`,
+      department,
+    );
   }
 
   updateDepartment(id: number, department: any) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/departments/${id}`, department);
+    return this.http.put(
+      `${environment.apiBaseUrl}/masters/departments/${id}`,
+      department,
+    );
   }
 
   deleteDepartment(id: number) {
-    return this.http.delete(`${environment.apiBaseUrl}/masters/departments/${id}`);
+    return this.http.delete(
+      `${environment.apiBaseUrl}/masters/departments/${id}`,
+    );
   }
 
   // Users
-  getUsers(period:any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/users`,{period});
+  getUsers(period: any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/users`, {
+      period,
+    });
   }
-   getTrafterHistory(period:any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/trasfer-history`,{period});
+  getTrafterHistory(period: any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/trasfer-history`, {
+      period,
+    });
   }
-   getTrafterKpiHistory(period:any,staff_id:any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/transfer-kpi-history`,{period,staff_id});
+  getTrafterKpiHistory(period: any, staff_id: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/masters/transfer-kpi-history`,
+      { period, staff_id },
+    );
   }
 
-  addUser(user: any,period:any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/users`, user,period);
+  addUser(user: any, period: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/masters/users`,
+      user,
+      period,
+    );
   }
 
-  updateUser(id: string, user: any,period:any) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/users/${id}`, user,period);
+  updateUser(id: string, user: any, period: any) {
+    return this.http.put(
+      `${environment.apiBaseUrl}/masters/users/${id}`,
+      user,
+      period,
+    );
   }
 
-  transferUser(id: string, branch_id:string,role:string,hod_id:string,period:string) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_user/${id}`, { branch_id ,role,hod_id,period});
+  transferUser(
+    id: string,
+    branch_id: string,
+    role: string,
+    hod_id: string,
+    period: string,
+  ) {
+    return this.http.put(
+      `${environment.apiBaseUrl}/masters/Transfers_user/${id}`,
+      { branch_id, role, hod_id, period },
+    );
   }
-  transferDate(id:string,period:string){
-    return this.http.put(`${environment.apiBaseUrl}/masters/Transfers_date/${id}`, {period});
+  transferDate(id: string, period: string) {
+    return this.http.put(
+      `${environment.apiBaseUrl}/masters/Transfers_date/${id}`,
+      { period },
+    );
   }
   resignUser(id: string) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/Resign_user/${id}`, {});
+    return this.http.put(
+      `${environment.apiBaseUrl}/masters/Resign_user/${id}`,
+      {},
+    );
   }
-  deleteUser(id: string,resignedDate: string,period:any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/users/${id}`,{resignedDate,period});
+  deleteUser(id: string, resignedDate: string, period: any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/users/${id}`, {
+      resignedDate,
+      period,
+    });
   }
-  updateEmployeeTrasfer(data:any){
-    return this.http.post(`${environment.apiBaseUrl}/masters/update_employee_transfer`,data);
+  updateEmployeeTrasfer(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/masters/update_employee_transfer`,
+      data,
+    );
   }
-  updateEmployeeTrasfert(data:any){
-    return this.http.post(`${environment.apiBaseUrl}/masters/update_employee_transfer_Transfered`,data);
+  updateEmployeeTrasfert(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/masters/update_employee_transfer_Transfered`,
+      data,
+    );
   }
-  updateEmployeeTransferBM(staff_id:any, period:any,old_branchId:any, new_branchId:any){
-    return this.http.post(`${environment.apiBaseUrl}/allocations/update-prorated-targets`,{staff_id, period,old_branchId, new_branchId});
+  updateEmployeeTransferBM(
+    staff_id: any,
+    period: any,
+    old_branchId: any,
+    new_branchId: any,
+  ) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/allocations/update-prorated-targets`,
+      { staff_id, period, old_branchId, new_branchId },
+    );
   }
-  addClearkToBMTraget( period:any, branchId:any, staff_id:any){
-    return this.http.post(`${environment.apiBaseUrl}/allocations/CLEARK-TO-BM-Target`,{period, branchId, staff_id});
+  addClearkToBMTraget(period: any, branchId: any, staff_id: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/allocations/CLEARK-TO-BM-Target`,
+      { period, branchId, staff_id },
+    );
   }
-  
-deleteAllocations(user_id: string) {
-  return this.http.delete(
-    `${environment.apiBaseUrl}/masters/Transfer_for_delete_allocation`,
-    { body: { user_id } } 
-  );
-}
-deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
-  return this.http.delete(`${environment.apiBaseUrl}/masters/Transfer_for_delete_ho_staff`, { body: { ho_staff_id, branch_id } });
-}
 
+  deleteAllocations(user_id: string) {
+    return this.http.delete(
+      `${environment.apiBaseUrl}/masters/Transfer_for_delete_allocation`,
+      { body: { user_id } },
+    );
+  }
+  deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
+    return this.http.delete(
+      `${environment.apiBaseUrl}/masters/Transfer_for_delete_ho_staff`,
+      { body: { ho_staff_id, branch_id } },
+    );
+  }
 
   // Branches
-  getBranches(period:any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/branches`,{period});
+  getBranches(period: any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/branches`, {
+      period,
+    });
   }
-  getAGMS(period:any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/get-AGM`, {period});
+  getAGMS(period: any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/get-AGM`, {
+      period,
+    });
   }
-  addBranch(branch: any,period:any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/branches`, branch,period);
+  addBranch(branch: any, period: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/masters/branches`,
+      branch,
+      period,
+    );
   }
 
-  updateBranch(id: string, branch: any,period:any) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/branches/${id}`, branch,period);
+  updateBranch(id: string, branch: any, period: any) {
+    return this.http.put(
+      `${environment.apiBaseUrl}/masters/branches/${id}`,
+      branch,
+      period,
+    );
   }
 
   deleteBranch(id: string) {
@@ -106,118 +177,206 @@ deleteSpecificHoStaff(ho_staff_id: string, branch_id: string) {
   }
 
   updateWeightage(weightage: any) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/weightages`, weightage);
+    return this.http.put(
+      `${environment.apiBaseUrl}/masters/weightages`,
+      weightage,
+    );
   }
 
   //transfer
-    getTrasferedStaff(period:any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/transfers`,{period});
+  getTrasferedStaff(period: any) {
+    return this.http.post(`${environment.apiBaseUrl}/masters/transfers`, {
+      period,
+    });
   }
 
   addTrasferedStaff(branch: any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/transfers`, branch);
+    return this.http.post(
+      `${environment.apiBaseUrl}/masters/transfers`,
+      branch,
+    );
   }
 
   updateTrasferedStaff(id: string, branch: any) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/transfers/${id}`, branch);
+    return this.http.put(
+      `${environment.apiBaseUrl}/masters/transfers/${id}`,
+      branch,
+    );
   }
 
   deleteTrasferedStaff(id: string) {
-    return this.http.delete(`${environment.apiBaseUrl}/masters/transfers/${id}`);
+    return this.http.delete(
+      `${environment.apiBaseUrl}/masters/transfers/${id}`,
+    );
+  }
+
+  revertTransfer(id: string) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/masters/revert-transfer/${id}`,
+      {},
+    );
   }
 
   //kpi-master
-   getKpiList() {
+  getKpiList() {
     return this.http.get(`${environment.apiBaseUrl}/kpi_master/kpiMaster`);
   }
 
   addKpi(branch: any) {
-    return this.http.post(`${environment.apiBaseUrl}/kpi_master/kpiMaster`, branch);
+    return this.http.post(
+      `${environment.apiBaseUrl}/kpi_master/kpiMaster`,
+      branch,
+    );
   }
 
   updateKpi(id: string, branch: any) {
-    return this.http.put(`${environment.apiBaseUrl}/kpi_master/kpiMaster/${id}`, branch);
+    return this.http.put(
+      `${environment.apiBaseUrl}/kpi_master/kpiMaster/${id}`,
+      branch,
+    );
   }
 
   deleteKpi(id: string) {
-    return this.http.delete(`${environment.apiBaseUrl}/kpi_master/kpiMaster/${id}`);
+    return this.http.delete(
+      `${environment.apiBaseUrl}/kpi_master/kpiMaster/${id}`,
+    );
   }
 
-   //kpi-mapping
-   getKpiMappingList() {
+  //kpi-mapping
+  getKpiMappingList() {
     return this.http.get(`${environment.apiBaseUrl}/kpi_master/kpiMapping`);
   }
 
   addKpiMapping(branch: any) {
-    return this.http.post(`${environment.apiBaseUrl}/kpi_master/kpiMapping`, branch);
+    return this.http.post(
+      `${environment.apiBaseUrl}/kpi_master/kpiMapping`,
+      branch,
+    );
   }
 
   updateKpiMapping(id: string, branch: any) {
-    return this.http.put(`${environment.apiBaseUrl}/kpi_master/kpiMapping/${id}`, branch);
+    return this.http.put(
+      `${environment.apiBaseUrl}/kpi_master/kpiMapping/${id}`,
+      branch,
+    );
   }
 
   deleteKpiMapping(id: string) {
-    return this.http.delete(`${environment.apiBaseUrl}/kpi_master/kpiMapping/${id}`);
+    return this.http.delete(
+      `${environment.apiBaseUrl}/kpi_master/kpiMapping/${id}`,
+    );
   }
-  getMonthEntries(period:any) {
-    return this.http.post(`${environment.apiBaseUrl}/entries/monthEntries`,{period});
+  getMonthEntries(period: any) {
+    return this.http.post(`${environment.apiBaseUrl}/entries/monthEntries`, {
+      period,
+    });
   }
-   deleteEntries(id: string) {
+  deleteEntries(id: string) {
     return this.http.delete(`${environment.apiBaseUrl}/entries/entries/${id}`);
   }
   verifyOldPassword(data: any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/verifyPassword`, data);
+    return this.http.post(
+      `${environment.apiBaseUrl}/masters/verifyPassword`,
+      data,
+    );
   }
 
-  updatePassword(id: any, newPassword: any,period:any) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/changePassword/${id}`, { newPassword: newPassword,period:period });
+  updatePassword(id: any, newPassword: any, period: any) {
+    return this.http.put(
+      `${environment.apiBaseUrl}/masters/changePassword/${id}`,
+      { newPassword: newPassword, period: period },
+    );
   }
   updateEntries(id: string, entry: any) {
-    return this.http.put(`${environment.apiBaseUrl}/masters/updateentries/${id}`, entry);
+    return this.http.put(
+      `${environment.apiBaseUrl}/masters/updateentries/${id}`,
+      entry,
+    );
   }
 
-  transferMaster(data:any){
-    return this.http.post(`${environment.apiBaseUrl}/trans/transfer-staff-master`,data);
+  transferMaster(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/trans/transfer-staff-master`,
+      data,
+    );
   }
-   transferMasterUpdate(data:any){
-    return this.http.post(`${environment.apiBaseUrl}/trans/transfer-staff-master-update`,data);
+  transferMasterUpdate(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/trans/transfer-staff-master-update`,
+      data,
+    );
   }
-  deputationStaffReport(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/deputation-report`,data);
+  deputationStaffReport(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/performnceMaster/deputation-report`,
+      data,
+    );
   }
-   allBranchReport(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/getAllBranchesScore`,data);
+  allBranchReport(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/performnceMaster/getAllBranchesScore`,
+      data,
+    );
   }
-    allUsersReport(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/getAllUserReport`,data);
+  allUsersReport(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/performnceMaster/getAllUserReport`,
+      data,
+    );
   }
-   usersBM(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersBM`,data);
+  usersBM(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/performnceMaster/usersBM`,
+      data,
+    );
   }
-  usersClerk(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersClerk`,data);
-  }
-  
-  usersHOStaff(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersHOStaff`,data);
-  }
-  usersAttender(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersAttender`,data);
-  }
-  usersAgmGm(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/usersAgmGm`,data);
-  }
-  hoStaffTransfer(transferData:any){
-     return this.http.post(`${environment.apiBaseUrl}/trans/ho_transfer`,transferData);
-  }
-   attenderTransfer(transferData:any){
-     return this.http.post(`${environment.apiBaseUrl}/trans/attender_transfer`,transferData);
+  usersClerk(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/performnceMaster/usersClerk/part1`,
+      data,
+    );
   }
 
-  allSectionWiseReport(data:any){
-     return this.http.post(`${environment.apiBaseUrl}/performnceMaster/getAllBranchesScoreSectionsWise`,data);
+  usersHOStaff(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/performnceMaster/usersHOStaff`,
+      data,
+    );
   }
-  getLastTransfer(period:any,staff_id:any){
-    return this.http.get(`${environment.apiBaseUrl}/performnceMaster/getLasttransfer?period=${period}&staff_id=${staff_id}`);
+  usersAttender(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/performnceMaster/usersAttender`,
+      data,
+    );
+  }
+  usersAgmGm(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/performnceMaster/usersAgmGm`,
+      data,
+    );
+  }
+  hoStaffTransfer(transferData: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/trans/ho_transfer`,
+      transferData,
+    );
+  }
+  attenderTransfer(transferData: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/trans/attender_transfer`,
+      transferData,
+    );
+  }
+
+  allSectionWiseReport(data: any) {
+    return this.http.post(
+      `${environment.apiBaseUrl}/performnceMaster/getAllBranchesScoreSectionsWise`,
+      data,
+    );
+  }
+  getLastTransfer(period: any, staff_id: any) {
+    return this.http.get(
+      `${environment.apiBaseUrl}/performnceMaster/getLasttransfer?period=${period}&staff_id=${staff_id}`,
+    );
   }
 }

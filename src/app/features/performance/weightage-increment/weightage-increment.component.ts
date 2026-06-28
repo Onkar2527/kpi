@@ -87,7 +87,57 @@ export class WeightageIncrementComponent implements OnInit {
       this.transferHistory();
     });
   }
+  getTransferCalculation(employee: any, mergeHistoryed: any): any {
+    if (!employee || !mergeHistoryed || !mergeHistoryed.transfers || mergeHistoryed.transfers.length === 0) {
+      return null;
+    }
+
+    let sumOfPrevious = 0;
+    const transferCalcs: any[] = [];
+
+    mergeHistoryed.transfers.forEach((t: any) => {
+      const rawScore = Number(t.total_weightage_score || 0);
+      const months = Number(t.months || 0);
+      const proportionateScore = months > 0 ? (rawScore / 12) * months : rawScore;
+      sumOfPrevious += proportionateScore;
+
+      transferCalcs.push({
+        branchName: t.old_branch_name || t.branch_name || "Old Branch",
+        kpaScore: rawScore,
+        months,
+        proportionateScore,
+      });
+    });
+
+    const currentScoreExcludingInsurance =
+      Number(employee.deposit?.weightageScore || 0) +
+      Number(employee.loan_gen?.weightageScore || 0) +
+      Number(employee.loan_amulya?.weightageScore || 0) +
+      Number(employee.recovery?.weightageScore || 0) +
+      Number(employee.audit?.weightageScore || 0);
+
+    const totalCount = transferCalcs.length + 1;
+    const averageExcludingInsurance = (sumOfPrevious + currentScoreExcludingInsurance) / totalCount;
+    const insuranceScore = Number(employee.insurance?.weightageScore || 0);
+    const finalKpaScore = averageExcludingInsurance + insuranceScore;
+
+    return {
+      transfers: transferCalcs,
+      currentBranch: {
+        kpaScoreExcludingInsurance: currentScoreExcludingInsurance,
+      },
+      averageExcludingInsurance: averageExcludingInsurance,
+      insuranceScore: insuranceScore,
+      totalFinalKpaScore: finalKpaScore,
+    };
+  }
+
   getAverageKpi(): number {
+    const calc = this.getTransferCalculation(this.selectedEmployee, this.mergeHistoryed);
+    if (calc) {
+      return calc.totalFinalKpaScore;
+    }
+
     if (!this.selectedEmployee?.branch_name) return 0;
 
     const values = Object.entries(this.selectedEmployee.branch_name).map(
@@ -105,6 +155,7 @@ export class WeightageIncrementComponent implements OnInit {
 
     return total / count;
   }
+
 
   getSalary(period: any, PF_NO: any) {
     if (this.period) {
@@ -334,6 +385,11 @@ export class WeightageIncrementComponent implements OnInit {
     };
   }
   getAverageKpiBM(): number {
+    const calc = this.getTransferCalculation(this.bmScores, this.mergeHistoryedBM);
+    if (calc) {
+      return calc.totalFinalKpaScore;
+    }
+
     if (!this.mergeHistoryedBM?.branch_name) return 0;
 
     const values = Object.entries(this.mergeHistoryedBM.branch_name).map(

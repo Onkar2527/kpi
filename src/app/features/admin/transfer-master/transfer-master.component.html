@@ -117,6 +117,7 @@
         <td>{{ branch.new_branch }}</td>
         <td>
           <button class="btn btn-primary btn-sm me-2" (click)="editBranch(branch)">Edit</button>
+          <button *ngIf="isRevertAvailable(branch.transfer_date)" class="btn btn-warning btn-sm me-2" (click)="revertTransfer(branch)">Revert</button>
           <button class="btn btn-danger btn-sm" (click)="deleteBranch(branch.id)">Delete</button>
         </td>
       </tr>

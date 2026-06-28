@@ -246,7 +246,7 @@
                     <th>Weightage</th>
                     <th>Target</th>
                     <th>Achieved</th>
-                    <th>Achieved</th>
+                    <th>Achieved %</th>
                     <th>Score</th>
                     <th>Weightage Score</th>
                   </tr>
@@ -1200,7 +1200,7 @@
                   <th>Weightage</th>
                   <th>Target</th>
                   <th>Achieved</th>
-                  <th>Achieved</th>
+                  <th>Achieved %</th>
                   <th>Score</th>
                   <th>Weightage Score</th>
                 </tr>
@@ -1227,12 +1227,54 @@
                 </tr>
                 <tr class="table-info fw-bold">
                   <td colspan="6">Total</td>
-                  <td>{{ (singlStaffScore.originalTotal | number: "1.2-2") || (singlStaffScore.total | number: "1.2-2")
-                    ||
-                    '0.00' }}</td>
+                  <td>{{ (singlStaffScore.total | number: "1.2-2") || '0.00' }}</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Transfer Score Calculation Breakdown Card -->
+          <div class="card mt-4 shadow-sm border-0" *ngIf="singlStaffScore?.transferCalculation">
+            <div class="card-header bg-info text-white">
+              <h5 class="mb-0 fw-bold">📐 KPA Score Calculation (Branch Transfer)</h5>
+            </div>
+            <div class="card-body bg-light text-black">
+              <div class="mb-3 p-3 bg-white border rounded">
+                <h6 class="fw-bold text-primary">Branch-wise Scores (excluding Insurance)</h6>
+                <div class="ms-2">
+                  <div *ngFor="let tr of singlStaffScore.transferCalculation.transfers" class="mb-2">
+                    <strong>{{ tr.branchName }}:</strong> {{ tr.kpaScore | number: "1.2-2" }}
+                    <span *ngIf="tr.months > 0" class="text-muted small ms-2">
+                      ({{ tr.kpaScore | number: "1.2-2" }} ÷ 12 × {{ tr.months }} months
+                      = {{ tr.proportionateScore | number: "1.2-2" }})
+                    </span>
+                  </div>
+                  <p class="mb-0"><strong>New Branch Score (excluding Insurance):</strong> {{ singlStaffScore.transferCalculation.currentBranch.kpaScoreExcludingInsurance | number: "1.2-2" }}</p>
+                </div>
+              </div>
+
+              <div class="mb-3 p-3 bg-white border rounded">
+                <h6 class="fw-bold text-primary">Average KPI Score Calculation</h6>
+                <div class="ms-2">
+                  <p class="mb-1">
+                    <strong>Formula:</strong> (
+                    <span *ngFor="let tr of singlStaffScore.transferCalculation.transfers">{{ tr.proportionateScore | number: "1.2-2" }} + </span>
+                    {{ singlStaffScore.transferCalculation.currentBranch.kpaScoreExcludingInsurance | number: "1.2-2" }}
+                    ) / {{ singlStaffScore.transferCalculation.transfers.length + 1 }}
+                  </p>
+                  <p class="mb-0 text-success"><strong>Average Score:</strong> {{ singlStaffScore.transferCalculation.averageExcludingInsurance | number: "1.2-2" }}</p>
+                </div>
+              </div>
+
+              <div class="p-3 bg-white border rounded">
+                <h6 class="fw-bold text-dark">Final KPA Score</h6>
+                <div class="ms-2">
+                  <p class="mb-1"><strong>Average Score (excluding Insurance):</strong> {{ singlStaffScore.transferCalculation.averageExcludingInsurance | number: "1.2-2" }}</p>
+                  <p class="mb-1"><strong>Insurance Score:</strong> {{ singlStaffScore.transferCalculation.insuranceScore | number: "1.2-2" }}</p>
+                  <p class="mb-0 fs-5 text-primary"><strong>Total Final KPA Score:</strong> {{ singlStaffScore.transferCalculation.totalFinalKpaScore | number: "1.2-2" }}</p>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="card mt-4 shadow-sm border-0"
             *ngIf="history || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">

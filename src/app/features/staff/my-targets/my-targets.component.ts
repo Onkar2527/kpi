@@ -217,8 +217,24 @@ calculateScores(targets: any[]): any[] {
   const auditRatio = auditObj ? auditObj.achieved / auditObj.amount : 0;
   const recoveryRatio = recoveryObj ? recoveryObj.achieved / recoveryObj.amount : 0;
 
-
   return targets.map(target => {
+    const baseline = Number(target.baseline) || 0;
+
+    // If achieved is equal to or less than baseline (previous period carry-over), score = 0
+    const isBaselineOnly =
+      ['deposit', 'loan_gen', 'loan_amulya'].includes(target.kpi) &&
+      baseline > 0 &&
+      Number(target.achieved) <= baseline;
+
+    if (isBaselineOnly) {
+      return {
+        ...target,
+        achieved: 0,
+        outOf10: 0,
+        weightageScore: 0,
+      };
+    }
+
     let outOf10;
 
     if (target.amount === 0) {
@@ -369,10 +385,10 @@ calculateScores(targets: any[]): any[] {
     return Object.keys(transfer).filter((k) => !ignore.includes(k));
   }
 
-getAllTransferValues(): number[] {
+// Returns all old-branch scores (excluding insurance) from transfer history
+getAllTransferValuesExclInsurance(): number[] {
   const branch =
-  this.history?.transfers
-    .map((t: any) => +t.total_weightage_score || 0) || [];
+    this.history?.transfers?.map((t: any) => +t.total_weightage_score || 0) || [];
 
   const ho =
     this.hostaffScores?.transfers?.map((t: any) => +t.total_weightage_score || 0) || [];
@@ -380,22 +396,85 @@ getAllTransferValues(): number[] {
   const attender =
     this.attenderTransferScores?.transfers?.map((t: any) => +t.total_weightage_score || 0) || [];
 
-  const current = this.grandTotalWeightageScore
-    ? [this.grandTotalWeightageScore]
-    : [];
+  return [...branch, ...ho, ...attender];
+}
 
-  return [...branch, ...ho, ...attender, ...current];
+// Returns the current branch score excluding insurance
+getCurrentScoreExclInsurance(): number {
+  if (!this.staffAll) return 0;
+  let total = 0;
+  this.staffAll.forEach((t: any) => {
+    if (t.kpi !== 'insurance') {
+      total += Number(t.weightageScore || 0);
+    }
+  });
+  return total;
+}
+
+// Returns the current branch insurance score
+getInsuranceScore(): number {
+  if (!this.staffAll) return 0;
+  const ins = this.staffAll.find((t: any) => t.kpi === 'insurance');
+  return Number(ins?.weightageScore || 0);
+}
+
+// Returns transfer calculation breakdown object (only for Clerk with transfers)
+getTransferCalculation(): any {
+  const oldBranchScores = this.getAllTransferValuesExclInsurance();
+  const hasTransfers = oldBranchScores.length > 0;
+  if (!hasTransfers) return null;
+
+  const allTransfers: any[] = [];
+  [
+    ...(this.history?.transfers || []),
+    ...(this.hostaffScores?.transfers || []),
+    ...(this.attenderTransferScores?.transfers || [])
+  ].forEach((t: any) => {
+    const rawScore = Number(t.total_weightage_score || 0);
+    const months = Number(t.months || 0);
+    const proportionateScore = months > 0 ? (rawScore / 12) * months : rawScore;
+    allTransfers.push({
+      branchName: t.old_branch_name || t.branch_name || 'Old Branch',
+      kpaScore: rawScore,
+      months,
+      proportionateScore
+    });
+  });
+
+  const currentScoreExclInsurance = this.getCurrentScoreExclInsurance();
+  const insuranceScore = this.getInsuranceScore();
+  const totalCount = allTransfers.length + 1;
+  // Use proportionate scores in the average, not raw scores
+  const sumOfPrevious = allTransfers.reduce((a: number, b: any) => a + b.proportionateScore, 0);
+  const averageExcludingInsurance = (sumOfPrevious + currentScoreExclInsurance) / totalCount;
+  const totalFinalKpaScore = averageExcludingInsurance + insuranceScore;
+
+  return {
+    transfers: allTransfers,
+    currentBranch: { kpaScoreExcludingInsurance: currentScoreExclInsurance },
+    averageExcludingInsurance,
+    insuranceScore,
+    totalFinalKpaScore
+  };
+}
+
+// Final average used for salary calculation
+getTransferAverage(): number {
+  const calc = this.getTransferCalculation();
+  if (calc) return calc.totalFinalKpaScore;
+  return this.grandTotalWeightageScore || 0;
+}
+
+// Legacy helpers kept for the Total KPI Score display line
+getAllTransferValues(): number[] {
+  return [
+    ...this.getAllTransferValuesExclInsurance(),
+    this.getCurrentScoreExclInsurance()
+  ];
 }
 
 getTransferTotal(): number {
-  const values = this.getAllTransferValues();
-  return values.reduce((a, b) => a + b, 0);
-}
-
-getTransferAverage(): number {
-  const values = this.getAllTransferValues();
-  if (values.length === 0) return 0;
-  return this.getTransferTotal() / values.length;
+  return this.getAllTransferValues().reduce((a, b) => a + b, 0);
 }
 
 

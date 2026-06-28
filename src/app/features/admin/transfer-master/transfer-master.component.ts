@@ -608,6 +608,39 @@ if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender'
     });
   }
 
+  revertTransfer(branch: any) {
+    const confirmed = confirm(`Are you sure you want to revert the transfer for ${branch.name}? This will restore them to branch ${branch.old_branch || 'their old branch'} and redistribute targets.`);
+    if (!confirmed) return;
+
+    this.adminService.revertTransfer(branch.id).subscribe(
+      async (res: any) => {
+        this.loadTrasferedStaff();
+        this.loadUsers();
+        
+        // Redistribute targets on both old and new branches if applicable
+        if (res.old_branch_id) {
+          await this.autoDistributeNewBranch(res.old_branch_id).toPromise();
+        }
+        if (res.new_branch_id) {
+          await this.autoDistributeNewBranch(res.new_branch_id).toPromise();
+        }
+        
+        alert('Transfer reverted successfully!');
+      },
+      (err: any) => {
+        console.error(err);
+        alert('Failed to revert transfer');
+      }
+    );
+  }
+
+  isRevertAvailable(transferDate: string): boolean {
+    if (!transferDate) return false;
+    const diffTime = Math.abs(new Date().getTime() - new Date(transferDate).getTime());
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays <= 3;
+  }
+
   employeeId = this.transfer.staff_id;
   branchId = this.transfer.old_branch_id;
   branchstaff() {

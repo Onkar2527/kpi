@@ -1407,11 +1407,41 @@ console.log(this.entredUserData);
       '',
       '',
       '',
-      Number(staffObj.originalTotal || staffObj.total || 0).toFixed(2),
+      Number(staffObj.total || 0).toFixed(2),
     ]);
 
     rows.push([]);
     rows.push([]);
+
+    // ===== KPA SCORE CALCULATION (BRANCH TRANSFER) =====
+    if (staffObj.transferCalculation) {
+      rows.push(['KPA SCORE CALCULATION (BRANCH TRANSFER)']);
+      rows.push([]);
+
+      rows.push(['Branch-wise Scores (excluding Insurance)']);
+      staffObj.transferCalculation.transfers.forEach((tr: any) => {
+        rows.push([`${tr.branchName}: ${Number(tr.kpaScore).toFixed(2)}`]);
+      });
+      rows.push([`New Branch Score (excluding Insurance): ${Number(staffObj.transferCalculation.currentBranch.kpaScoreExcludingInsurance).toFixed(2)}`]);
+      rows.push([]);
+
+      rows.push(['Average KPI Score Calculation']);
+      let formulaStr = `Formula: (`;
+      staffObj.transferCalculation.transfers.forEach((tr: any) => {
+        formulaStr += `${Number(tr.kpaScore).toFixed(2)} + `;
+      });
+      formulaStr += `${Number(staffObj.transferCalculation.currentBranch.kpaScoreExcludingInsurance).toFixed(2)}) / ${staffObj.transferCalculation.transfers.length + 1}`;
+      rows.push([formulaStr]);
+      rows.push([`Average Score: ${Number(staffObj.transferCalculation.averageExcludingInsurance).toFixed(2)}`]);
+      rows.push([]);
+
+      rows.push(['Final KPA Score']);
+      rows.push([`Average Score (excluding Insurance): ${Number(staffObj.transferCalculation.averageExcludingInsurance).toFixed(2)}`]);
+      rows.push([`Insurance Score: ${Number(staffObj.transferCalculation.insuranceScore).toFixed(2)}`]);
+      rows.push([`Total Final KPA Score: ${Number(staffObj.transferCalculation.totalFinalKpaScore).toFixed(2)}`]);
+      rows.push([]);
+      rows.push([]);
+    }
 
     // ===== TRANSFER HISTORY =====
     if (this.mergeHistoryed?.transfers?.length > 0) {

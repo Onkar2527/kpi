@@ -36,32 +36,80 @@
         </tbody>
       </table>
     </div>
-    <div class="card " *ngIf="hasBranchData(selectedEmployee?.branch_name)">
+    <div class="card" *ngIf="hasBranchData(selectedEmployee?.branch_name) || mergeHistoryed?.transfers?.length > 0">
 
       <div class="card-header">
-        <h4> Transfer Branch History</h4>
+        <h4>Transfer Branch History</h4>
       </div>
 
       <div class="card-body">
+        <ng-container *ngIf="getTransferCalculation(hostaffScores, mergeHistoryed) as calc; else hoSimpleBlock">
 
-        <div *ngFor="let item of selectedEmployee.branch_name | keyvalue">
-          <b>{{ item.key }}</b> :
-          {{ +$any(item.value).avg_kpi | number:'1.2-2' }}
-          ({{ $any(item.value).months }} months)
-        </div>
+          <!-- Branch-wise Scores -->
+          <div class="mb-3 p-3 bg-light border rounded">
+            <h6 class="fw-bold text-primary">Branch-wise Scores (excluding Insurance)</h6>
+            <div class="ms-2">
+              <div *ngFor="let tr of calc.transfers" class="mb-2">
+                <strong>{{ tr.branchName }}:</strong> {{ tr.kpaScore | number:'1.2-2' }}
+                <span *ngIf="tr.months > 0" class="text-muted small ms-2">
+                  ({{ tr.kpaScore | number:'1.2-2' }} ÷ 12 × {{ tr.months }} months
+                  = {{ tr.proportionateScore | number:'1.2-2' }})
+                </span>
+              </div>
+              <p class="mb-0">
+                <strong>New Branch Score (excluding Insurance):</strong>
+                {{ calc.currentBranch.kpaScoreExcludingInsurance | number:'1.2-2' }}
+              </p>
+            </div>
+          </div>
 
-        <div class="mt-2">
-          <b>Total Average KPI Score:</b>
-          (
-          <ng-container *ngFor="let item of selectedEmployee.branch_name | keyvalue">
-            {{ +$any(item.value).avg_kpi | number:'1.2-2' }} +
-          </ng-container>
-          {{ hostaffScores.originalTotal | number:'1.2-2' }}
-          )
-          /
-          {{ (selectedEmployee.branch_name | keyvalue).length + 1 }}
-          = <b>{{ getAverageKpi() | number:'1.2-2' }}</b>
-        </div>
+          <!-- Average Calculation -->
+          <div class="mb-3 p-3 bg-light border rounded">
+            <h6 class="fw-bold text-primary">Average KPI Score Calculation</h6>
+            <div class="ms-2">
+              <p class="mb-1">
+                <strong>Formula:</strong> (
+                <span *ngFor="let tr of calc.transfers">{{ tr.proportionateScore | number:'1.2-2' }} + </span>
+                {{ calc.currentBranch.kpaScoreExcludingInsurance | number:'1.2-2' }}
+                ) / {{ calc.transfers.length + 1 }}
+              </p>
+              <p class="mb-0 text-success">
+                <strong>Average Score:</strong> {{ calc.averageExcludingInsurance | number:'1.2-2' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Final KPA Score -->
+          <div class="p-3 bg-light border rounded">
+            <h6 class="fw-bold text-dark">Final KPA Score</h6>
+            <div class="ms-2">
+              <p class="mb-1"><strong>Average Score (excluding Insurance):</strong> {{ calc.averageExcludingInsurance | number:'1.2-2' }}</p>
+              <p class="mb-1"><strong>Insurance Score:</strong> {{ calc.insuranceScore | number:'1.2-2' }}</p>
+              <h5 class="mb-0 mt-2 text-primary fw-bold">Total Final KPA Score = {{ calc.totalFinalKpaScore | number:'1.2-2' }}</h5>
+            </div>
+          </div>
+
+        </ng-container>
+
+        <ng-template #hoSimpleBlock>
+          <div *ngFor="let item of selectedEmployee.branch_name | keyvalue">
+            <b>{{ item.key }}</b> :
+            {{ +$any(item.value).avg_kpi | number:'1.2-2' }}
+            ({{ $any(item.value).months }} months)
+          </div>
+          <div class="mt-2">
+            <b>Total Average KPI Score:</b>
+            (
+            <ng-container *ngFor="let item of selectedEmployee.branch_name | keyvalue">
+              {{ +$any(item.value).avg_kpi | number:'1.2-2' }} +
+            </ng-container>
+            {{ hostaffScores.originalTotal | number:'1.2-2' }}
+            )
+            /
+            {{ (selectedEmployee.branch_name | keyvalue).length + 1 }}
+            = <b>{{ getAverageKpi() | number:'1.2-2' }}</b>
+          </div>
+        </ng-template>
 
       </div>
     </div>
@@ -299,25 +347,64 @@
         </div>
 
         <div class="card-body">
-          <div *ngFor="let item of selectedEmployee.branch_name | keyvalue">
-            <b>{{ item.key }}</b> :
-            {{ +$any(item.value).avg_kpi | number:'1.2-2' }}
-            
-          </div>
+          <ng-container *ngIf="getTransferCalculation(selectedEmployee, mergeHistoryed) as calc; else simpleAvgAllBlock">
+            <!-- Simple Average Calculation Layout -->
+            <div class="mb-3 p-3 bg-light border rounded">
+              <h6 class="fw-bold text-primary">Branch-wise Scores (excluding Insurance)</h6>
+              <div class="ms-2">
+                <div *ngFor="let tr of calc.transfers" class="mb-2">
+                  <strong>{{ tr.branchName }}:</strong> {{ tr.kpaScore | number:'1.2-2' }}
+                  <span *ngIf="tr.months > 0" class="text-muted small ms-2">
+                    ({{ tr.kpaScore | number:'1.2-2' }} ÷ 12 × {{ tr.months }} months
+                    = {{ tr.proportionateScore | number:'1.2-2' }})
+                  </span>
+                </div>
+                <p class="mb-0"><strong>New Branch Score (excluding Insurance):</strong> {{ calc.currentBranch.kpaScoreExcludingInsurance | number:'1.2-2' }}</p>
+              </div>
+            </div>
 
-          <div class="mt-2">
-            <b>Total Average KPI Score:</b>
-            (
-            <ng-container *ngFor="let item of selectedEmployee.branch_name | keyvalue">
-              {{ +$any(item.value).avg_kpi | number:'1.2-2' }} +
-            </ng-container>
-            {{ selectedEmployee.originalTotal | number:'1.2-2' }}
-            )
-            /
-            {{ (selectedEmployee.branch_name | keyvalue).length + 1 }}
-            =
-            <b>{{ getAverageKpi() | number:'1.2-2' }}</b>
-          </div>
+            <div class="mb-3 p-3 bg-light border rounded">
+              <h6 class="fw-bold text-primary">Average KPI Score Calculation</h6>
+              <div class="ms-2">
+                <p class="mb-1">
+                  <strong>Formula:</strong> (
+                  <span *ngFor="let tr of calc.transfers">{{ tr.proportionateScore | number:'1.2-2' }} + </span>
+                  {{ calc.currentBranch.kpaScoreExcludingInsurance | number:'1.2-2' }}
+                  ) / {{ calc.transfers.length + 1 }}
+                </p>
+                <p class="mb-0 text-success"><strong>Average Score:</strong> {{ calc.averageExcludingInsurance | number:'1.2-2' }}</p>
+              </div>
+            </div>
+
+            <div class="p-3 bg-light border rounded">
+              <h6 class="fw-bold text-dark">Final KPA Score</h6>
+              <div class="ms-2">
+                <p class="mb-1"><strong>Average Score (excluding Insurance):</strong> {{ calc.averageExcludingInsurance | number:'1.2-2' }}</p>
+                <p class="mb-1"><strong>Insurance Score:</strong> {{ calc.insuranceScore | number:'1.2-2' }}</p>
+                <h5 class="mb-0 mt-2 text-primary fw-bold">Total Final KPA Score = {{ calc.totalFinalKpaScore | number:'1.2-2' }}</h5>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-template #simpleAvgAllBlock>
+            <div *ngFor="let item of selectedEmployee.branch_name | keyvalue">
+              <b>{{ item.key }}</b> :
+              {{ +$any(item.value).avg_kpi | number:'1.2-2' }}
+            </div>
+            <div class="mt-2">
+              <b>Total Average KPI Score:</b>
+              (
+              <ng-container *ngFor="let item of selectedEmployee.branch_name | keyvalue">
+                {{ +$any(item.value).avg_kpi | number:'1.2-2' }} +
+              </ng-container>
+              {{ selectedEmployee.originalTotal | number:'1.2-2' }}
+              )
+              /
+              {{ (selectedEmployee.branch_name | keyvalue).length + 1 }}
+              =
+              <b>{{ getAverageKpi() | number:'1.2-2' }}</b>
+            </div>
+          </ng-template>
         </div>
       </div>
 

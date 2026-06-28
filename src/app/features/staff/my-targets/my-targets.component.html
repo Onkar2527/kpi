@@ -93,45 +93,89 @@
 
       <div class="card-body">
 
-        <!-- Branch history -->
-        <div *ngFor="let item of history?.branch_avg_kpi | keyvalue">
-          <b>{{ item.key }}</b> :
-          {{ $any(item.value).avg_kpi | number:'1.2-2' }}
-          
-        </div>
+        <ng-container *ngIf="getTransferCalculation() as calc; else simpleTransferBlock">
 
-        <!-- HO history -->
-        <div *ngFor="let item of hostaffScores?.branch_avg_kpi | keyvalue">
-          <b>HO - {{ item.key }}</b> :
-          {{ $any(item.value).avg_kpi | number:'1.2-2' }}
-       
-        </div>
+          <!-- Branch-wise Scores -->
+          <div class="mb-3 p-3 bg-light border rounded">
+            <h6 class="fw-bold text-primary">Branch-wise Scores (excluding Insurance)</h6>
+            <div class="ms-2">
+              <div *ngFor="let tr of calc.transfers" class="mb-2">
+                <strong>{{ tr.branchName }}:</strong> {{ tr.kpaScore | number:'1.2-2' }}
+                <span *ngIf="tr.months > 0" class="text-muted small ms-2">
+                  ({{ tr.kpaScore | number:'1.2-2' }} ÷ 12 × {{ tr.months }} months
+                  = {{ tr.proportionateScore | number:'1.2-2' }})
+                </span>
+              </div>
+              <p class="mb-0">
+                <strong>New Branch Score (excluding Insurance):</strong>
+                {{ calc.currentBranch.kpaScoreExcludingInsurance | number:'1.2-2' }}
+              </p>
+            </div>
+          </div>
 
-        <!-- Attender history -->
-        <div *ngFor="let item of attenderTransferScores?.branch_avg_kpi | keyvalue">
-          <b>Attender - {{ item.key }}</b> :
-          {{ $any(item.value).avg_kpi | number:'1.2-2' }}
-      
-        </div>
+          <!-- Average Calculation -->
+          <div class="mb-3 p-3 bg-light border rounded">
+            <h6 class="fw-bold text-primary">Average KPI Score Calculation</h6>
+            <div class="ms-2">
+              <p class="mb-1">
+                <strong>Formula:</strong> (
+                <span *ngFor="let tr of calc.transfers">{{ tr.proportionateScore | number:'1.2-2' }} + </span>
+                {{ calc.currentBranch.kpaScoreExcludingInsurance | number:'1.2-2' }}
+                ) / {{ calc.transfers.length + 1 }}
+              </p>
+              <p class="mb-0 text-success">
+                <strong>Average Score:</strong> {{ calc.averageExcludingInsurance | number:'1.2-2' }}
+              </p>
+            </div>
+          </div>
 
-        <div class="mt-2">
-          <b>Total KPI Score:</b>
+          <!-- Final KPA Score -->
+          <div class="p-3 bg-light border rounded">
+            <h6 class="fw-bold text-dark">Final KPA Score</h6>
+            <div class="ms-2">
+              <p class="mb-1">
+                <strong>Average Score (excluding Insurance):</strong>
+                {{ calc.averageExcludingInsurance | number:'1.2-2' }}
+              </p>
+              <p class="mb-1">
+                <strong>Insurance Score:</strong> {{ calc.insuranceScore | number:'1.2-2' }}
+              </p>
+              <h5 class="mb-0 mt-2 text-primary fw-bold">
+                Total Final KPA Score = {{ calc.totalFinalKpaScore | number:'1.2-2' }}
+              </h5>
+            </div>
+          </div>
 
-          <ng-container *ngFor="let v of getAllTransferValues(); let i = index">
-            {{ v | number:'1.2-2' }}
-            <span *ngIf="i < getAllTransferValues().length - 1"> + </span>
-          </ng-container>
+        </ng-container>
 
-          =
-          {{ getTransferTotal() | number:'1.2-2' }}
-          /
-          {{ getAllTransferValues().length }}
-          =
-          <b>{{ getTransferAverage() | number:'1.2-2' }}</b>
-        </div>
-
-
-
+        <ng-template #simpleTransferBlock>
+          <!-- Fallback: no transfer history, just show current total -->
+          <div *ngFor="let item of history?.branch_avg_kpi | keyvalue">
+            <b>{{ item.key }}</b> :
+            {{ $any(item.value).avg_kpi | number:'1.2-2' }}
+          </div>
+          <div *ngFor="let item of hostaffScores?.branch_avg_kpi | keyvalue">
+            <b>HO - {{ item.key }}</b> :
+            {{ $any(item.value).avg_kpi | number:'1.2-2' }}
+          </div>
+          <div *ngFor="let item of attenderTransferScores?.branch_avg_kpi | keyvalue">
+            <b>Attender - {{ item.key }}</b> :
+            {{ $any(item.value).avg_kpi | number:'1.2-2' }}
+          </div>
+          <div class="mt-2">
+            <b>Total KPI Score:</b>
+            <ng-container *ngFor="let v of getAllTransferValues(); let i = index">
+              {{ v | number:'1.2-2' }}
+              <span *ngIf="i < getAllTransferValues().length - 1"> + </span>
+            </ng-container>
+            =
+            {{ getTransferTotal() | number:'1.2-2' }}
+            /
+            {{ getAllTransferValues().length }}
+            =
+            <b>{{ getTransferAverage() | number:'1.2-2' }}</b>
+          </div>
+        </ng-template>
 
       </div>
     </div>
