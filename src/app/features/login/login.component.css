@@ -97,6 +97,11 @@
   background:#2563eb;
 }
 
+.login-btn:disabled {
+  background: #a3c2f7;
+  cursor: not-allowed;
+}
+
 /* Forgot */
 
 .forgot{

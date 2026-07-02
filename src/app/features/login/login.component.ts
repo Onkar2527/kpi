@@ -23,10 +23,10 @@ export class LoginComponent implements OnInit {
   constructor(private auth: AuthService, private periodService: PeriodService) {}
 
   onSubmit() {
-    if (!this.username || !this.password) {
+    if (!this.username || !this.password || !this.period) {
       return;
     }
-    this.auth.login(this.username, this.password,this.period);
+    this.auth.login(this.username, this.password, this.period);
   }
 
   togglePasswordVisibility() {

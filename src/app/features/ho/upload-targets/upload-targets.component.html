@@ -12,7 +12,7 @@
         <label class="form-check-label" for="main">
           <span *ngIf="auth.user?.role === 'deposit_ho'">Deposit</span>
           <span *ngIf="auth.user?.role === 'loan_ho'">Loan General</span>
-          <span *ngIf="auth.user?.role === 'loanAmulya_ho'">Loan Amulya</span>  
+          <span *ngIf="auth.user?.role === 'loanAmulya_ho'">Loan Amulya</span>
         </label>
       </div>
 
@@ -22,7 +22,7 @@
           [(ngModel)]="uploadType">
 
         <label class="form-check-label" for="branch-specific">
-          <span *ngIf="auth.user?.role === 'recovery_ho'">Recovery</span>  
+          <span *ngIf="auth.user?.role === 'recovery_ho'">Recovery</span>
         </label>
       </div>
 
@@ -30,17 +30,17 @@
         <input class="form-check-input" type="radio" name="uploadType" id="dashborad" value="dashborad"
           [(ngModel)]="uploadType">
         <label class="form-check-label" for="dashborad">
-          Dashborad Previous Year Data
+          Dashborad new Year Data
         </label>
       </div>
 
-      <div class="form-check" *ngIf="auth.user?.role === 'HO'">
+      <!-- <div class="form-check" *ngIf="auth.user?.role === 'HO'">
         <input class="form-check-input" type="radio" name="uploadType" id="dashborad-achieved"
           value="dashborad-achieved" [(ngModel)]="uploadType">
         <label class="form-check-label" for="dashborad-achieved">
           Dashborad Total Achieved Data
         </label>
-      </div>
+      </div> -->
 
       <div class="form-check" *ngIf="auth.user?.role === 'HO'">
         <input class="form-check-input" type="radio" name="uploadType" id="previous-period-data"
@@ -58,63 +58,61 @@
         </label>
       </div>
 
-       <div class="form-check" *ngIf="auth.user?.role === 'HO'">
+      <div class="form-check" *ngIf="auth.user?.role === 'HO'">
         <input class="form-check-input" type="radio" name="uploadType" id="deputation-staff" value="deputation-staff"
           [(ngModel)]="uploadType">
         <label class="form-check-label" for="deputation-staff">
           Upload Deputation Staff
         </label>
       </div>
-      
-        <div class="form-check" *ngIf="auth.user?.role === 'insurance_ho'">
-        <input class="form-check-input" type="radio" name="uploadType" id="insurance-traget"
-          value="insurance-traget" [(ngModel)]="uploadType">
+
+      <div class="form-check" *ngIf="auth.user?.role === 'insurance_ho'">
+        <input class="form-check-input" type="radio" name="uploadType" id="insurance-traget" value="insurance-traget"
+          [(ngModel)]="uploadType">
         <label class="form-check-label" for="insurance-traget">
-        Insurance-Traget
+          Insurance-Traget
         </label>
       </div>
 
-       <div class="form-check" *ngIf="auth.user?.role === 'insurance_ho'">
+      <div class="form-check" *ngIf="auth.user?.role === 'insurance_ho'">
         <input class="form-check-input" type="radio" name="uploadType" id="insurance-achiveved"
           value="insurance-achiveved" [(ngModel)]="uploadType">
         <label class="form-check-label" for="insurance-achiveved">
-        Insurance-Achieved
+          Insurance-Achieved
         </label>
       </div>
 
-       <div class="form-check" *ngIf="auth.user?.role === 'recovery_ho'">
+      <div class="form-check" *ngIf="auth.user?.role === 'recovery_ho'">
         <input class="form-check-input" type="radio" name="uploadType" id="recovery-achiveved"
           value="recovery-achiveved" [(ngModel)]="uploadType">
         <label class="form-check-label" for="recovery-achiveved">
-        Recovery-Achieved
+          Recovery-Achieved
         </label>
       </div>
 
-       <div class="form-check" *ngIf="auth.user?.role === 'audit_ho'">
-        <input class="form-check-input" type="radio" name="uploadType" id="audit-achiveved"
-          value="audit-achiveved" [(ngModel)]="uploadType">
+      <div class="form-check" *ngIf="auth.user?.role === 'audit_ho'">
+        <input class="form-check-input" type="radio" name="uploadType" id="audit-achiveved" value="audit-achiveved"
+          [(ngModel)]="uploadType">
         <label class="form-check-label" for="audit-achiveved">
-        audit-Achieved
+          audit-Achieved
         </label>
       </div>
-      
+
     </div>
 
     <div class="mb-3" *ngIf="uploadType">
       <label for="targetFile" class="form-label">Target File (CSV)</label>
       <input class="form-control" type="file" id="targetFile" (change)="onFileChange($event)" name="targetFile"
         accept=".csv" required>
-      <div *ngIf="uploadType === 'previous-period-data'" class="form-text">
-        <a href="javascript:void(0)" (click)="downloadSampleCSV()" class="text-decoration-none">
+      <div class="form-text">
+        <a href="javascript:void(0)" (click)="downloadCSVTemplate()" class="text-decoration-none">
           Download Sample CSV
         </a>
       </div>
     </div>
     <button type="submit" class="btn btn-primary">Upload</button>
   </form>
-  <div
-    *ngIf="message"
-    class="mt-3">
+  <div *ngIf="message" class="mt-3">
     <div class="alert" [ngClass]="{
         'alert-success': messageType === 'success',
         'alert-danger': messageType === 'error'

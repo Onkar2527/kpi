@@ -1,4 +1,3 @@
-
 <div class="dashboard-container">
   <div class="card branch-dashboard shadow-lg border-0">
     <div class="card-header text-white text-center">
@@ -17,8 +16,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let kpi of ['balance_deposit', 'loan_gen']">
-            <td class="fw-semibold text-indigo">{{ kpi | titlecase }}</td>
+          <tr *ngFor="let kpi of ['balance_deposit', 'loan_gen', 'loan_amulya']">
+            <td class="fw-semibold text-indigo">{{ kpi == 'balance_deposit' ? 'Deposit' : (kpi == 'loan_gen' ? 'Loan' : 'Loan Amulya') }}</td>
             <td>{{ dashboradScores?.[kpi]?.PreviousBalance | number:'1.0-0' }}</td>
             <td>{{ dashboradScores?.[kpi]?.totalPresentTarget | number:'1.0-0' }}</td>
             <td>{{ dashboradScores?.[kpi]?.total | number:'1.0-0' }}</td>

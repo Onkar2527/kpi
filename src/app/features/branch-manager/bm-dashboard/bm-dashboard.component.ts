@@ -25,7 +25,7 @@ export class BmDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.periodService.currentPeriod.subscribe(period => {
       this.period = period;
-      if (this.branchId) {
+      if (this.period && this.branchId) {
         this.branchManagerService.getDashboardCounts(this.period, this.branchId).subscribe(data => {
           this.dashboradScores = data;
           
