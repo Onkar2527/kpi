@@ -277,6 +277,9 @@ export class ReportsComponent implements OnInit {
     this.selectedPf = row.pf || '';
     this.selectedPeriod = row.period || '';
     this.selectedDepartment = row.department || '';
+    if (this.selectedPeriod) {
+      this.onPeriodChange();
+    }
 
     const modal = new bootstrap.Modal(document.getElementById('pfModal'));
     modal.show();
@@ -320,6 +323,25 @@ export class ReportsComponent implements OnInit {
 
     const modalEl = document.getElementById('pfModal');
     bootstrap.Modal.getInstance(modalEl)?.hide();
+  }
+
+  onPeriodChange() {
+    if (this.selectedPeriod) {
+      this.adminService.getUsers(this.selectedPeriod).subscribe((data) => {
+        this.users = data;
+        if (this.selectedPf) {
+          if (this.selectedRow?.type === 'BM') {
+            this.entredUserData = this.serachBranchID1(this.selectedPf);
+          } else {
+            this.entredUserData = this.serachBranchID(this.selectedPf);
+          }
+        }
+      });
+      this.adminService.getBranches(this.selectedPeriod).subscribe((data) => {
+        this.branches = data;
+        this.filteredBranches = data;
+      });
+    }
   }
 
   loadUsers() {
@@ -493,11 +515,20 @@ export class ReportsComponent implements OnInit {
 
   isGMLoading = false;
   transferBmScores: any;
+
   generateReport(row: any) {
+    this.selectedPeriod = row.period;
+    this.adminService.getUsers(row.period).subscribe((data) => {
+      this.users = data;
+      this.continueGenerateReport(row);
+    });
+  }
+
+  continueGenerateReport(row: any) {
     this.entredUserData = this.serachBranchID1(row.pf);
 
     if (row.type === 'BM') {
-      if (this.entredUserData.role !== 'BM') {
+      if (this.entredUserData?.role !== 'BM') {
         this.showToast('Enter valid branch code ');
         return;
       }

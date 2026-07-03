@@ -108,3 +108,21 @@
   text-decoration:none;
   color:#3b82f6;
 }
+
+.error-alert {
+  background-color: #fde8e8;
+  color: #e02424;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #fbd5d5;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

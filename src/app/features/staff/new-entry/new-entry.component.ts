@@ -22,6 +22,11 @@ export class NewEntryComponent implements OnInit {
   typeOfDeposit = '';
   type = '';
   kpiOptions = ['deposit', 'loan_gen', 'loan_amulya'];
+  kpiDisplayNames: { [key: string]: string } = {
+    'deposit': 'Deposit',
+    'loan_gen': 'Loan General',
+    'loan_amulya': 'Loan Amulya'
+  };
   typeOfDepositOptions = ['Individual', 'Combined'];
   typeOptions = ['ADD', 'Remove'];
   accountNo = '';
@@ -92,29 +97,34 @@ validateSchemeCode() {
 
 isSubmitted = false;
   onSubmit() {
-
     if (this.isSubmitted) return;
-    console.log(this.accountError);
-    
-    if (this.accountError) {
-    this.error = this.accountError;
-    return;
-   }
-    if(this.accountNo.length < 14 && (this.kpi==="deposit"||this.kpi==="loan_gen") ){
-      this.error = 'Account Number must be at least 14 digits long.';
-      return;
+
+    const isAccountRequired = (this.kpi !== 'loan_amulya') && (this.typeOfDeposit === 'Individual');
+
+    if (isAccountRequired) {
+      if (this.accountError) {
+        this.error = this.accountError;
+        return;
+      }
+      if (!this.accountNo) {
+        this.error = 'Account Number is required.';
+        return;
+      }
+      if (this.accountNo.length < 13 && (this.kpi === 'deposit' || this.kpi === 'loan_gen' || this.kpi === 'loan_amulya')) {
+        this.error = 'Account Number must be at least 13 digits long.';
+        return;
+      }
     }
-    if (this.kpi === 'loan_amulya') {
-    if (!this.value || !this.typeOfDeposit || !this.type || !this.date) {
-      this.error = 'Please fill in all required fields for Loan Amulya.';
-      return;
-    }
-  } else {
-    if (!this.kpi || !this.value || !this.typeOfDeposit || !this.type || !this.accountNo || !this.date) {
+
+    const hasRequiredFields = this.kpi && this.value && this.typeOfDeposit && this.type && this.date && (!isAccountRequired || this.accountNo);
+    if (!hasRequiredFields) {
       this.error = 'Please fill in all required fields.';
       return;
     }
-  }
+
+    if (!isAccountRequired) {
+      this.accountNo = '';
+    }
 
     this.error = null;
     this.isSubmitted = true;
@@ -138,7 +148,7 @@ isSubmitted = false;
     },
     error: (err) => {
       console.error(err);
-      this.error = 'Submission failed. Please try again.';
+      this.error = err.error?.error || 'Submission failed. Please try again.';
       this.isSubmitted = false; 
     }
   });

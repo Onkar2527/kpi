@@ -21,6 +21,7 @@ export class AuthService {
   private _user = signal<UserProfile | null>(null);
   private _token = '';
   private sessionTimeoutId: any;
+  errorMessage = signal<string | null>(null);
 
   constructor(private http: HttpClient, private router: Router) {
     this.loadSession();
@@ -35,6 +36,7 @@ export class AuthService {
   }
 
   login(username: string, password: string,period:string) {
+    this.errorMessage.set(null);
     return this.http.post<{ token: string; user: UserProfile }>(`${environment.apiBaseUrl}/auth/login`, { username, password,period }).subscribe({
       next: (resp) => {
         this._token = resp.token;
@@ -43,8 +45,12 @@ export class AuthService {
         this.router.navigateByUrl('/home');
       },
       error: (error) => {
-        console.error('Invalid credentials');
-        alert(error.error.error);
+        console.error('Login error', error);
+        if (error.status === 0) {
+          this.errorMessage.set('Server is unreachable. Please check your network connection or try again later.');
+        } else {
+          this.errorMessage.set(error.error?.error || 'Invalid credentials or login failed.');
+        }
       }
     });
   }

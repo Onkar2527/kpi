@@ -150,7 +150,7 @@ export class UploadTargetsComponent {
         fileName = "recovery_targets_sample.csv";
         break;
       case 'dashborad':
-        csvContent = "period,branch_id,balance_deposit,loan_gen\n2026-27,1,5000000.00,4000000.00\n2026-27,2,6500000.00,4500000.00\n";
+        csvContent = "period,branch_id,balance_deposit,loan_gen,loan_amulya\n2026-27,1,5000000.00,4000000.00,20.00\n2026-27,2,6500000.00,4500000.00,30.00\n";
         fileName = "dashboard_new_year_data_sample.csv";
         break;
       case 'salary':

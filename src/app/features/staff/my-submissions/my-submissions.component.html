@@ -46,7 +46,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let sub of paginatedSubmissions">
-        <td>{{ sub.kpi }}</td>
+        <td>{{ kpiDisplayNames[sub.kpi] || sub.kpi }}</td>
         <td>{{ sub.account_no }}</td>
         <td>{{ sub.value }}</td>
         <td>{{ sub.type }}</td>

@@ -28,6 +28,11 @@ export class MySubmissionsComponent implements OnInit {
   depositCount = 0;
   loanGenCount = 0;
   loanAmulyaCount = 0;
+  kpiDisplayNames: { [key: string]: string } = {
+    'deposit': 'Deposit',
+    'loan_gen': 'Loan General',
+    'loan_amulya': 'Loan Amulya'
+  };
 
   constructor(
     private staffService: StaffService,

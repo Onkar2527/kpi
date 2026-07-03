@@ -69,6 +69,12 @@
       <p>Sign in to continue</p>
     </div>
 
+    @if (errorMessage) {
+      <div class="error-alert">
+        {{ errorMessage }}
+      </div>
+    }
+
     <form (ngSubmit)="onSubmit()" #loginForm="ngForm" novalidate>
 
       <!-- Username -->

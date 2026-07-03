@@ -101,8 +101,6 @@
               <th>Increment Basic.</th>
               <th>KPI Based</th>
               <th>Tot. Basic</th>
-              <th>DA</th>
-              <th>Tot. Salary</th>
             </tr>
           </thead>
           <tbody>
@@ -112,8 +110,6 @@
               <td>{{ staffIncrementAmt | number:'1.2-2' }}</td>
               <td>{{ calculateKpiBasedIncrementStaff() | number:'1.2-2' }}</td>
               <td>{{ calculateTotalSalaryStaff() | number:'1.2-2' }}</td>
-              <td>25%</td>
-              <td>{{finalSalaryStaff() | number:'1.2-2'}}</td>
             </tr>
           </tbody>
         </table>

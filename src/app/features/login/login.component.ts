@@ -22,6 +22,10 @@ export class LoginComponent implements OnInit {
 
   constructor(private auth: AuthService, private periodService: PeriodService) {}
 
+  get errorMessage(): string | null {
+    return this.auth.errorMessage();
+  }
+
   onSubmit() {
     if (!this.username || !this.password || !this.period) {
       return;

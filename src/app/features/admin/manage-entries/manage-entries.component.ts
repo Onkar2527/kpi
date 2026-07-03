@@ -25,7 +25,7 @@ export class manageEntriesComponent implements OnInit {
   period: any;
   modal: any;
   toastMessage: string = '';
-  entriesData = { id: '', kpi: '', account_no: '', value: '', date: '' };
+  entriesData = { id: '', kpi: '', account_no: '', value: '', date: '', type: '' };
   loading: boolean = false;
   selectedKpiTypes: string[] = [];
   selectedStatuses: string[] = [];
@@ -57,7 +57,8 @@ export class manageEntriesComponent implements OnInit {
     let accountNo = (this.entriesData.account_no || '').trim();
     this.entriesData.account_no = accountNo;
 
-    const needsAccountValidation = kpi === 'deposit' || kpi === 'loan_gen';
+    const isAccountRequired = (kpi !== 'loan_amulya') && (this.entriesData.type === 'Individual');
+    const needsAccountValidation = isAccountRequired && (kpi === 'deposit' || kpi === 'loan_gen' || kpi === 'loan_amulya');
 
     if (needsAccountValidation) {
       if (!accountNo) {
@@ -70,8 +71,8 @@ export class manageEntriesComponent implements OnInit {
         return;
       }
 
-      if (accountNo.length !== 14) {
-        this.showToast('Account Number must be 14 digits long');
+      if (accountNo.length < 13 || accountNo.length > 14) {
+        this.showToast('Account Number must be 13 or 14 digits long');
         return;
       }
     }
@@ -92,6 +93,7 @@ export class manageEntriesComponent implements OnInit {
           account_no: '',
           value: '',
           date: '',
+          type: '',
         };
         this.showToast('Entry updated successfully!');
         this.modal.hide();
