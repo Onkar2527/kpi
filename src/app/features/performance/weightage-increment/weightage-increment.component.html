@@ -47,7 +47,9 @@
           <tr>
             <th>KPI</th>
             <th>Weightage</th>
-            <th>Target</th>
+            <th>Previous Balance</th>
+            <th>New Target</th>
+            <th>Total Target</th>
             <th>Achieved</th>
             <th>Out of 10</th>
             <th>Weightage Score</th>
@@ -57,7 +59,9 @@
           <tr>
             <td>Deposit</td>
             <td>{{ bmScores.deposit.weightage }}</td>
-            <td>{{ bmScores.deposit.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.deposit.previousBalance | number:'1.2-2' }}</td>
+            <td>{{ bmScores.deposit.newTarget | number:'1.2-2' }}</td>
+            <td>{{ bmScores.deposit.totalTarget | number:'1.2-2' }}</td>
             <td>{{ bmScores.deposit.achieved | number:'1.2-2' }}</td>
             <td>{{ bmScores.deposit.score | number:'1.2-2' }}</td>
             <td>{{ bmScores.deposit.weightageScore | number:'1.2-2' }}</td>
@@ -65,7 +69,9 @@
           <tr>
             <td>Loan Gen</td>
             <td>{{ bmScores.loan_gen.weightage }}</td>
-            <td>{{ bmScores.loan_gen.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_gen.previousBalance | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_gen.newTarget | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_gen.totalTarget | number:'1.2-2' }}</td>
             <td>{{ bmScores.loan_gen.achieved | number:'1.2-2' }}</td>
             <td>{{ bmScores.loan_gen.score | number:'1.2-2' }}</td>
             <td>{{ bmScores.loan_gen.weightageScore | number:'1.2-2' }}</td>
@@ -73,7 +79,9 @@
           <tr>
             <td>Loan Amulya</td>
             <td>{{ bmScores.loan_amulya.weightage }}</td>
-            <td>{{ bmScores.loan_amulya.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_amulya.previousBalance | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_amulya.newTarget | number:'1.2-2' }}</td>
+            <td>{{ bmScores.loan_amulya.totalTarget | number:'1.2-2' }}</td>
             <td>{{ bmScores.loan_amulya.achieved | number:'1.2-2' }}</td>
             <td>{{ bmScores.loan_amulya.score | number:'1.2-2' }}</td>
             <td>{{ bmScores.loan_amulya.weightageScore | number:'1.2-2' }}</td>
@@ -81,7 +89,9 @@
           <tr>
             <td>Recovery</td>
             <td>{{ bmScores.recovery.weightage }}</td>
-            <td>{{ bmScores.recovery.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.recovery.previousBalance | number:'1.2-2' }}</td>
+            <td>{{ bmScores.recovery.newTarget | number:'1.2-2' }}</td>
+            <td>{{ bmScores.recovery.totalTarget | number:'1.2-2' }}</td>
             <td>{{ bmScores.recovery.achieved | number:'1.2-2' }}</td>
             <td>{{ bmScores.recovery.score | number:'1.2-2' }}</td>
             <td>{{ bmScores.recovery.weightageScore | number:'1.2-2' }}</td>
@@ -89,7 +99,9 @@
           <tr>
             <td>Audit</td>
             <td>{{ bmScores.audit.weightage }}</td>
-            <td>{{ bmScores.audit.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.audit.previousBalance | number:'1.2-2' }}</td>
+            <td>{{ bmScores.audit.newTarget | number:'1.2-2' }}</td>
+            <td>{{ bmScores.audit.totalTarget | number:'1.2-2' }}</td>
             <td>{{ bmScores.audit.achieved | number:'1.2-2' }}</td>
             <td>{{ bmScores.audit.score | number:'1.2-2' }}</td>
             <td>{{ bmScores.audit.weightageScore | number:'1.2-2' }}</td>
@@ -97,14 +109,16 @@
           <tr>
             <td>Insurance</td>
             <td>{{ bmScores.insurance.weightage }}</td>
-            <td>{{ bmScores.insurance.target | number:'1.2-2' }}</td>
+            <td>{{ bmScores.insurance.previousBalance | number:'1.2-2' }}</td>
+            <td>{{ bmScores.insurance.newTarget | number:'1.2-2' }}</td>
+            <td>{{ bmScores.insurance.totalTarget | number:'1.2-2' }}</td>
             <td>{{ bmScores.insurance.achieved | number:'1.2-2' }}</td>
             <td>{{ bmScores.insurance.score | number:'1.2-2' }}</td>
             <td>{{ bmScores.insurance.weightageScore | number:'1.2-2' }}</td>
           </tr>
           <tr>
             <td><strong>Total</strong></td>
-            <td colspan="4"></td>
+            <td colspan="6"></td>
             <td><strong>{{ bmScores.total | number:'1.2-2' }}</strong></td>
           </tr>
         </tbody>

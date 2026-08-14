@@ -219,7 +219,9 @@
               <tr>
                 <th>KPI</th>
                 <th>Weightage</th>
-                <th>Target</th>
+                <th>Previous Balance</th>
+                <th>New Target</th>
+                <th>Total Target</th>
                 <th>Achieved</th>
                 <th>Score</th>
                 <th>Weightage Score</th>
@@ -229,13 +231,15 @@
               <tr *ngFor="let kpi of ['deposit','loan_gen','loan_amulya','recovery','audit','insurance']">
                 <td>{{ kpi | titlecase }}</td>
                 <td>{{ bmScores[kpi]?.weightage }}</td>
-                <td>{{ bmScores[kpi]?.target | number }}</td>
+                <td>{{ bmScores[kpi]?.previousBalance | number }}</td>
+                <td>{{ bmScores[kpi]?.newTarget | number }}</td>
+                <td>{{ bmScores[kpi]?.totalTarget | number }}</td>
                 <td>{{ bmScores[kpi]?.achieved | number }}</td>
                 <td>{{ bmScores[kpi]?.score | number:'1.2-2' }}</td>
                 <td>{{ bmScores[kpi]?.weightageScore | number:'1.2-2' }}</td>
               </tr>
               <tr class="table-info fw-bold">
-                <td colspan="5">Total</td>
+                <td colspan="7">Total</td>
                 <td>{{ bmScores.total | number:'1.2-2' }}</td>
               </tr>
             </tbody>
