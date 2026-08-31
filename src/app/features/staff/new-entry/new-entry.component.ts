@@ -55,6 +55,15 @@ accountError: string = '';
     this.periodService.currentPeriod.subscribe(period => this.period = period);
     
   }
+
+  onKpiChange() {
+    if (this.kpi === 'loan_amulya') {
+      this.typeOfDepositOptions = ['Individual'];
+      this.typeOfDeposit = 'Individual';
+    } else {
+      this.typeOfDepositOptions = ['Individual', 'Combined'];
+    }
+  }
 allowOnlyNumbers(event: any) {
   let input = event.target.value;
 

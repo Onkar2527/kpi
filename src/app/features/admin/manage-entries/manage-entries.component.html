@@ -1,275 +1,311 @@
-<div class="container mt-4">
-  <h2>Manage KPI Entries</h2>
+<div class="entries-container">
+  
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h2 class="page-title">Manage KPI Entries</h2>
+  </div>
 
+  <!-- SEARCH & FILTERS PANEL -->
+  <div class="glass-panel">
+    
+    <!-- Search Bar Row -->
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <div class="search-wrapper">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="form-control search-input" placeholder="Search by Branch, KPI, PF or account..." [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch()" />
+        </div>
+      </div>
+    </div>
 
-  <div class="row mb-3">
-    <div class="col-md-12">
-      <input type="text" class="form-control form-control-sm" placeholder="Search..." [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearch()" />
+    <!-- Filters Row -->
+    <div class="row align-items-end g-3">
+
+      <!-- KPI Type Dropdown -->
+      <div class="col-md-2">
+        <div class="filter-group">
+          <label>KPI Type</label>
+          <div class="dropdown">
+            <button class="dropdown-trigger" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+              <span>{{ selectedKpiTypes.length > 0 ? selectedKpiTypes.join(', ') : 'Select KPI' }}</span>
+              <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+
+            <ul class="dropdown-menu scroll-dropdown w-100">
+              <li *ngFor="let kpi of uniqueKpiTypes">
+                <div class="form-check" (click)="toggleSelection(kpi, selectedKpiTypes); $event.stopPropagation()">
+                  <input type="checkbox" [checked]="selectedKpiTypes.includes(kpi)" (change)="toggleSelection(kpi, selectedKpiTypes)" />
+                  <label>{{ kpi }}</label>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Dropdown -->
+      <div class="col-md-2">
+        <div class="filter-group">
+          <label>Status</label>
+          <div class="dropdown">
+            <button class="dropdown-trigger" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+              <span>{{ selectedStatuses.length > 0 ? selectedStatuses.join(', ') : 'Select Status' }}</span>
+              <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+
+            <ul class="dropdown-menu scroll-dropdown w-100">
+              <li *ngFor="let status of uniqueStatuses">
+                <div class="form-check" (click)="toggleSelection(status, selectedStatuses); $event.stopPropagation()">
+                  <input type="checkbox" [checked]="selectedStatuses.includes(status)" (change)="toggleSelection(status, selectedStatuses)" />
+                  <label>{{ status }}</label>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- PF Number Dropdown -->
+      <div class="col-md-2">
+        <div class="filter-group">
+          <label>PF Number</label>
+          <div class="dropdown">
+            <button class="dropdown-trigger" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+              <span>{{ selectedPfNumbers.length > 0 ? selectedPfNumbers.join(', ') : 'Select PF' }}</span>
+              <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+
+            <ul class="dropdown-menu scroll-dropdown w-100">
+              <li *ngFor="let pf of uniquePfNumbers">
+                <div class="form-check" (click)="toggleSelection(pf, selectedPfNumbers); $event.stopPropagation()">
+                  <input type="checkbox" [checked]="selectedPfNumbers.includes(pf)" (change)="toggleSelection(pf, selectedPfNumbers)" />
+                  <label>{{ pf }}</label>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Branch Name Dropdown -->
+      <div class="col-md-3">
+        <div class="filter-group">
+          <label>Branch Name</label>
+          <div class="dropdown">
+            <button class="dropdown-trigger" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+              <span>{{ selectedBranches.length > 0 ? selectedBranches.join(', ') : 'Select Branch' }}</span>
+              <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <ul class="dropdown-menu scroll-dropdown w-100">
+              <!-- Dropdown Branch Search -->
+              <li class="px-2 mb-2">
+                <input type="text" class="form-control" style="height: 34px; padding-left: 0.75rem;" placeholder="Search Branch..."
+                  [(ngModel)]="branchSearchTerm" (ngModelChange)="filterBranches()" />
+              </li>
+              <li class="divider-line"></li>
+              <!-- Branch List -->
+              <li *ngFor="let branch of filteredBranches">
+                <div class="form-check" (click)="toggleSelection(branch, selectedBranches); $event.stopPropagation()">
+                  <input type="checkbox" [checked]="selectedBranches.includes(branch)" (change)="toggleSelection(branch, selectedBranches)" />
+                  <label>{{ branch }}</label>
+                </div>
+              </li>
+              <!-- No result -->
+              <li *ngIf="filteredBranches.length === 0" class="text-center text-muted small py-2">
+                No branch found
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clear Button -->
+      <div class="col-md-3">
+        <button class="btn-clear w-100" (click)="clearAllFilters()" [disabled]="
+          !searchTerm &&
+          !selectedKpiTypes.length &&
+          !selectedStatuses.length &&
+          !selectedPfNumbers.length &&
+          !selectedBranches.length
+        ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          Clear Filters
+        </button>
+      </div>
+
     </div>
   </div>
 
+  <!-- DATA TABLE -->
+  <div class="table-wrapper">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Period</th>
+          <th>PF No</th>
+          <th class="col-branch">Branch Name</th>
+          <th>KPI</th>
+          <th>Account No</th>
+          <th>Value</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
 
-  <div class="row mb-3 align-items-end">
-
-    <!-- KPI Type -->
-    <div class="col-md-2">
-      <label class="small fw-bold">KPI Type</label>
-      <div class="dropdown">
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
-          data-bs-toggle="dropdown">
-          {{ selectedKpiTypes.length > 0
-          ? selectedKpiTypes.join(', ')
-          : 'Select KPI' }}
-        </button>
-
-        <ul class="dropdown-menu w-100 p-2 scroll-dropdown">
-          <li *ngFor="let kpi of uniqueKpiTypes">
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" [checked]="selectedKpiTypes.includes(kpi)"
-                (change)="toggleSelection(kpi, selectedKpiTypes)" />
-              <label class="form-check-label">
-                {{ kpi }}
-              </label>
+      <!-- SKELETON LOADER -->
+      <tbody *ngIf="loading">
+        <tr *ngFor="let item of [1, 2, 3, 4, 5]">
+          <td><div class="skeleton-line"></div></td>
+          <td><div class="skeleton-line"></div></td>
+          <td class="col-branch"><div class="skeleton-line"></div></td>
+          <td><div class="skeleton-line"></div></td>
+          <td><div class="skeleton-line"></div></td>
+          <td><div class="skeleton-line"></div></td>
+          <td><div class="skeleton-line"></div></td>
+          <td><div class="skeleton-line"></div></td>
+          <td><div class="skeleton-line"></div></td>
+          <td class="col-actions">
+            <div class="action-btn-group">
+              <div class="skeleton-btn"></div>
+              <div class="skeleton-btn"></div>
             </div>
-          </li>
-        </ul>
-      </div>
-    </div>
+          </td>
+        </tr>
+      </tbody>
 
-    <!-- Status -->
-    <div class="col-md-2">
-      <label class="small fw-bold">Status</label>
-      <div class="dropdown">
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
-          data-bs-toggle="dropdown">
-          {{ selectedStatuses.length > 0
-          ? selectedStatuses.join(', ')
-          : 'Select Status' }}
-        </button>
-
-        <ul class="dropdown-menu w-100 p-2 scroll-dropdown">
-          <li *ngFor="let status of uniqueStatuses">
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" [checked]="selectedStatuses.includes(status)"
-                (change)="toggleSelection(status, selectedStatuses)" />
-              <label class="form-check-label">
-                {{ status }}
-              </label>
+      <!-- ACTUAL DATA -->
+      <tbody *ngIf="!loading">
+        <tr *ngFor="let entry of paginatedEntries; let i = index">
+          <td>{{ entry.period }}</td>
+          <td>{{ entry.PF_NO }}</td>
+          <td class="col-branch" title="{{ entry.branchName }}">{{ entry.branchName }}</td>
+          <td>{{ entry.kpi }}</td>
+          <td>{{ entry.account_no || '-' }}</td>
+          <td>{{ entry.value }}</td>
+          <td>{{ entry.type }}</td>
+          <td>{{ entry.date | date: "dd-MM-yyyy" }}</td>
+          <td>
+            <span class="badge-status {{ entry.status?.toLowerCase() || 'other' }}">
+              {{ entry.status || 'Other' }}
+            </span>
+          </td>
+          <td class="col-actions">
+            <div class="action-btn-group">
+              <!-- Edit Action -->
+              <button class="btn-action edit" (click)="editEntry(entry)" title="Edit Entry">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"></path>
+                </svg>
+              </button>
+              <!-- Delete Action -->
+              <button class="btn-action delete" (click)="deleteEntry(entry.id)" title="Delete Entry">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </button>
             </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- PF Number -->
-    <div class="col-md-2">
-      <label class="small fw-bold">PF Number</label>
-      <div class="dropdown">
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
-          data-bs-toggle="dropdown">
-          {{ selectedPfNumbers.length > 0
-          ? selectedPfNumbers.join(', ')
-          : 'Select PF Number' }}
-        </button>
-
-        <ul class="dropdown-menu w-100 p-2 scroll-dropdown">
-          <li *ngFor="let pf of uniquePfNumbers">
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" [checked]="selectedPfNumbers.includes(pf)"
-                (change)="toggleSelection(pf, selectedPfNumbers)" />
-              <label class="form-check-label">
-                {{ pf }}
-              </label>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Branch -->
-    <div class="col-md-3">
-      <label class="small fw-bold">Branch Name</label>
-      <div class="dropdown">
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
-          data-bs-toggle="dropdown">
-          {{ selectedBranches.length > 0
-          ? selectedBranches.join(', ')
-          : 'Select Branch' }}
-        </button>
-        <ul class="dropdown-menu w-100 p-2 scroll-dropdown">
-
-          <!-- Search Input -->
-          <li class="px-2 mb-2">
-            <input type="text" class="form-control form-control-sm" placeholder="Search Branch Here..."
-              [(ngModel)]="branchSearchTerm" (ngModelChange)="filterBranches()" />
-          </li>
-
-          <li>
-            <hr class="dropdown-divider">
-          </li>
-
-          <!-- Branch List -->
-          <li *ngFor="let branch of filteredBranches" class="px-2">
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" [checked]="selectedBranches.includes(branch)"
-                (change)="toggleSelection(branch, selectedBranches)" />
-              <label class="form-check-label">
-                {{ branch }}
-              </label>
-            </div>
-          </li>
-
-          <!-- No result -->
-          <li *ngIf="filteredBranches.length === 0" class="text-center text-muted">
-            No branch found
-          </li>
-
-        </ul>
-      </div>
-    </div>
-
-    <!-- Clear Button -->
-    <div class="col-md-3 text-end">
-      <button class="btn btn-sm btn-danger" (click)="clearAllFilters()" [disabled]="
-        !searchTerm &&
-        !selectedKpiTypes.length &&
-        !selectedStatuses.length &&
-        !selectedPfNumbers.length &&
-        !selectedBranches.length
-      ">
-        Clear All Filters
-      </button>
-    </div>
-
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-
-  <table class="table table-bordered table-striped">
-    <thead class="table-dark">
-      <tr>
-        <th>Period</th>
-        <th>PF No</th>
-        <th>Branch Name</th>
-        <th>KPI</th>
-        <th>Account No</th>
-        <th>Value</th>
-        <th>Type</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-
-
-    <tbody *ngIf="loading">
-      <tr>
-        <td colspan="11" class="text-center text-muted fw-bold">
-          Loading Entries{{ loadingDots }}
-        </td>
-      </tr>
-    </tbody>
-
-
-    <tbody *ngIf="!loading">
-      <tr *ngFor="let entry of paginatedEntries; let i = index">
-
-        <td>{{ entry.period }}</td>
-        <td>{{ entry.PF_NO }}</td>
-        <td>{{ entry.branchName }}</td>
-        <td>{{ entry.kpi }}</td>
-        <td>{{ entry.account_no }}</td>
-        <td>{{ entry.value }}</td>
-        <td>{{ entry.type }}</td>
-        <td>{{ entry.date | date: "dd-MM-yyyy" }}</td>
-        <td>{{ entry.status }}</td>
-        <td>
-          <button class="btn btn-primary btn-sm me-2" (click)="editEntry(entry)">
-            Edit
-          </button>
-          <button class="btn btn-danger btn-sm" (click)="deleteEntry(entry.id)">
-            Delete
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- PAGINATION -->
   <nav *ngIf="totalPages > 1">
-    <ul class="pagination justify-content-center">
-      <li class="page-item" [class.disabled]="currentPage === 1">
-        <a class="page-link" href="#" (click)="goToPage($event, currentPage - 1)">Previous</a>
+    <ul class="pagination-custom">
+      <li class="page-item-custom" [class.disabled]="currentPage === 1">
+        <a class="page-link-custom" href="#" (click)="goToPage($event, currentPage - 1)">Previous</a>
       </li>
 
-      <li class="page-item" *ngFor="let page of visiblePages" [class.active]="currentPage === page">
-        <a class="page-link" href="#" (click)="goToPage($event, page)">{{
-          page
-          }}</a>
+      <li class="page-item-custom" *ngFor="let page of visiblePages" [class.active]="currentPage === page">
+        <a class="page-link-custom" href="#" (click)="goToPage($event, page)">{{ page }}</a>
       </li>
 
-      <li class="page-item" [class.disabled]="currentPage === totalPages">
-        <a class="page-link" href="#" (click)="goToPage($event, currentPage + 1)">Next</a>
+      <li class="page-item-custom" [class.disabled]="currentPage === totalPages">
+        <a class="page-link-custom" href="#" (click)="goToPage($event, currentPage + 1)">Next</a>
       </li>
     </ul>
   </nav>
+
 </div>
 
+<!-- EDIT DIALOG MODAL -->
 <div class="modal fade" id="editEntriesModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Edit Entries</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="mb-3">
-
-          <ng-container *ngIf="
-              entriesData.kpi === 'deposit' || entriesData.kpi === 'loan_gen'
-            ">
-            <label for="account_no" class="form-label">Account Number</label>
-            <input disabled type="text" class="form-control" id="account_no" [(ngModel)]="entriesData.account_no"
-              name="account_no" />
-          </ng-container>
-
-        </div>
-
-        <div class="mb-3">
-          <label for="date" class="form-label">Date</label>
-          <input type="date" class="form-control" id="date" [(ngModel)]="entriesData.date" name="date" />
-        </div>
-
-        <div class="mb-3">
-          <label for="kpi" class="form-label">KPI NAME</label>
-          <input type="text" class="form-control" id="kpi" [(ngModel)]="entriesData.kpi" name="kpi" />
-        </div>
-
-        <div class="mb-3">
-          <ng-container *ngIf="
-              entriesData.kpi === 'loan_amulya';
-              else Kpi
-            ">
-            <label for="value" class="form-label">Number of Accounts</label>
-            <input type="text" class="form-control" id="value" [(ngModel)]="entriesData.value" name="value" />
-          </ng-container>
-
-          <ng-template #Kpi>
-            <label for="value" class="form-label">Value</label>
-            <input type="text" class="form-control" id="value" [(ngModel)]="entriesData.value" name="value" />
-          </ng-template>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-          Cancel
+    <div class="modal-content modal-content-custom">
+      
+      <!-- Modal Header -->
+      <div class="modal-header-custom">
+        <h5 class="modal-title-custom">Edit KPI Entry</h5>
+        <button type="button" class="btn-close-custom" data-bs-dismiss="modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
-
-        <button class="btn btn-primary" (click)="editEntries()">Update</button>
       </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body-custom">
+        
+        <!-- Account Number (deposit or loan_gen only) -->
+        <div class="form-group-custom" *ngIf="entriesData.kpi === 'deposit' || entriesData.kpi === 'loan_gen'">
+          <label for="account_no">Account Number</label>
+          <input disabled type="text" class="form-control modal-input" id="account_no" [(ngModel)]="entriesData.account_no" name="account_no" />
+        </div>
+
+        <!-- Date -->
+        <div class="form-group-custom">
+          <label for="date">Date</label>
+          <input type="date" class="form-control modal-input" id="date" [(ngModel)]="entriesData.date" name="date" />
+        </div>
+
+        <!-- KPI Name -->
+        <div class="form-group-custom">
+          <label for="kpi">KPI NAME</label>
+          <input type="text" class="form-control modal-input" id="kpi" [(ngModel)]="entriesData.kpi" name="kpi" />
+        </div>
+
+        <!-- Value/Number of Accounts -->
+        <div class="form-group-custom">
+          <label for="value">{{ entriesData.kpi === 'loan_amulya' ? 'Number of Accounts' : 'Value' }}</label>
+          <input type="text" class="form-control modal-input" id="value" [(ngModel)]="entriesData.value" name="value" />
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer-custom">
+        <button class="btn-modal cancel" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn-modal update" (click)="editEntries()">Update Entry</button>
+      </div>
+
     </div>
   </div>
 </div>
+
+<!-- TOAST SNAPBAR MESSAGES -->
 <div class="toast-message" *ngIf="toastMessage">
   {{ toastMessage }}
 </div>

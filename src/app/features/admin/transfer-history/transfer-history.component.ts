@@ -92,20 +92,35 @@ export class TrasferHistoryComponent implements OnInit {
   }
 
   getKpis(transfer: any): string[] {
-  if (!transfer) return [];
+    if (!transfer) return [];
 
-  return Object.keys(transfer).filter(
-    key =>
-      key !== 'transfer_date' &&
-      key !== 'total_weightage_score' &&
-      key !== 'hod_name' &&
-      key !== 'old_hod_name' &&
-      key !== 'old_branch_name' &&
-      key !== 'new_branch_name' &&
-      key !== 'old_designation' &&
-      key !== 'new_designation'
-  );
-}
+    const ignore = [
+      'id',
+      'staff_id',
+      'old_branch_id',
+      'new_branch_id',
+      'kpi_total',
+      'transfer_date',
+      'old_designation',
+      'new_designation',
+      'period',
+      'resiged',
+      'resigned',
+      'resign_date',
+      'staff_name',
+      'branch_name',
+      'old_branch_name',
+      'new_branch_name',
+      'total_weightage_score',
+      'months',
+      'hod_name',
+      'old_hod_name',
+      'hod_id',
+      'old_hod_id',
+    ];
+
+    return Object.keys(transfer).filter((k) => !ignore.includes(k));
+  }
 
 
  editUser(user: any) {
@@ -137,6 +152,7 @@ export class TrasferHistoryComponent implements OnInit {
           period: base.period,
           resigned: base.resigned,
           resign_date: base.resign_date,
+          role: empData ? 'emp' : (hoData ? 'ho' : 'att'),
           transfers
         }
       : null;

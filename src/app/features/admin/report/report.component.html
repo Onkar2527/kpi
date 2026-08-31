@@ -248,7 +248,9 @@
                   <tr>
                     <th>KPI</th>
                     <th>Weightage</th>
-                    <th>Target</th>
+                    <th>Previous Balance</th>
+                    <th>New Target</th>
+                    <th>Total Target</th>
                     <th>Achieved</th>
                     <th>Achieved %</th>
                     <th>Score</th>
@@ -260,12 +262,14 @@
                   <tr *ngFor="let kpi of kpiKeys">
                     <td>{{ kpi | titlecase }}</td>
                     <td>{{ staff[kpi]?.weightage }}</td>
-                    <td>{{ staff[kpi]?.target | number }}</td>
+                    <td>{{ staff[kpi]?.previousBalance | number }}</td>
+                    <td>{{ staff[kpi]?.newTarget | number }}</td>
+                    <td>{{ staff[kpi]?.totalTarget | number }}</td>
                     <td>{{ staff[kpi]?.achieved | number }}</td>
                     <td>
                       {{
-                      staff[kpi]?.target > 0
-                      ? ((staff[kpi].achieved / staff[kpi].target) * 100
+                      staff[kpi]?.newTarget > 0
+                      ? (((staff[kpi].achieved > 0 ? staff[kpi].achieved - (staff[kpi].previousBalance || 0) : 0) / staff[kpi].newTarget) * 100
                       | number: "1.2-2")
                       : "0"
                       }}%
@@ -275,7 +279,7 @@
                   </tr>
                   <tr class="table-info fw-bold">
                     <td>Total</td>
-                    <td colspan="5"></td>
+                    <td colspan="7"></td>
                     <td>{{ staff.total | number: "1.2-2" }}</td>
                   </tr>
                 </tbody>
@@ -1109,7 +1113,9 @@
                     <tr>
                       <th>KPI</th>
                       <th>Weightage</th>
-                      <th>Target</th>
+                      <th *ngIf="transfer.hasTarget">Previous Balance</th>
+                      <th *ngIf="transfer.hasTarget">New Target</th>
+                      <th *ngIf="transfer.hasTarget">Total Target</th>
                       <th>Achieved</th>
                       <th>Score</th>
                       <th>Weightage Score</th>
@@ -1122,7 +1128,9 @@
                       <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
                         <td>{{ kpi | titlecase }}</td>
                         <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
-                        <td>{{ transfer[kpi]?.target || '-' }}</td>
+                        <td *ngIf="transfer.hasTarget">{{ transfer[kpi]?.previousBalance || '-' }}</td>
+                        <td *ngIf="transfer.hasTarget">{{ transfer[kpi]?.newTarget || '-' }}</td>
+                        <td *ngIf="transfer.hasTarget">{{ transfer[kpi]?.totalTarget || '-' }}</td>
                         <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
                         <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
                         <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
@@ -1131,7 +1139,7 @@
 
                     <tr class="table-info fw-bold">
                       <td>Total</td>
-                      <td colspan="4"></td>
+                      <td [attr.colspan]="transfer.hasTarget ? 6 : 3"></td>
                       <td>
                         {{ transfer.total_weightage_score | number:'1.2-2' }}
                       </td>
@@ -1202,10 +1210,11 @@
                 <tr>
                   <th>KPI</th>
                   <th>Weightage</th>
-                  <th>Target</th>
+                  <th>Previous Balance</th>
+                  <th>New Target</th>
+                  <th>Total Target</th>
                   <th>Achieved</th>
-                  <th>Achieved %</th>
-                  <th>Score</th>
+                  <th>Out of 10</th>
                   <th>Weightage Score</th>
                 </tr>
               </thead>
@@ -1213,24 +1222,17 @@
                 <tr *ngFor="let kpi of kpiKeys">
                   <td>{{ kpi | titlecase }}</td>
                   <td>{{ singlStaffScore[kpi]?.weightage }}</td>
-                  <td>{{ singlStaffScore[kpi]?.target | number }}</td>
+                  <td>{{ singlStaffScore[kpi]?.previousBalance | number }}</td>
+                  <td>{{ singlStaffScore[kpi]?.newTarget | number }}</td>
+                  <td>{{ singlStaffScore[kpi]?.totalTarget | number }}</td>
                   <td>{{ singlStaffScore[kpi]?.achieved | number }}</td>
-                  <td>
-                    {{
-                    singlStaffScore[kpi]?.target > 0
-                    ? ((singlStaffScore[kpi].achieved /
-                    singlStaffScore[kpi].target) *
-                    100 | number: "1.2-2")
-                    : "0"
-                    }}%
-                  </td>
                   <td>{{ singlStaffScore[kpi]?.score | number: "1.2-2" }}</td>
                   <td>
                     {{ singlStaffScore[kpi]?.weightageScore | number: "1.2-2" }}
                   </td>
                 </tr>
                 <tr class="table-info fw-bold">
-                  <td colspan="6">Total</td>
+                  <td colspan="7">Total</td>
                   <td>{{ (singlStaffScore.total | number: "1.2-2") || '0.00' }}</td>
                 </tr>
               </tbody>
@@ -1253,29 +1255,23 @@
                       = {{ tr.proportionateScore | number: "1.2-2" }})
                     </span>
                   </div>
-                  <p class="mb-0"><strong>New Branch Score (excluding Insurance):</strong> {{ singlStaffScore.transferCalculation.currentBranch.kpaScoreExcludingInsurance | number: "1.2-2" }}</p>
+                  <p class="mb-0"><strong>New Branch Score (excluding Insurance):</strong> {{
+                    singlStaffScore.transferCalculation.currentBranch.kpaScoreExcludingInsurance | number: "1.2-2" }}
+                  </p>
                 </div>
               </div>
 
-              <div class="mb-3 p-3 bg-white border rounded">
-                <h6 class="fw-bold text-primary">Average KPI Score Calculation</h6>
-                <div class="ms-2">
-                  <p class="mb-1">
-                    <strong>Formula:</strong> (
-                    <span *ngFor="let tr of singlStaffScore.transferCalculation.transfers">{{ tr.proportionateScore | number: "1.2-2" }} + </span>
-                    {{ singlStaffScore.transferCalculation.currentBranch.kpaScoreExcludingInsurance | number: "1.2-2" }}
-                    ) / {{ singlStaffScore.transferCalculation.transfers.length + 1 }}
-                  </p>
-                  <p class="mb-0 text-success"><strong>Average Score:</strong> {{ singlStaffScore.transferCalculation.averageExcludingInsurance | number: "1.2-2" }}</p>
-                </div>
-              </div>
+
 
               <div class="p-3 bg-white border rounded">
                 <h6 class="fw-bold text-dark">Final KPA Score</h6>
                 <div class="ms-2">
-                  <p class="mb-1"><strong>Average Score (excluding Insurance):</strong> {{ singlStaffScore.transferCalculation.averageExcludingInsurance | number: "1.2-2" }}</p>
-                  <p class="mb-1"><strong>Insurance Score:</strong> {{ singlStaffScore.transferCalculation.insuranceScore | number: "1.2-2" }}</p>
-                  <p class="mb-0 fs-5 text-primary"><strong>Total Final KPA Score:</strong> {{ singlStaffScore.transferCalculation.totalFinalKpaScore | number: "1.2-2" }}</p>
+                  <p class="mb-1"><strong>Total Score (excluding Insurance):</strong> {{
+                    singlStaffScore.transferCalculation.averageExcludingInsurance | number: "1.2-2" }}</p>
+                  <p class="mb-1"><strong>Insurance Score:</strong> {{
+                    singlStaffScore.transferCalculation.insuranceScore | number: "1.2-2" }}</p>
+                  <p class="mb-0 fs-5 text-primary"><strong>Total Final KPA Score:</strong> {{
+                    singlStaffScore.transferCalculation.totalFinalKpaScore | number: "1.2-2" }}</p>
                 </div>
               </div>
             </div>
@@ -1330,7 +1326,9 @@
                     <tr>
                       <th>KPI</th>
                       <th>Weightage</th>
-                      <th>Target</th>
+                      <th *ngIf="transfer.hasTarget">Previous Balance</th>
+                      <th *ngIf="transfer.hasTarget">New Target</th>
+                      <th *ngIf="transfer.hasTarget">Total Target</th>
                       <th>Achieved</th>
                       <th>Score</th>
                       <th>Weightage Score</th>
@@ -1343,7 +1341,9 @@
                       <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
                         <td>{{ kpi | titlecase }}</td>
                         <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
-                        <td>{{ transfer[kpi]?.target || '-' }}</td>
+                        <td *ngIf="transfer.hasTarget">{{ transfer[kpi]?.previousBalance || '-' }}</td>
+                        <td *ngIf="transfer.hasTarget">{{ transfer[kpi]?.newTarget || '-' }}</td>
+                        <td *ngIf="transfer.hasTarget">{{ transfer[kpi]?.totalTarget || '-' }}</td>
                         <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
                         <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
                         <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
@@ -1352,7 +1352,7 @@
 
                     <tr class="table-info fw-bold">
                       <td>Total</td>
-                      <td colspan="4"></td>
+                      <td [attr.colspan]="transfer.hasTarget ? 6 : 3"></td>
                       <td>
                         {{ transfer.total_weightage_score | number:'1.2-2' }}
                       </td>
@@ -1756,8 +1756,10 @@
                 <th>Branch Code</th>
                 <th>Branch Name</th>
                 <th>BM Name</th>
-                <th>{{ALLtotalBranches?.[0]?.department}} Target</th>
-                <th>{{ALLtotalBranches?.[0]?.department}} Achieved </th>
+                <th>{{ALLtotalBranches?.[0]?.department}} Previous Balance</th>
+                <th>{{ALLtotalBranches?.[0]?.department}} New Target</th>
+                <th>{{ALLtotalBranches?.[0]?.department}} Total Target</th>
+                <th>{{ALLtotalBranches?.[0]?.department}} Achieved</th>
                 <th>Total Weightage Score</th>
               </tr>
             </thead>
@@ -1767,8 +1769,10 @@
                 <td>{{ branch.code }}</td>
                 <td>{{ branch.name }}</td>
                 <td>{{ branch.bmName }}</td>
-                <td>{{branch.departmentData?.target}}</td>
-                <td>{{branch.departmentData?.achieved}}</td>
+                <td>{{branch.departmentData?.previousBalance | number}}</td>
+                <td>{{branch.departmentData?.newTarget | number}}</td>
+                <td>{{branch.departmentData?.totalTarget | number}}</td>
+                <td>{{branch.departmentData?.achieved | number}}</td>
                 <td [ngClass]="{
                     'text-danger': branch.departmentData?.score < 0,
                     'text-black': branch.departmentData?.score >= 0,

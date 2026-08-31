@@ -183,7 +183,7 @@ sortKpis(list: any[]) {
                   kpi: kpi.kpi_name,
                   weightage: kpi.weightage,
                   
-                  weightageScore: branchKpiScore ===0 ? -2 : branchKpiScore
+                  weightageScore: branchKpiScore
 
                 });
               }
@@ -214,81 +214,89 @@ calculateScores(targets: any[]): any[] {
   const auditObj = targets.find(t => t.kpi === 'audit');
   const recoveryObj = targets.find(t => t.kpi === 'recovery');
 
-  const auditRatio = auditObj ? auditObj.achieved / auditObj.amount : 0;
-  const recoveryRatio = recoveryObj ? recoveryObj.achieved / recoveryObj.amount : 0;
+  const getRatioVal = (row: any) => {
+    if (!row) return 0;
+    const prevBal = Number(row.baseline) || 0;
+    const targetN = Number(row.amount) || 0;
+    const currentAch = Number(row.achieved) || 0;
+    return targetN > 0 ? Math.max(0, (currentAch - prevBal) / targetN) : 0;
+  };
+
+  const auditRatio = getRatioVal(auditObj);
+  const recoveryRatio = getRatioVal(recoveryObj);
 
   return targets.map(target => {
-    const baseline = Number(target.baseline) || 0;
+    const previousBalance = Number(target.baseline) || 0;
+    const newTarget = Number(target.amount) || 0;
+    const totalTarget = previousBalance + newTarget;
+    const currentAchieved = Number(target.achieved) || 0;
 
-    // If achieved is equal to or less than baseline (previous period carry-over), score = 0
     const isBaselineOnly =
       ['deposit', 'loan_gen', 'loan_amulya'].includes(target.kpi) &&
-      baseline > 0 &&
-      Number(target.achieved) <= baseline;
+      previousBalance > 0 &&
+      currentAchieved <= previousBalance;
 
-    if (isBaselineOnly) {
+    let outOf10 = 0;
+
+    if (newTarget === 0) {
       return {
         ...target,
-        achieved: 0,
+        previousBalance,
+        newTarget,
+        totalTarget,
+        achieved: isBaselineOnly ? 0 : currentAchieved,
         outOf10: 0,
-        weightageScore: 0,
+        weightageScore: 0
       };
     }
 
-    let outOf10;
+    let ratio = 0;
 
-    if (target.amount === 0) {
-      outOf10 = 0;
-      return {
-        ...target,
-        outOf10,
-        weightageScore:
-          target.kpi === 'insurance' && (target.weightage === 0 || target.achieved === 0)
-            ? -2
-            : isNaN((outOf10 * target.weightage) / 100)
-            ? 0
-            : (outOf10 * target.weightage) / 100
-      };
-    }
+    if (!isBaselineOnly) {
+      ratio = ['deposit', 'loan_gen', 'loan_amulya'].includes(target.kpi)
+        ? (newTarget > 0 ? Math.max(0, (currentAchieved - previousBalance) / newTarget) : 0)
+        : (currentAchieved / newTarget);
 
-    const ratio = target.achieved / target.amount;
+      switch (target.kpi) {
+        case 'deposit':
+        case 'loan_gen':
+        case 'loan_amulya':
+          if (ratio <= 1) outOf10 = ratio * 10;
+          else if (ratio <= 1.25) outOf10 = 10;
+          else if (auditRatio >= 0.75 && recoveryRatio >= 0.75) outOf10 = 12.5;
+          else outOf10 = 10;
+          break;
 
-    switch (target.kpi) {
-      case 'deposit':
-      case 'loan_gen':
-      case 'loan_amulya':
-        if (ratio <= 1) outOf10 = ratio * 10;
-        else if (ratio <= 1.25) outOf10 = 10;
-        else if (auditRatio >= 0.75 && recoveryRatio >= 0.75) outOf10 = 12.5;
-        else outOf10 = 10;
-        break;
+        case 'insurance':
+          if (ratio === 0) outOf10 = 0;
+          else if (ratio < 1) outOf10 = ratio * 10;
+          else if (ratio < 1.25) outOf10 = 10;
+          else outOf10 = 12.5;
+          break;
 
-      case 'insurance':
-        if (ratio === 0) outOf10 = 0;
-        else if (ratio < 1) outOf10 = ratio * 10;
-        else if (ratio < 1.25) outOf10 = 10;
-        else outOf10 = 12.5;
-        break;
+        case 'recovery':
+        case 'audit':
+          if (isNaN(ratio)) outOf10 = 0;
+          else if (ratio <= 1) outOf10 = ratio * 10;
+          else outOf10 = 12.5;
+          break;
 
-      case 'recovery':
-      case 'audit':
-        if (ratio <= 1) outOf10 = ratio * 10;
-        else outOf10 = 12.5;
-        break;
-
-      default:
-        outOf10 = 0;
+        default:
+          outOf10 = 0;
+      }
     }
 
     outOf10 = Math.max(0, Math.min(12.5, isNaN(outOf10) ? 0 : outOf10));
 
     return {
       ...target,
+      previousBalance,
+      newTarget,
+      totalTarget,
+      achieved: isBaselineOnly ? 0 : currentAchieved,
       outOf10,
       weightageScore:
-        target.kpi === 'insurance' && (target.weightage === 0 || target.achieved === 0)
-          ? -2
-          : isNaN((outOf10 * target.weightage) / 100)
+        isNaN((outOf10 * target.weightage) / 100)
           ? 0
           : (outOf10 * target.weightage) / 100
     };
@@ -374,12 +382,28 @@ calculateScores(targets: any[]): any[] {
     if (!transfer) return [];
 
     const ignore = [
+      'id',
+      'staff_id',
+      'old_branch_id',
+      'new_branch_id',
+      'kpi_total',
       'transfer_date',
-      'total_weightage_score',
-      'old_branch_name',
-      'new_branch_name',
       'old_designation',
       'new_designation',
+      'period',
+      'resiged',
+      'resigned',
+      'resign_date',
+      'staff_name',
+      'branch_name',
+      'old_branch_name',
+      'new_branch_name',
+      'total_weightage_score',
+      'months',
+      'hod_name',
+      'old_hod_name',
+      'hod_id',
+      'old_hod_id',
     ];
 
     return Object.keys(transfer).filter((k) => !ignore.includes(k));
@@ -443,10 +467,8 @@ getTransferCalculation(): any {
 
   const currentScoreExclInsurance = this.getCurrentScoreExclInsurance();
   const insuranceScore = this.getInsuranceScore();
-  const totalCount = allTransfers.length + 1;
-  // Use proportionate scores in the average, not raw scores
   const sumOfPrevious = allTransfers.reduce((a: number, b: any) => a + b.proportionateScore, 0);
-  const averageExcludingInsurance = (sumOfPrevious + currentScoreExclInsurance) / totalCount;
+  const averageExcludingInsurance = sumOfPrevious + currentScoreExclInsurance;
   const totalFinalKpaScore = averageExcludingInsurance + insuranceScore;
 
   return {

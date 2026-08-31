@@ -118,12 +118,28 @@ export class WeightageAllComponent implements OnInit {
     if (!transfer) return [];
 
     const ignore = [
+      'id',
+      'staff_id',
+      'old_branch_id',
+      'new_branch_id',
+      'kpi_total',
       'transfer_date',
-      'total_weightage_score',
-      'old_branch_name',
-      'new_branch_name',
       'old_designation',
       'new_designation',
+      'period',
+      'resiged',
+      'resigned',
+      'resign_date',
+      'staff_name',
+      'branch_name',
+      'old_branch_name',
+      'new_branch_name',
+      'total_weightage_score',
+      'months',
+      'hod_name',
+      'old_hod_name',
+      'hod_id',
+      'old_hod_id',
     ];
 
     return Object.keys(transfer).filter((k) => !ignore.includes(k));
@@ -437,8 +453,7 @@ export class WeightageAllComponent implements OnInit {
       currentScoreExcludingInsurance = Number(employee.originalTotal || employee.total || 0) - insuranceScore;
     }
 
-    const totalCount = transferCalcs.length + 1;
-    const averageExcludingInsurance = (sumOfPrevious + currentScoreExcludingInsurance) / totalCount;
+    const averageExcludingInsurance = sumOfPrevious + currentScoreExcludingInsurance;
     const finalKpaScore = averageExcludingInsurance + insuranceScore;
 
     return {
@@ -470,9 +485,7 @@ export class WeightageAllComponent implements OnInit {
       +this.selectedEmployee?.originalTotal ||
       0;
 
-    const count = values.length + 1;
-
-    return count > 0 ? total / count : 0;
+    return total;
   }
 
   hasBranchData(obj: any): boolean {

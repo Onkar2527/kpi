@@ -444,10 +444,14 @@ export class ReportsComponent implements OnInit {
       return;
     }
 
+    const h1Transfers = (h1?.transfers || []).map((t: any) => ({ ...t, hasTarget: true }));
+    const h2Transfers = (h2?.transfers || []).map((t: any) => ({ ...t, hasTarget: false }));
+    const h3Transfers = (h3?.transfers || []).map((t: any) => ({ ...t, hasTarget: false }));
+
     const transfers = [
-      ...(h1?.transfers || []),
-      ...(h2?.transfers || []),
-      ...(h3?.transfers || []),
+      ...h1Transfers,
+      ...h2Transfers,
+      ...h3Transfers,
     ];
 
     transfers.sort(
@@ -1033,12 +1037,29 @@ console.log(this.entredUserData);
     if (!transfer) return [];
 
     const ignore = [
+      'id',
+      'staff_id',
+      'old_branch_id',
+      'new_branch_id',
+      'kpi_total',
       'transfer_date',
-      'total_weightage_score',
-      'old_branch_name',
-      'new_branch_name',
       'old_designation',
       'new_designation',
+      'period',
+      'resiged',
+      'resigned',
+      'resign_date',
+      'staff_name',
+      'branch_name',
+      'old_branch_name',
+      'new_branch_name',
+      'total_weightage_score',
+      'months',
+      'hod_name',
+      'old_hod_name',
+      'hod_id',
+      'old_hod_id',
+      'hasTarget',
     ];
 
     return Object.keys(transfer).filter((k) => !ignore.includes(k));
@@ -1456,18 +1477,10 @@ console.log(this.entredUserData);
       rows.push([`New Branch Score (excluding Insurance): ${Number(staffObj.transferCalculation.currentBranch.kpaScoreExcludingInsurance).toFixed(2)}`]);
       rows.push([]);
 
-      rows.push(['Average KPI Score Calculation']);
-      let formulaStr = `Formula: (`;
-      staffObj.transferCalculation.transfers.forEach((tr: any) => {
-        formulaStr += `${Number(tr.kpaScore).toFixed(2)} + `;
-      });
-      formulaStr += `${Number(staffObj.transferCalculation.currentBranch.kpaScoreExcludingInsurance).toFixed(2)}) / ${staffObj.transferCalculation.transfers.length + 1}`;
-      rows.push([formulaStr]);
-      rows.push([`Average Score: ${Number(staffObj.transferCalculation.averageExcludingInsurance).toFixed(2)}`]);
-      rows.push([]);
+
 
       rows.push(['Final KPA Score']);
-      rows.push([`Average Score (excluding Insurance): ${Number(staffObj.transferCalculation.averageExcludingInsurance).toFixed(2)}`]);
+      rows.push([`Total Score (excluding Insurance): ${Number(staffObj.transferCalculation.averageExcludingInsurance).toFixed(2)}`]);
       rows.push([`Insurance Score: ${Number(staffObj.transferCalculation.insuranceScore).toFixed(2)}`]);
       rows.push([`Total Final KPA Score: ${Number(staffObj.transferCalculation.totalFinalKpaScore).toFixed(2)}`]);
       rows.push([]);
@@ -1563,7 +1576,9 @@ console.log(this.entredUserData);
         'Branch Code': branch.code,
         'Branch Name': branch.name,
         'BM Name': branch.bmName,
-        [`${branch.department} Target`]: branch.departmentData?.target ?? 0,
+        [`${branch.department} Previous Balance`]: branch.departmentData?.previousBalance ?? 0,
+        [`${branch.department} New Target`]: branch.departmentData?.newTarget ?? 0,
+        [`${branch.department} Total Target`]: branch.departmentData?.totalTarget ?? 0,
         [`${branch.department} Achieved`]: branch.departmentData?.achieved ?? 0,
         'Total Weightage Score': Number(
           branch.departmentData?.score || 0,
@@ -1578,6 +1593,8 @@ console.log(this.entredUserData);
       { wch: 14 },
       { wch: 22 },
       { wch: 22 },
+      { wch: 24 },
+      { wch: 18 },
       { wch: 18 },
       { wch: 20 },
       { wch: 22 },

@@ -54,16 +54,14 @@ export class AdminService {
   addUser(user: any, period: any) {
     return this.http.post(
       `${environment.apiBaseUrl}/masters/users`,
-      user,
-      period,
+      { ...user, period },
     );
   }
 
   updateUser(id: string, user: any, period: any) {
     return this.http.put(
       `${environment.apiBaseUrl}/masters/users/${id}`,
-      user,
-      period,
+      { ...user, period },
     );
   }
 
@@ -154,16 +152,14 @@ export class AdminService {
   addBranch(branch: any, period: any) {
     return this.http.post(
       `${environment.apiBaseUrl}/masters/branches`,
-      branch,
-      period,
+      { ...branch, period },
     );
   }
 
   updateBranch(id: string, branch: any, period: any) {
     return this.http.put(
       `${environment.apiBaseUrl}/masters/branches/${id}`,
-      branch,
-      period,
+      { ...branch, period },
     );
   }
 

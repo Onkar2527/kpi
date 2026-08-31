@@ -75,6 +75,9 @@ export class TransferMasterComponent implements OnInit {
   };
 
   searchTerm = '';
+  showRevertConfirmModal = false;
+  showSaveConfirmModal = false;
+  pendingRevertBranch: any = null;
   currentPage = 1;
   pageSize = 10;
   totalPages = 0;
@@ -273,9 +276,11 @@ export class TransferMasterComponent implements OnInit {
               if (scoreData) {
                 this.transfer[`${kpi}_target`] = scoreData.target || 0;
                 this.transfer[`${kpi}_achieved`] = scoreData.achieved || 0;
+                this.transfer[`${kpi}_baseline`] = scoreData.previousBalance || 0;
               } else {
                 this.transfer[`${kpi}_target`] = 0;
                 this.transfer[`${kpi}_achieved`] = 0;
+                this.transfer[`${kpi}_baseline`] = 0;
               }
             });
 
@@ -371,9 +376,11 @@ export class TransferMasterComponent implements OnInit {
               if (scoreData) {
                 this.transfer[`${kpi}_target`] = scoreData.target || 0;
                 this.transfer[`${kpi}_achieved`] = scoreData.achieved || 0;
+                this.transfer[`${kpi}_baseline`] = scoreData.previousBalance || 0;
               } else {
                 this.transfer[`${kpi}_target`] = 0;
                 this.transfer[`${kpi}_achieved`] = 0;
+                this.transfer[`${kpi}_baseline`] = 0;
               }
             });
 
@@ -404,14 +411,25 @@ export class TransferMasterComponent implements OnInit {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  private async saveOrUpdateTransfer() {
+  private saveOrUpdateTransfer() {
+    this.showSaveConfirmModal = true;
+  }
+
+  cancelSave() {
+    this.showSaveConfirmModal = false;
+  }
+
+  async confirmSave() {
+    this.showSaveConfirmModal = false;
+    await this.executeSaveOrUpdateTransfer();
+  }
+
+  private async executeSaveOrUpdateTransfer() {
     const newBranchId = this.transfer.new_branch_id;
     const oldBranchId = this.transfer.old_branch_id;
     const role = this.transfer.new_designation;
     const staff_id = this.transfer.staff_id;
     const hod_id = this.transfer.hod_id;
-    const confirmed = confirm('Do you want to Transfer the Staff?');
-    if (!confirmed) return;
     
 if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender') {
   const invalidFields = [];
@@ -512,10 +530,14 @@ if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender'
       }
 
       console.log('Transfer Completed Successfully');
+      this.showToast('Transfer completed successfully!');
+    } else {
+      this.showToast('Transfer completed successfully!');
     }
       this.resetTransferForm();
     } catch (err) {
       console.error(err);
+      this.showToast('Failed to complete staff transfer');
     }
   }
   private resetTransferForm() {
@@ -602,15 +624,35 @@ if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender'
    
   }
 
-  deleteBranch(id: string) {
-    this.adminService.deleteTrasferedStaff(id).subscribe(() => {
+  deleteBranch(branch: any) {
+    this.adminService.deleteTrasferedStaff(branch.id).subscribe(async (res: any) => {
       this.loadTrasferedStaff();
+      
+      // Redistribute targets on both old and new branches if applicable
+      if (res.old_branch_id) {
+        await this.autoDistributeOldBranch(res.old_branch_id).toPromise();
+      }
+      if (res.new_branch_id) {
+        await this.autoDistributeNewBranch(res.new_branch_id).toPromise();
+      }
     });
   }
 
   revertTransfer(branch: any) {
-    const confirmed = confirm(`Are you sure you want to revert the transfer for ${branch.name}? This will restore them to branch ${branch.old_branch || 'their old branch'} and redistribute targets.`);
-    if (!confirmed) return;
+    this.pendingRevertBranch = branch;
+    this.showRevertConfirmModal = true;
+  }
+
+  cancelRevert() {
+    this.showRevertConfirmModal = false;
+    this.pendingRevertBranch = null;
+  }
+
+  confirmRevert() {
+    if (!this.pendingRevertBranch) return;
+    const branch = this.pendingRevertBranch;
+    this.showRevertConfirmModal = false;
+    this.pendingRevertBranch = null;
 
     this.adminService.revertTransfer(branch.id).subscribe(
       async (res: any) => {
@@ -619,17 +661,17 @@ if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender'
         
         // Redistribute targets on both old and new branches if applicable
         if (res.old_branch_id) {
-          await this.autoDistributeNewBranch(res.old_branch_id).toPromise();
+          await this.autoDistributeOldBranch(res.old_branch_id).toPromise();
         }
         if (res.new_branch_id) {
           await this.autoDistributeNewBranch(res.new_branch_id).toPromise();
         }
         
-        alert('Transfer reverted successfully!');
+        this.showToast('Transfer reverted successfully!');
       },
       (err: any) => {
         console.error(err);
-        alert('Failed to revert transfer');
+        this.showToast('Failed to revert transfer');
       }
     );
   }

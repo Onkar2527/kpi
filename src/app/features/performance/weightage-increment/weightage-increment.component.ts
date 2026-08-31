@@ -116,8 +116,7 @@ export class WeightageIncrementComponent implements OnInit {
       Number(employee.recovery?.weightageScore || 0) +
       Number(employee.audit?.weightageScore || 0);
 
-    const totalCount = transferCalcs.length + 1;
-    const averageExcludingInsurance = (sumOfPrevious + currentScoreExcludingInsurance) / totalCount;
+    const averageExcludingInsurance = sumOfPrevious + currentScoreExcludingInsurance;
     const insuranceScore = Number(employee.insurance?.weightageScore || 0);
     const finalKpaScore = averageExcludingInsurance + insuranceScore;
 
@@ -151,9 +150,7 @@ export class WeightageIncrementComponent implements OnInit {
 
     total += +this.selectedEmployee.originalTotal;
 
-    const count = values.length + 1;
-
-    return total / count;
+    return total;
   }
 
 
@@ -199,12 +196,28 @@ export class WeightageIncrementComponent implements OnInit {
     if (!transfer) return [];
 
     const ignore = [
+      'id',
+      'staff_id',
+      'old_branch_id',
+      'new_branch_id',
+      'kpi_total',
       'transfer_date',
-      'total_weightage_score',
-      'old_branch_name',
-      'new_branch_name',
       'old_designation',
       'new_designation',
+      'period',
+      'resiged',
+      'resigned',
+      'resign_date',
+      'staff_name',
+      'branch_name',
+      'old_branch_name',
+      'new_branch_name',
+      'total_weightage_score',
+      'months',
+      'hod_name',
+      'old_hod_name',
+      'hod_id',
+      'old_hod_id',
     ];
 
     return Object.keys(transfer).filter((k) => !ignore.includes(k));
@@ -403,9 +416,7 @@ export class WeightageIncrementComponent implements OnInit {
 
     total += +this.transferBmScores?.total;
 
-    const count = values.length + 1;
-
-    return total / count;
+    return total;
   }
   transferHOStaffHistoryBM() {
     if (!this.period) return;

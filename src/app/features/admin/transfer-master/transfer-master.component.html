@@ -118,7 +118,7 @@
         <td>
           <button class="btn btn-primary btn-sm me-2" (click)="editBranch(branch)">Edit</button>
           <button *ngIf="isRevertAvailable(branch.transfer_date)" class="btn btn-warning btn-sm me-2" (click)="revertTransfer(branch)">Revert</button>
-          <button class="btn btn-danger btn-sm" (click)="deleteBranch(branch.id)">Delete</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteBranch(branch)">Delete</button>
         </td>
       </tr>
     </tbody>
@@ -139,6 +139,61 @@
     </ul>
   </nav>
 </div>
+
+<!-- Modern Custom Confirmation Modal -->
+<div class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);" *ngIf="showRevertConfirmModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+      <div class="modal-header bg-warning text-dark border-0">
+        <h5 class="modal-title fw-bold">⚠️ Revert Transfer Confirmation</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="cancelRevert()"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <div class="mb-3 text-warning">
+          <i class="bi bi-exclamation-triangle" style="font-size: 3rem;"></i>
+        </div>
+        <p class="fs-5 mb-0 text-dark">
+          Are you sure you want to revert the transfer for <strong>{{ pendingRevertBranch?.name }}</strong>?
+        </p>
+        <p class="text-muted mt-2 small">
+          This will restore them to branch <strong>{{ pendingRevertBranch?.old_branch || 'their old branch' }}</strong> and redistribute targets.
+        </p>
+      </div>
+      <div class="modal-footer border-0 bg-light d-flex justify-content-between p-3">
+        <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" (click)="cancelRevert()">Cancel</button>
+        <button type="button" class="btn btn-warning px-4 text-dark fw-bold" (click)="confirmRevert()">Revert Transfer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modern Custom Transfer Confirmation Modal -->
+<div class="modal fade show" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);" *ngIf="showSaveConfirmModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+      <div class="modal-header bg-primary text-white border-0">
+        <h5 class="modal-title fw-bold">🙋‍♂️ Transfer Staff Confirmation</h5>
+        <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="cancelSave()"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <div class="mb-3 text-primary">
+          <i class="bi bi-person-badge" style="font-size: 3rem;"></i>
+        </div>
+        <p class="fs-5 mb-0 text-dark">
+          Do you want to transfer the staff member <strong>{{ selectedUser?.name || 'this staff' }}</strong>?
+        </p>
+        <p class="text-muted mt-2 small">
+          This will assign them to their new role/branch and update system targets.
+        </p>
+      </div>
+      <div class="modal-footer border-0 bg-light d-flex justify-content-between p-3">
+        <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" (click)="cancelSave()">Cancel</button>
+        <button type="button" class="btn btn-primary px-4 fw-bold" (click)="confirmSave()">Transfer Staff</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast-message" *ngIf="toastMessage">
   {{ toastMessage }}
 </div>

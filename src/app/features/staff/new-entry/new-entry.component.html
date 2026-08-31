@@ -17,7 +17,7 @@
           <!-- KPI Type -->
           <div class="col-md-6 mb-4">
             <label for="kpi" class="form-label fw-semibold mb-2">KPI Type</label>
-            <select id="kpi" class="form-select form-select-lg rounded-3" [(ngModel)]="kpi" name="kpi" required>
+            <select id="kpi" class="form-select form-select-lg rounded-3" [(ngModel)]="kpi" (change)="onKpiChange()" name="kpi" required>
               <option value="" disabled selected>-- Select KPI --</option>
               <option *ngFor="let option of kpiOptions" [value]="option">
                 {{ kpiDisplayNames[option] }}

@@ -38,8 +38,6 @@ export class manageEntriesComponent implements OnInit {
   uniqueBranches: any[] = [];
   allPfNumbers: string[] = [];
   allBranches: string[] = [];
-  loadingDots: string = '';
-  private dotInterval: any;
   branchSearchTerm: string = '';
   filteredBranches: string[] = [];
   constructor(
@@ -80,13 +78,7 @@ export class manageEntriesComponent implements OnInit {
     this.adminService
       .updateEntries(this.entriesData.id, this.entriesData)
       .subscribe(() => {
-        const current = this.currentPage;
-        this.loadEntries();
-        setTimeout(() => {
-          this.currentPage = current;
-          this.updatePaginatedEntries();
-          this.updateVisiblePages();
-        }, 0);
+        this.loadEntries(false, false);
         this.entriesData = {
           id: '',
           kpi: '',
@@ -104,14 +96,15 @@ export class manageEntriesComponent implements OnInit {
     this.periodService.currentPeriod.subscribe((period) => {
       this.period = period;
       if (this.period) {
-        this.loadEntries();
+        this.loadEntries(true, true);
       }
     });
   }
 
-  loadEntries() {
-    this.loading = true;
-    this.startLoadingAnimation();
+  loadEntries(resetPage: boolean = true, showSkeleton: boolean = true) {
+    if (showSkeleton) {
+      this.loading = true;
+    }
     this.adminService.getMonthEntries(this.period).subscribe(
       (response: any) => {
         const data = response as any[];
@@ -138,31 +131,14 @@ export class manageEntriesComponent implements OnInit {
         this.allPfNumbers = [...this.uniquePfNumbers];
         this.allBranches = [...this.uniqueBranches];
 
-        this.applyAdvancedFilters(false);
-        this.stopLoadingAnimation();
+        this.applyAdvancedFilters(resetPage);
         this.loading = false;
       },
       (error) => {
         console.error(error);
-        this.stopLoadingAnimation();
         this.loading = false;
       },
     );
-  }
-  startLoadingAnimation() {
-    this.loadingDots = '';
-    this.dotInterval = setInterval(() => {
-      if (this.loadingDots.length < 5) {
-        this.loadingDots += '.';
-      } else {
-        this.loadingDots = '';
-      }
-    }, 500);
-  }
-
-  stopLoadingAnimation() {
-    clearInterval(this.dotInterval);
-    this.loadingDots = '';
   }
   filterBranches() {
   const term = this.branchSearchTerm.toLowerCase();
@@ -229,7 +205,11 @@ export class manageEntriesComponent implements OnInit {
     );
 
     if (resetPage) {
-    this.currentPage = 1;
+      this.currentPage = 1;
+    } else {
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = Math.max(1, this.totalPages);
+      }
     }
     this.updatePaginatedEntries();
     this.updateVisiblePages();
@@ -330,17 +310,8 @@ export class manageEntriesComponent implements OnInit {
   }
 deleteEntry(id: string) {
   if (confirm('Are you sure you want to delete this entry?')) {
-
-    const current = this.currentPage; 
-
     this.adminService.deleteEntries(id).subscribe(() => {
-      this.loadEntries();
-
-      setTimeout(() => {
-        this.currentPage = current;
-        this.updatePaginatedEntries();
-        this.updateVisiblePages();
-      }, 0);
+      this.loadEntries(false, false);
     });
   }
 }

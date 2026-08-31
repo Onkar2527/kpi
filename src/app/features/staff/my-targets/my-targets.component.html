@@ -12,7 +12,9 @@
           <tr>
             <th>KPI</th>
             <th>Weightage</th>
-            <th>Target Amount</th>
+            <th>Previous Balance</th>
+            <th>New Target</th>
+            <th>Total Target</th>
             <th>Achieved</th>
             <th>Out of 10</th>
             <th>Weightage Score</th>
@@ -20,20 +22,21 @@
         </thead>
         <tbody>
           <tr *ngFor="let target of staffAll">
-            <td>{{ target.kpi }}</td>
+            <td>{{ target.kpi | titlecase }}</td>
             <td>{{ target.weightage }}</td>
-            <td>{{ target.amount }}</td>
-            <td>{{ target.achieved || 0 }}</td>
+            <td>{{ target.previousBalance | number:'1.2-2' }}</td>
+            <td>{{ target.newTarget | number:'1.2-2' }}</td>
+            <td>{{ target.totalTarget | number:'1.2-2' }}</td>
+            <td>{{ target.achieved | number:'1.2-2' }}</td>
             <td>{{ target.outOf10 | number:'1.2-2' }}</td>
             <td>{{ target.weightageScore | number:'1.2-2' }}</td>
           </tr>
-        </tbody>
-        <tfoot>
           <tr>
-            <td colspan="5" class="text-end"><strong>Total</strong></td>
+            <td><strong>Total</strong></td>
+            <td colspan="6"></td>
             <td><strong>{{ grandTotalWeightageScore | number:'1.2-2' }}</strong></td>
           </tr>
-        </tfoot>
+        </tbody>
       </table>
     </div>
   </div>
@@ -113,28 +116,14 @@
             </div>
           </div>
 
-          <!-- Average Calculation -->
-          <div class="mb-3 p-3 bg-light border rounded">
-            <h6 class="fw-bold text-primary">Average KPI Score Calculation</h6>
-            <div class="ms-2">
-              <p class="mb-1">
-                <strong>Formula:</strong> (
-                <span *ngFor="let tr of calc.transfers">{{ tr.proportionateScore | number:'1.2-2' }} + </span>
-                {{ calc.currentBranch.kpaScoreExcludingInsurance | number:'1.2-2' }}
-                ) / {{ calc.transfers.length + 1 }}
-              </p>
-              <p class="mb-0 text-success">
-                <strong>Average Score:</strong> {{ calc.averageExcludingInsurance | number:'1.2-2' }}
-              </p>
-            </div>
-          </div>
+
 
           <!-- Final KPA Score -->
           <div class="p-3 bg-light border rounded">
             <h6 class="fw-bold text-dark">Final KPA Score</h6>
             <div class="ms-2">
               <p class="mb-1">
-                <strong>Average Score (excluding Insurance):</strong>
+                <strong>Total Score (excluding Insurance):</strong>
                 {{ calc.averageExcludingInsurance | number:'1.2-2' }}
               </p>
               <p class="mb-1">
@@ -259,7 +248,9 @@
             <tr>
               <th>KPI</th>
               <th>Weightage</th>
-              <th>Target</th>
+              <th>Previous Balance</th>
+              <th>New Target</th>
+              <th>Total Target</th>
               <th>Achieved</th>
               <th>Score</th>
               <th>Weightage Score</th>
@@ -271,8 +262,10 @@
             <ng-container *ngFor="let kpi of getKpis(transfer)">
               <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
                 <td>{{ kpi | titlecase }}</td>
-                 <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
-                 <td>{{ transfer[kpi]?.target || '-' }}</td>
+                <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
+                <td>{{ transfer[kpi]?.previousBalance || '-' }}</td>
+                <td>{{ transfer[kpi]?.newTarget || '-' }}</td>
+                <td>{{ transfer[kpi]?.totalTarget || '-' }}</td>
                 <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
                 <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
                 <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
@@ -282,7 +275,7 @@
 
             <tr class="table-info">
               <td><strong>Total</strong></td>
-              <td colspan="4"></td>
+              <td colspan="6"></td>
               <td>
                 <strong>
                   {{ transfer.total_weightage_score | number:'1.2-2' }}
