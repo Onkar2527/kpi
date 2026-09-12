@@ -543,10 +543,19 @@ export class ReportsComponent implements OnInit {
       modal.show();
       this.isBmLoading = true;
       this.performanceService
-        .getBmScores(this.selectedPeriod, this.entredUserData.branch_id)
-        .subscribe((data) => {
-          this.bmScores = data;
-          this.isBmLoading = false;
+        .getBmTransferScores(this.selectedPeriod, this.entredUserData.branch_id)
+        .subscribe((transferData: any) => {
+          if (!transferData || transferData.length === 0 || transferData.total === undefined) {
+            this.performanceService
+              .getBmScores(this.selectedPeriod, this.entredUserData.branch_id)
+              .subscribe((bmData: any) => {
+                this.bmScores = bmData;
+                this.isBmLoading = false;
+              });
+          } else {
+            this.bmScores = transferData;
+            this.isBmLoading = false;
+          }
         });
       this.performanceService
         .getScores(this.selectedPeriod, this.entredUserData.branch_id)
@@ -970,7 +979,7 @@ console.log(this.entredUserData);
           .subscribe((transferData: any) => {
             
             
-            if (!transferData || transferData.length === 0) {
+            if (!transferData || transferData.length === 0 || transferData.total === undefined) {
               this.performanceService
                 .getBmScores(this.selectedPeriod, this.entredUserData.branch_id)
                 .subscribe((bmData: any) => {

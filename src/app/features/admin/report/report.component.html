@@ -269,7 +269,8 @@
                     <td>
                       {{
                       staff[kpi]?.newTarget > 0
-                      ? (((staff[kpi].achieved > 0 ? staff[kpi].achieved - (staff[kpi].previousBalance || 0) : 0) / staff[kpi].newTarget) * 100
+                      ? (((staff[kpi].achieved > 0 ? staff[kpi].achieved - (staff[kpi].previousBalance || 0) : 0) /
+                      staff[kpi].newTarget) * 100
                       | number: "1.2-2")
                       : "0"
                       }}%
@@ -1093,18 +1094,18 @@
                   <strong class="text-dark">{{ transfer.hod_name }}</strong>
                 </p>
 
-                <p *ngIf="transfer.old_branch_name">
+                <p *ngIf="transfer.old_branch_name || transfer.old_designation">
                   <strong>Old Branch:</strong>
-                  {{ transfer.old_branch_name }} |
+                  {{ transfer.old_branch_name || '-' }} |
                   <strong>Old Designation:</strong>
-                  {{ transfer.old_designation }}
+                  {{ transfer.old_designation || '-' }}
                 </p>
 
-                <p *ngIf="transfer.new_branch_name">
+                <p *ngIf="transfer.new_branch_name || transfer.new_designation">
                   <strong>New Branch:</strong>
-                  {{ transfer.new_branch_name }} |
+                  {{ transfer.new_branch_name || '-' }} |
                   <strong>New Designation:</strong>
-                  {{ transfer.new_designation }}
+                  {{ transfer.new_designation || '-' }}
                 </p>
 
                 <!-- KPI TABLE -->

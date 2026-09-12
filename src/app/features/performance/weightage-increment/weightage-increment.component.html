@@ -139,64 +139,28 @@
           <tr>
             <th>KPI</th>
             <th>Weightage</th>
-            <th>Target</th>
+            <th>Previous Balance</th>
+            <th>New Target</th>
+            <th>Total Target</th>
             <th>Achieved</th>
             <th>Out of 10</th>
             <th>Weightage Score</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Deposit</td>
-            <td>{{ transferBmScores?.deposit?.weightage }}</td>
-            <td>{{ transferBmScores?.deposit?.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.deposit?.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.deposit?.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.deposit?.weightageScore | number:'1.2-2' }}</td>
-          </tr>
-          <tr>
-            <td>Loan Gen</td>
-            <td>{{ transferBmScores?.loan_gen?.weightage }}</td>
-            <td>{{ transferBmScores?.loan_gen?.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.loan_gen?.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.loan_gen?.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.loan_gen?.weightageScore | number:'1.2-2' }}</td>
-          </tr>
-          <tr>
-            <td>Loan Amulya</td>
-            <td>{{ transferBmScores?.loan_amulya?.weightage }}</td>
-            <td>{{ transferBmScores?.loan_amulya?.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.loan_amulya?.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.loan_amulya?.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.loan_amulya?.weightageScore | number:'1.2-2' }}</td>
-          </tr>
-          <tr>
-            <td>Recovery</td>
-            <td>{{ transferBmScores?.recovery?.weightage }}</td>
-            <td>{{ transferBmScores?.recovery?.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.recovery?.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.recovery?.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.recovery?.weightageScore | number:'1.2-2' }}</td>
-          </tr>
-          <tr>
-            <td>Audit</td>
-            <td>{{ transferBmScores?.audit?.weightage }}</td>
-            <td>{{ transferBmScores?.audit?.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.audit?.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.audit?.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.audit?.weightageScore | number:'1.2-2' }}</td>
-          </tr>
-          <tr>
-            <td>Insurance</td>
-            <td>{{ transferBmScores?.insurance?.weightage }}</td>
-            <td>{{ transferBmScores?.insurance?.target | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.insurance?.achieved | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.insurance?.score | number:'1.2-2' }}</td>
-            <td>{{ transferBmScores?.insurance?.weightageScore | number:'1.2-2' }}</td>
+          <tr *ngFor="let kpi of ['deposit', 'loan_gen', 'loan_amulya', 'recovery', 'audit', 'insurance']">
+            <td>{{ kpi === 'loan_gen' ? 'Loan Gen' : (kpi === 'loan_amulya' ? 'Loan Amulya' : (kpi | titlecase)) }}</td>
+            <td>{{ transferBmScores[kpi]?.weightage }}</td>
+            <td>{{ transferBmScores[kpi]?.previousBalance | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores[kpi]?.newTarget | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores[kpi]?.totalTarget | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores[kpi]?.achieved | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores[kpi]?.score | number:'1.2-2' }}</td>
+            <td>{{ transferBmScores[kpi]?.weightageScore | number:'1.2-2' }}</td>
           </tr>
           <tr>
             <td><strong>Total</strong></td>
-            <td colspan="4"></td>
+            <td colspan="6"></td>
             <td><strong>{{ transferBmScores?.total | number:'1.2-2' }}</strong></td>
           </tr>
         </tbody>
@@ -212,7 +176,7 @@
     </div>
 
     <div class="card-body">
-      <ng-container *ngIf="getTransferCalculation(bmScores, mergeHistoryedBM) as calc; else simpleAvgBMBlock">
+      <ng-container *ngIf="getTransferCalculation(transferBmScores, mergeHistoryedBM) as calc; else simpleAvgBMBlock">
         <!-- Simple Average Calculation Layout -->
         <div class="mb-3 p-3 bg-light border rounded">
           <h6 class="fw-bold text-primary">Branch-wise Scores (excluding Insurance)</h6>
@@ -289,18 +253,16 @@
           <strong>{{ transfer.hod_name }}</strong>
         </p>
         <!-- Branch Info (only if exists) -->
-        <p *ngIf="transfer.old_branch_name">
-          <strong>Old Branch:</strong>
-          {{ transfer.old_branch_name }} |
-          <strong>Old Designation:</strong>
-          {{ transfer.old_designation }}
+        <p *ngIf="transfer.old_branch_name || transfer.old_designation">
+          <span *ngIf="transfer.old_branch_name"><strong>Old Branch:</strong> {{ transfer.old_branch_name }}</span>
+          <span *ngIf="transfer.old_branch_name && transfer.old_designation"> | </span>
+          <span *ngIf="transfer.old_designation"><strong>Old Designation:</strong> {{ transfer.old_designation }}</span>
         </p>
 
-        <p *ngIf="transfer.new_branch_name">
-          <strong>New Branch:</strong>
-          {{ transfer.new_branch_name }} |
-          <strong>New Designation:</strong>
-          {{ transfer.new_designation }}
+        <p *ngIf="transfer.new_branch_name || transfer.new_designation">
+          <span *ngIf="transfer.new_branch_name"><strong>New Branch:</strong> {{ transfer.new_branch_name }}</span>
+          <span *ngIf="transfer.new_branch_name && transfer.new_designation"> | </span>
+          <span *ngIf="transfer.new_designation"><strong>New Designation:</strong> {{ transfer.new_designation }}</span>
         </p>
 
         <!-- KPI TABLE -->
@@ -309,9 +271,11 @@
             <tr>
               <th>KPI</th>
               <th>Weightage</th>
-              <th>Target</th>
+              <th>Previous Balance</th>
+              <th>New Target</th>
+              <th>Total Target</th>
               <th>Achieved</th>
-              <th>Score</th>
+              <th>Out of 10</th>
               <th>Weightage Score</th>
             </tr>
           </thead>
@@ -319,20 +283,21 @@
           <tbody>
 
             <ng-container *ngFor="let kpi of getKpis(transfer)">
-              <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
-                <td>{{ kpi | titlecase }}</td>
-                <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
-                <td>{{ transfer[kpi]?.target || '-' }}</td>
-                <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
-                <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
-                <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+              <tr *ngIf="transfer[kpi] && (transfer[kpi]?.weightage !== undefined || transfer[kpi]?.achieved !== undefined)">
+                <td>{{ kpi === 'loan_gen' ? 'Loan Gen' : (kpi === 'loan_amulya' ? 'Loan Amulya' : (kpi | titlecase)) }}</td>
+                <td>{{ transfer[kpi]?.weightage != null ? (transfer[kpi]?.weightage | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.previousBalance != null ? (transfer[kpi]?.previousBalance | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.newTarget != null ? (transfer[kpi]?.newTarget | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.totalTarget != null ? (transfer[kpi]?.totalTarget | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.achieved != null ? (transfer[kpi]?.achieved | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.score != null ? (transfer[kpi]?.score | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.weightageScore != null ? (transfer[kpi]?.weightageScore | number:'1.2-2') : '-' }}</td>
               </tr>
             </ng-container>
 
-
             <tr class="table-info">
               <td><strong>Total</strong></td>
-              <td colspan="4"></td>
+              <td colspan="6"></td>
               <td>
                 <strong>
                   {{ transfer.total_weightage_score | number:'1.2-2' }}
@@ -551,18 +516,16 @@
           <strong>{{ transfer.hod_name }}</strong>
         </p>
         <!-- Branch Info (only if exists) -->
-        <p *ngIf="transfer.old_branch_name">
-          <strong>Old Branch:</strong>
-          {{ transfer.old_branch_name }} |
-          <strong>Old Designation:</strong>
-          {{ transfer.old_designation }}
+        <p *ngIf="transfer.old_branch_name || transfer.old_designation">
+          <span *ngIf="transfer.old_branch_name"><strong>Old Branch:</strong> {{ transfer.old_branch_name }}</span>
+          <span *ngIf="transfer.old_branch_name && transfer.old_designation"> | </span>
+          <span *ngIf="transfer.old_designation"><strong>Old Designation:</strong> {{ transfer.old_designation }}</span>
         </p>
 
-        <p *ngIf="transfer.new_branch_name">
-          <strong>New Branch:</strong>
-          {{ transfer.new_branch_name }} |
-          <strong>New Designation:</strong>
-          {{ transfer.new_designation }}
+        <p *ngIf="transfer.new_branch_name || transfer.new_designation">
+          <span *ngIf="transfer.new_branch_name"><strong>New Branch:</strong> {{ transfer.new_branch_name }}</span>
+          <span *ngIf="transfer.new_branch_name && transfer.new_designation"> | </span>
+          <span *ngIf="transfer.new_designation"><strong>New Designation:</strong> {{ transfer.new_designation }}</span>
         </p>
 
         <!-- KPI TABLE -->
@@ -575,7 +538,7 @@
               <th>New Target</th>
               <th>Total Target</th>
               <th>Achieved</th>
-              <th>Score</th>
+              <th>Out of 10</th>
               <th>Weightage Score</th>
             </tr>
           </thead>
@@ -583,18 +546,17 @@
           <tbody>
 
             <ng-container *ngFor="let kpi of getKpis(transfer)">
-              <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name'">
-                <td>{{ kpi | titlecase }}</td>
-                <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
-                <td>{{ transfer[kpi]?.previousBalance || '-' }}</td>
-                <td>{{ transfer[kpi]?.newTarget || '-' }}</td>
-                <td>{{ transfer[kpi]?.totalTarget || '-' }}</td>
-                <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
-                <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
-                <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+              <tr *ngIf="transfer[kpi] && (transfer[kpi]?.weightage !== undefined || transfer[kpi]?.achieved !== undefined)">
+                <td>{{ kpi === 'loan_gen' ? 'Loan Gen' : (kpi === 'loan_amulya' ? 'Loan Amulya' : (kpi | titlecase)) }}</td>
+                <td>{{ transfer[kpi]?.weightage != null ? (transfer[kpi]?.weightage | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.previousBalance != null ? (transfer[kpi]?.previousBalance | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.newTarget != null ? (transfer[kpi]?.newTarget | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.totalTarget != null ? (transfer[kpi]?.totalTarget | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.achieved != null ? (transfer[kpi]?.achieved | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.score != null ? (transfer[kpi]?.score | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.weightageScore != null ? (transfer[kpi]?.weightageScore | number:'1.2-2') : '-' }}</td>
               </tr>
             </ng-container>
-
 
             <tr class="table-info">
               <td><strong>Total</strong></td>

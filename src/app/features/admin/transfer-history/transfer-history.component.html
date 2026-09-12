@@ -96,7 +96,7 @@
                 <strong>New Designation:</strong>
                 {{ transfer.new_designation }}
               </p>
-              <p *ngIf="transfer.old_hod_name">
+              <p *ngIf="transfer.old_hod_name || transfer.new_designation">
                 <strong>HOD Name:</strong>
                 {{ transfer.old_hod_name }}
                 <strong>New Designation:</strong>

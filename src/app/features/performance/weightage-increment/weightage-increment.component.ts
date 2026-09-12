@@ -102,7 +102,7 @@ export class WeightageIncrementComponent implements OnInit {
       sumOfPrevious += proportionateScore;
 
       transferCalcs.push({
-        branchName: t.old_branch_name || t.branch_name || "Old Branch",
+        branchName: t.old_branch_name || t.old_designation || t.branch_name || "Old Branch",
         kpaScore: rawScore,
         months,
         proportionateScore,
@@ -218,6 +218,9 @@ export class WeightageIncrementComponent implements OnInit {
       'old_hod_name',
       'hod_id',
       'old_hod_id',
+      'created_at',
+      'updated_at',
+      'deleted_at',
     ];
 
     return Object.keys(transfer).filter((k) => !ignore.includes(k));
@@ -398,7 +401,7 @@ export class WeightageIncrementComponent implements OnInit {
     };
   }
   getAverageKpiBM(): number {
-    const calc = this.getTransferCalculation(this.bmScores, this.mergeHistoryedBM);
+    const calc = this.getTransferCalculation(this.transferBmScores, this.mergeHistoryedBM);
     if (calc) {
       return calc.totalFinalKpaScore;
     }
