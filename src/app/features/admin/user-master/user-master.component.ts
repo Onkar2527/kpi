@@ -179,6 +179,20 @@ export class UserMasterComponent implements OnInit {
 
   editUser(user: any) {
     this.user = { ...user };
+    this.branchSearch = user.branch_name || '';
+    if (!this.branchSearch && this.user.branch_id && this.branches) {
+      const br = this.branches.find((b: any) => b.code == this.user.branch_id);
+      if (br) {
+        this.branchSearch = br.name;
+      }
+    }
+    if (!this.user.department_id && user.department_name && this.departments) {
+      const dept = this.departments.find((d: any) => d.name === user.department_name);
+      if (dept) {
+        this.user.department_id = dept.id;
+      }
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   saveUser() {
@@ -212,6 +226,7 @@ export class UserMasterComponent implements OnInit {
       department_id: '',
       hod_id: '',
     };
+    this.branchSearch = '';
   }
 
   autoDistribute(branchId: string) {
@@ -391,6 +406,7 @@ export class UserMasterComponent implements OnInit {
     kpis.forEach((k) => {
       this.transfer[`${k}_target`] = data[k]?.target || 0;
       this.transfer[`${k}_achieved`] = data[k]?.achieved || 0;
+      this.transfer[`${k}_baseline`] = data[k]?.previousBalance || 0;
     });
   }
   finalResignForAttender(user: any, transferData: any, resignDate: string) {

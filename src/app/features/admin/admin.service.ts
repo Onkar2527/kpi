@@ -181,7 +181,7 @@ export class AdminService {
 
   //transfer
   getTrasferedStaff(period: any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/transfers`, {
+    return this.http.post(`${environment.apiBaseUrl}/masters/transfers-list`, {
       period,
     });
   }

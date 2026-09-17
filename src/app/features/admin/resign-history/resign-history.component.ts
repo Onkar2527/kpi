@@ -149,6 +149,7 @@ export class ResignHistoryComponent implements OnInit {
           period: base.period,
           resigned: base.resigned,
           resign_date: base.resign_date,
+          role: empData ? 'emp' : (hoData ? 'ho' : 'att'),
           transfers
         }
       : null;
