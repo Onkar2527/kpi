@@ -72,12 +72,8 @@ export class WeightageIncrementComponent implements OnInit {
           .subscribe((data: any) => {
             this.scores = data;
             if (this.scores.length > 0) {
-              this.selectedEmployee = this.scores[0];
+              this.selectEmployee(this.scores[0]);
             }
-            this.getAllStaffSalary(this.period, this.branchId!);
-            this.transferStaffHistory();
-            this.transferHOStaffHistory();
-            this.transferAttenderHistory();
           });
       }
       this.getSalary(this.period, this.auth.user?.username);
@@ -282,6 +278,7 @@ export class WeightageIncrementComponent implements OnInit {
       });
   }
   transferStaffHistory() {
+    if (!this.selectedEmployee?.staffId) return;
     this.adminService
       .getTrafterKpiHistory(this.period, this.selectedEmployee.staffId)
       .subscribe((data: any) => {
@@ -290,10 +287,12 @@ export class WeightageIncrementComponent implements OnInit {
           this.mergeHistory();
         } else {
           this.history1 = null;
+          this.mergeHistory();
         }
       });
   }
   transferHOStaffHistory() {
+    if (!this.selectedEmployee?.staffId) return;
     this.al
       .getHoStaffHistory(this.period, this.selectedEmployee.staffId)
       .subscribe((data: any) => {
@@ -339,11 +338,13 @@ export class WeightageIncrementComponent implements OnInit {
     const ho = this.hostaffScores?.branch_avg_kpi || {};
     const attender = this.attenderTransferScores?.branch_avg_kpi || {};
 
-    this.selectedEmployee.branch_name = {
-      ...branch,
-      ...ho,
-      ...attender,
-    };
+    if (this.selectedEmployee) {
+      this.selectedEmployee.branch_name = {
+        ...branch,
+        ...ho,
+        ...attender,
+      };
+    }
 
     this.mergeHistoryed = {
       staff_id: h1?.staff_id ?? h2?.staff_id ?? h3?.staff_id,
@@ -461,6 +462,15 @@ export class WeightageIncrementComponent implements OnInit {
 
   selectEmployee(employee: any) {
     this.selectedEmployee = employee;
+    this.history1 = null;
+    this.mergeHistoryed = null;
+    this.hostaffScores = null;
+    this.attenderTransferScores = null;
+
+    if (employee?.isHistorical) {
+      return;
+    }
+
     this.getAllStaffSalary(this.period, this.branchId!);
     this.transferStaffHistory();
     this.transferHOStaffHistory();

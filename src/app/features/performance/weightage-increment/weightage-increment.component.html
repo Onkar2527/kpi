@@ -345,14 +345,34 @@
   <div class="card mt-4">
     <div class="card-header">
       <h4>Staff KPI Scores (out of 10)</h4>
-      <div class="d-flex flex-wrap">
-        <div *ngFor="let score of scores" class="chip" [class.selected]="score === selectedEmployee"
-          (click)="selectEmployee(score)">
+      <div class="d-flex flex-wrap align-items-center">
+        <div *ngFor="let score of scores" 
+             class="chip" 
+             [ngClass]="{
+               'selected': score === selectedEmployee,
+               'chip-transferred': score.transferStatus === 'TRANSFERRED',
+               'chip-resigned': score.transferStatus === 'RESIGNED'
+             }"
+             (click)="selectEmployee(score)">
           {{ score.staffName }}
+          <span *ngIf="score.transferStatus === 'TRANSFERRED'" class="badge bg-danger ms-1">Transferred</span>
+          <span *ngIf="score.transferStatus === 'RESIGNED'" class="badge bg-danger ms-1">Resigned</span>
         </div>
       </div>
     </div>
     <div class="card-body" *ngIf="selectedEmployee">
+      <!-- Status Notice for Transferred/Resigned Staff -->
+      <div *ngIf="selectedEmployee.transferStatus" class="alert alert-danger d-flex align-items-center mb-3">
+        <span class="fs-5 me-2">⚠️</span>
+        <div>
+          <strong>Status: </strong>
+          <span class="fw-bold">
+            {{ selectedEmployee.transferStatus === 'TRANSFERRED' ? 'Transferred to ' + (selectedEmployee.newBranchName || 'another branch') : 'Resigned' }}
+          </span>
+          <span *ngIf="selectedEmployee.transferDate"> on {{ selectedEmployee.transferDate | date:'dd-MM-yyyy' }}</span>.
+          Below are the recorded KPI targets and performance at this branch.
+        </div>
+      </div>
       <table class="table table-bordered table-striped">
         <thead class="table-dark">
           <tr>
@@ -392,13 +412,13 @@
       </table>
     </div>
   </div>
-  <div class="mt-4" *ngIf="auth.user?.role === 'BM' && selectedEmployee">
+  <div class="mt-4" *ngIf="auth.user?.role === 'BM' && selectedEmployee && !selectedEmployee?.isHistorical">
     <div class="card"
-      *ngIf="history1 || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
+      *ngIf="mergeHistoryed && mergeHistoryed.transfers && mergeHistoryed.transfers.length > 0">
 
 
       <div class="card-header">
-        <h4>{{ selectedEmployee.staffName }} Transfer Branch History</h4>
+        <h4>{{ selectedEmployee?.staffName }} Transfer Branch History</h4>
       </div>
 
       <div class="card-body">
@@ -487,26 +507,29 @@
 
 
   <div class="card mt-4"
-    *ngIf="history1 || hostaffScores?.transfers?.length > 0 || attenderTransferScores?.transfers?.length > 0">
+    *ngIf="!selectedEmployee?.isHistorical && mergeHistoryed && mergeHistoryed.transfers && mergeHistoryed.transfers.length > 0">
 
     <div class="card-header">
-      <h4>KPI Transfer History</h4>
+      <h4>{{ selectedEmployee?.staffName }} KPI Transfer History</h4>
     </div>
 
     <div class="card-body">
 
       <small>
-        <strong>Staff:</strong> {{ mergeHistoryed.name }} |
-        <strong>Period:</strong> {{ mergeHistoryed.period }} |
+        <strong>Staff:</strong> {{ mergeHistoryed?.name }} |
+        <strong>Period:</strong> {{ mergeHistoryed?.period }} |
 
       </small>
 
       <!-- TRANSFER LOOP -->
-      <div *ngFor="let transfer of mergeHistoryed.transfers; let i = index"
+      <div *ngFor="let transfer of mergeHistoryed?.transfers; let i = index"
         class="border rounded p-3 mb-4 shadow-sm mt-3">
 
         <h5 class="text-primary mb-3">
-          Transfer {{ i + 1 }} —
+          <span *ngIf="transfer.new_branch_name">Transfer {{ i + 1 }}</span>
+          <span *ngIf="!transfer.new_branch_name && (mergeHistoryed.resigned || transfer.resiged)">Resignation Record</span>
+          <span *ngIf="!transfer.new_branch_name && !mergeHistoryed.resigned && !transfer.resiged">Record {{ i + 1 }}</span>
+          —
           <span class="text-secondary">
             {{ transfer.transfer_date | date:'dd-MM-yyyy' }}
           </span>
