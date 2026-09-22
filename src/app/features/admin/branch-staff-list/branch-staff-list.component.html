@@ -28,12 +28,15 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let user of paginatedUsers">
+      <tr *ngFor="let user of paginatedUsers" [ngClass]="{'text-danger fw-semibold': user.transfer_date}">
         <td>{{ user.PF_NO }}</td>
-        <td>{{ user.name }}</td>
+        <td>
+          {{ user.name }}
+          <span *ngIf="user.transfer_date" class="badge bg-danger ms-2">Transferred</span>
+        </td>
         <td>{{ user.role }}</td>
         <td>{{ user.branch_id }}</td>
-        <td>{{ user.branch_name }}
+        <td>{{ user.branch_name }}</td>
       </tr>
     </tbody>
   </table>

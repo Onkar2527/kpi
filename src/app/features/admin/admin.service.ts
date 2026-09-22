@@ -140,7 +140,7 @@ export class AdminService {
 
   // Branches
   getBranches(period: any) {
-    return this.http.post(`${environment.apiBaseUrl}/masters/branches`, {
+    return this.http.post(`${environment.apiBaseUrl}/masters/get-branches`, {
       period,
     });
   }

@@ -142,17 +142,20 @@ export class TransferMasterComponent implements OnInit {
       return;
     }
 
+    this.filteredUsers = this.userData.filter(
+      (user: any) => String(user.PF_NO).toLowerCase().includes(text)
+    );
+
     const match = this.userData.find(
       (user: any) => String(user.PF_NO).toLowerCase() === text
     );
 
     if (match) {
       this.selectedUser = match;
-      this.filteredUsers = [match];
       this.onUserSelect(match);
-    } else {
-      this.filteredUsers = [];
-      this.selectedUser = null;
+    } else if (this.filteredUsers.length === 1) {
+      this.selectedUser = this.filteredUsers[0];
+      this.onUserSelect(this.filteredUsers[0]);
     }
   }
 
@@ -161,18 +164,25 @@ export class TransferMasterComponent implements OnInit {
       this.transfer.staff_id = user.id;
       this.selectedUserRole = user.role;
       this.transfer.old_designation = user.role;
-      this.hod_id=user.hod_id;
-      
-      
+      this.transfer.new_designation = user.role || '';
+      this.hod_id = user.hod_id;
+      this.transfer.hod_id = user.hod_id;
+      this.transfer.old_hod_id = user.hod_id;
 
-      const branch_id = this.branches.find(
-        (b: any) => b.name === user.branch_name
+      const branch_id = this.branches?.find(
+        (b: any) => b.name === user.branch_name || b.code == user.branch_id
       )?.code;
 
-      this.transfer.old_branch_id = branch_id;
+      this.transfer.old_branch_id = branch_id || user.branch_id || '';
     } else {
       this.transfer.staff_id = '';
       this.selectedUserRole = '';
+      this.transfer.old_designation = '';
+      this.transfer.new_designation = '';
+      this.hod_id = null;
+      this.transfer.hod_id = '';
+      this.transfer.old_hod_id = '';
+      this.transfer.old_branch_id = '';
     }
   }
 

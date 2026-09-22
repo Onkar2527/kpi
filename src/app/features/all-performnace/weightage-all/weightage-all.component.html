@@ -457,9 +457,11 @@
             <tr>
               <th>KPI</th>
               <th>Weightage</th>
-              <th>Target</th>
+              <th>Previous Balance</th>
+              <th>New Target</th>
+              <th>Total Target</th>
               <th>Achieved</th>
-              <th>Score</th>
+              <th>Score (Out of 10)</th>
               <th>Weightage Score</th>
             </tr>
           </thead>
@@ -467,20 +469,21 @@
           <tbody>
 
             <ng-container *ngFor="let kpi of getKpis(transfer)">
-              <tr *ngIf="kpi !== 'hod_name' && kpi!=='old_hod_name'">
-                <td>{{ kpi | titlecase }}</td>
-                <td>{{ transfer[kpi]?.weightage | number:'1.2-2' }}</td>
-                <td>{{ transfer[kpi]?.target || '-' }}</td>
-                <td>{{ transfer[kpi]?.achieved | number:'1.0-0' }}</td>
-                <td>{{ transfer[kpi]?.score | number:'1.2-2' }}</td>
-                <td>{{ transfer[kpi]?.weightageScore | number:'1.2-2' }}</td>
+              <tr *ngIf="kpi !== 'hod_name' && kpi !== 'old_hod_name' && transfer[kpi]">
+                <td>{{ kpi === 'loan_gen' ? 'Loan Gen' : (kpi === 'loan_amulya' ? 'Loan Amulya' : (kpi | titlecase)) }}</td>
+                <td>{{ transfer[kpi]?.weightage != null ? (transfer[kpi]?.weightage | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.previousBalance != null ? (transfer[kpi]?.previousBalance | number:'1.0-0') : (transfer[kpi]?.target || '-') }}</td>
+                <td>{{ transfer[kpi]?.newTarget != null ? (transfer[kpi]?.newTarget | number:'1.0-0') : '-' }}</td>
+                <td>{{ transfer[kpi]?.totalTarget != null ? (transfer[kpi]?.totalTarget | number:'1.0-0') : (transfer[kpi]?.target || '-') }}</td>
+                <td>{{ transfer[kpi]?.achieved != null ? (transfer[kpi]?.achieved | number:'1.0-0') : '-' }}</td>
+                <td>{{ transfer[kpi]?.score != null ? (transfer[kpi]?.score | number:'1.2-2') : '-' }}</td>
+                <td>{{ transfer[kpi]?.weightageScore != null ? (transfer[kpi]?.weightageScore | number:'1.2-2') : '-' }}</td>
               </tr>
             </ng-container>
 
-
             <tr class="table-info">
               <td><strong>Total</strong></td>
-              <td colspan="4"></td>
+              <td colspan="6"></td>
               <td>
                 <strong>
                   {{ transfer.total_weightage_score | number:'1.2-2' }}
