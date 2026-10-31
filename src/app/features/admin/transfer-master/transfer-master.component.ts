@@ -48,6 +48,7 @@ export class TransferMasterComponent implements OnInit {
     insurance_achieved: string;
     hod_id: string;
     old_hod_id: string;
+    transfer_date?: string;
   } = {
     id: '',
     staff_id: '',
@@ -71,7 +72,8 @@ export class TransferMasterComponent implements OnInit {
     insurance_target: '',
     insurance_achieved: '',
     hod_id: ''  ,
-    old_hod_id:''
+    old_hod_id:'',
+    transfer_date: new Date().toISOString().split('T')[0]
   };
 
   searchTerm = '';
@@ -246,6 +248,40 @@ export class TransferMasterComponent implements OnInit {
     return date.toISOString().split('T')[0];
   }
 
+  get displayTransferDate(): string {
+    if (!this.transfer.transfer_date) return "";
+    const parts = this.transfer.transfer_date.split("-");
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return this.transfer.transfer_date;
+  }
+
+  onDisplayDateChange(event: any): void {
+    const val = (event.target.value || "").trim();
+    const match = val.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (match) {
+      const day = match[1].padStart(2, "0");
+      const month = match[2].padStart(2, "0");
+      const year = match[3];
+      this.transfer.transfer_date = `${year}-${month}-${day}`;
+    }
+  }
+
+  onDatePickerChange(event: any): void {
+    if (event.target.value) {
+      this.transfer.transfer_date = event.target.value;
+    }
+  }
+
+  openDatePicker(picker: HTMLInputElement): void {
+    if (picker && typeof picker.showPicker === "function") {
+      picker.showPicker();
+    } else if (picker) {
+      picker.focus();
+      picker.click();
+    }
+  }
   saveBranch() {
     const kpis = [
       'deposit',
@@ -511,17 +547,17 @@ if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender'
         this.transfer.new_designation === 'HO_STAFF'
       ) {
         await this.adminService
-          .transferUser(staff_id, newBranchId, 'HO_STAFF', hod_id,this.period)
+          .transferUser(staff_id, newBranchId, 'HO_STAFF', hod_id, this.period, this.transfer.transfer_date)
           .toPromise();
       } else if ( 
         this.transfer.new_designation === 'Attender'
       ) {
         await this.adminService
-          .transferUser(staff_id, newBranchId, 'Attender', hod_id,this.period)
+          .transferUser(staff_id, newBranchId, 'Attender', hod_id, this.period, this.transfer.transfer_date)
           .toPromise();
       } else {
         await this.adminService
-          .transferUser(staff_id, newBranchId, role, hod_id,this.period)
+          .transferUser(staff_id, newBranchId, role, hod_id, this.period, this.transfer.transfer_date)
           .toPromise();
       }
 
@@ -574,7 +610,8 @@ if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender'
       insurance_target: '',
       insurance_achieved: '',
       hod_id: '' ,
-      old_hod_id:''
+      old_hod_id:'',
+      transfer_date: new Date().toISOString().split('T')[0]
     };
   }
 
@@ -631,7 +668,13 @@ if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender'
   }
   editBranch(branch: any) {
     this.transfer = { ...branch };
-   
+    if (branch.transfer_date) {
+      this.transfer.transfer_date = new Date(branch.transfer_date).toISOString().split('T')[0];
+    } else {
+      this.transfer.transfer_date = new Date().toISOString().split('T')[0];
+    }
+
+
   }
 
   deleteBranch(branch: any) {
@@ -690,7 +733,7 @@ if (this.selectedUserRole === 'HO_STAFF' || this.selectedUserRole === 'Attender'
     if (!transferDate) return false;
     const diffTime = Math.abs(new Date().getTime() - new Date(transferDate).getTime());
     const diffDays = diffTime / (1000 * 60 * 60 * 24);
-    return diffDays <= 3;
+    return true;
   }
 
   employeeId = this.transfer.staff_id;

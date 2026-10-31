@@ -93,10 +93,15 @@
           </select>
         </div>
 
-        <!-- <div class="mb-3">
-          <label for="date" class="form-label">Date of Transfered </label>
-          <input type="date" class="form-control" id="date" [(ngModel)]="transfer.transfer_date" name="date"  value="">
-        </div> -->
+        <div class="mb-3">
+          <label for="date" class="form-label fw-bold">Date of Transfer</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="date" [value]="displayTransferDate" (input)="onDisplayDateChange($event)" placeholder="DD/MM/YYYY" required />
+            <input type="date" #datePicker tabindex="-1" style="position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none;" [(ngModel)]="transfer.transfer_date" [ngModelOptions]="{ standalone: true }" (change)="onDatePickerChange($event)" />
+            <button class="btn btn-outline-secondary" type="button" title="Select date" (click)="openDatePicker(datePicker)"><i class="bi bi-calendar-event"></i></button>
+          </div>
+          <small class="text-muted">Format: DD/MM/YYYY</small>
+        </div>
         <button type="submit" class="btn btn-primary">Save</button>
       </form>
     </div>
@@ -109,6 +114,7 @@
         <th>Staff ID</th>
         <th>Old Branch</th>
         <th>New Branch</th>
+        <th>Transfer Date</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -118,6 +124,7 @@
         <td>{{ branch.name }}</td>
         <td>{{ branch.old_branch }}</td>
         <td>{{ branch.new_branch }}</td>
+        <td>{{ branch.transfer_date ? (branch.transfer_date | date: 'dd/MM/yyyy') : '-' }}</td>
         <td>
           <button class="btn btn-primary btn-sm me-2" (click)="editBranch(branch)">Edit</button>
           <button *ngIf="isRevertAvailable(branch.transfer_date)" class="btn btn-warning btn-sm me-2"

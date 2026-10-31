@@ -71,10 +71,11 @@ export class AdminService {
     role: string,
     hod_id: string,
     period: string,
+    transfer_date?: string
   ) {
     return this.http.put(
       `${environment.apiBaseUrl}/masters/Transfers_user/${id}`,
-      { branch_id, role, hod_id, period },
+      { branch_id, role, hod_id, period, transfer_date },
     );
   }
   transferDate(id: string, period: string) {
