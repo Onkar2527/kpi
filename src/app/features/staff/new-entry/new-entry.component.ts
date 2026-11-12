@@ -35,10 +35,7 @@ export class NewEntryComponent implements OnInit {
   minDate: string;
   maxDate: string;
   error: string | null = null;
-  validDepositCodes = ['111', '112', '113', '115', '117'];
-  validLoanCodes = ['801', '802', '804', '805', '811', '812', '851', '853', '854'];
 
-accountError: string = '';
   constructor(
     private staffService: StaffService,
     private auth: AuthService,
@@ -64,57 +61,27 @@ accountError: string = '';
       this.typeOfDepositOptions = ['Individual', 'Combined'];
     }
   }
-allowOnlyNumbers(event: any) {
-  let input = event.target.value;
+  allowOnlyNumbers(event: any) {
+    let input = event.target.value;
 
-  input = input.replace(/[eE.+-]/g, '');
-  input = input.replace(/[^0-9]/g, '');
+    input = input.replace(/[eE.+-]/g, '');
+    input = input.replace(/[^0-9]/g, '');
 
-  if (input.length > 14) {
-    input = input.substring(0, 14);
-  }
-
-  event.target.value = input;
-  this.accountNo = input;
-
-  
-  this.validateSchemeCode();
-}
-
-validateSchemeCode() {
-  this.accountError = '';
-
-  if (!this.accountNo || this.accountNo.length < 7) return;
-
-  const schemeCode = this.accountNo.substring(4, 7);
-  console.log('Scheme Code:', this.accountNo.substring(4, 7));
-  if (this.kpi === 'deposit') {
-    console.log(this.validDepositCodes.includes(schemeCode));
-    
-    if (!this.validDepositCodes.includes(schemeCode)) {
-      this.accountError = `Invalid Deposit Scheme Code (${schemeCode})`;
+    if (input.length > 14) {
+      input = input.substring(0, 14);
     }
+
+    event.target.value = input;
+    this.accountNo = input;
   }
 
-  if (this.kpi === 'loan_gen' || this.kpi === 'loan_amulya') {
-    if (!this.validLoanCodes.includes(schemeCode)) {
-      this.accountError = `Invalid Loan Scheme Code (${schemeCode})`;
-    }
-  }
-}
-
-
-isSubmitted = false;
+  isSubmitted = false;
   onSubmit() {
     if (this.isSubmitted) return;
 
     const isAccountRequired = (this.kpi !== 'loan_amulya') && (this.typeOfDeposit === 'Individual');
 
     if (isAccountRequired) {
-      if (this.accountError) {
-        this.error = this.accountError;
-        return;
-      }
       if (!this.accountNo) {
         this.error = 'Account Number is required.';
         return;
