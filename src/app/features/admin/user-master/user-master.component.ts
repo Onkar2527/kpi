@@ -36,6 +36,7 @@ export class UserMasterComponent implements OnInit {
     branch_id: '',
     department_id: '',
     hod_id: '',
+    user_add_date: '',
   };
 
   transfer: any = {
@@ -179,6 +180,8 @@ export class UserMasterComponent implements OnInit {
 
   editUser(user: any) {
     this.user = { ...user };
+    this.user.user_add_date = user.user_add_date
+  ? String(user.user_add_date).slice(0, 10): '';
     this.branchSearch = user.branch_name || '';
     if (!this.branchSearch && this.user.branch_id && this.branches) {
       const br = this.branches.find((b: any) => b.code == this.user.branch_id);
@@ -221,6 +224,7 @@ export class UserMasterComponent implements OnInit {
       name: '',
       password: '',
       PF_NO: '',
+     user_add_date: '',
       role: '',
       branch_id: '',
       department_id: '',

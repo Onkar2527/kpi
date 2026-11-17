@@ -26,6 +26,7 @@ export class VerifyEntriesComponent implements OnInit {
   visiblePages: number[] = [];
   pendingEntries = 0;
   verifiedEntries = 0;
+  activeFilter: string = 'All';
 
   constructor(
     private branchManagerService: BranchManagerService,
@@ -52,8 +53,15 @@ export class VerifyEntriesComponent implements OnInit {
             (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
           );
 
-          this.entries = data;
-          this.filteredEntries = data;
+this.entries = data;
+
+if (this.activeFilter === 'All') {
+  this.filteredEntries = data;
+} else {
+  this.filteredEntries = data.filter(
+    (e) => e.status === this.activeFilter
+  );
+}
 
           this.pendingEntries = data.filter(
             (e) => e.status === 'Pending',
@@ -122,7 +130,7 @@ export class VerifyEntriesComponent implements OnInit {
 
     this.branchManagerService.verifyEntry(entryId).subscribe(() => {
       this.loadPendingEntries(current); 
-      this.sharedService.notifyEntryVerified();
+      // this.sharedService.notifyEntryVerified();
     });
   }
 
@@ -134,16 +142,20 @@ export class VerifyEntriesComponent implements OnInit {
     });
   }
 
-  filterEntries(status: string) {
-    if (status === 'All') {
-      this.filteredEntries = this.entries;
-    } else {
-      this.filteredEntries = this.entries.filter((e) => e.status === status);
-    }
-    this.currentPage = 1;
-    this.updatePagination();
-    this.updateVisiblePages();
+filterEntries(status: string) {
+  this.activeFilter = status;
+
+  if (status === 'All') {
+    this.filteredEntries = this.entries;
+  } else {
+    this.filteredEntries = this.entries.filter( (e) => e.status === status);
+    
   }
+
+  this.currentPage = 1;
+  this.updatePagination();
+  this.updateVisiblePages();
+}
   updateVisiblePages(): void {
     const pagesPerGroup = 10;
     const startPage =

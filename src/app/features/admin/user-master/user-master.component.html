@@ -32,6 +32,16 @@
           <label for="username" class="form-label">PF NO</label>
           <input type="text" class="form-control" id="PF_NO" [(ngModel)]="user.PF_NO" name="PF_NO">
         </div>
+             <div class="mb-3">
+  <label for="user_add_date" class="form-label"> Date</label>
+  <input
+    type="date"
+    class="form-control"
+    id="user_add_date"
+    [(ngModel)]="user.user_add_date"
+    name="user_add_date"
+  >
+</div>
         <div class="mb-3">
           <label for="role" class="form-label">Role</label>
           <select id="role" class="form-select" [(ngModel)]="user.role" name="role" placeholder="Select Role">
